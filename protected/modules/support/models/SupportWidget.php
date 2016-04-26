@@ -1,9 +1,10 @@
 <?php
 /**
- * SupportContacts
+ * SupportWidget
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
- * @link https://github.com/oMMu/Ommu-Support
+ * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
+ * @created date 3 February 2016, 12:24 WIB
+ * @link http://company.ommu.co
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -17,13 +18,13 @@
  *
  * --------------------------------------------------------------------------------------
  *
- * This is the model class for table "ommu_support_contacts".
+ * This is the model class for table "ommu_support_widget".
  *
- * The followings are the available columns in table 'ommu_support_contacts':
- * @property integer $id
+ * The followings are the available columns in table 'ommu_support_widget':
+ * @property string $widget_id
  * @property integer $publish
  * @property integer $cat_id
- * @property string $value
+ * @property string $widget_source
  * @property string $creation_date
  * @property string $creation_id
  * @property string $modified_date
@@ -32,7 +33,7 @@
  * The followings are the available model relations:
  * @property OmmuSupportContactCategory $cat
  */
-class SupportContacts extends CActiveRecord
+class SupportWidget extends CActiveRecord
 {
 	public $defaultColumns = array();
 	
@@ -42,8 +43,9 @@ class SupportContacts extends CActiveRecord
 
 	/**
 	 * Returns the static model of the specified AR class.
+	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return SupportContacts the static model class
+	 * @return SupportWidget the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -55,7 +57,7 @@ class SupportContacts extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'ommu_support_contacts';
+		return 'ommu_support_widget';
 	}
 
 	/**
@@ -66,12 +68,13 @@ class SupportContacts extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('cat_id, value', 'required'),
-			array('publish, cat_id, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
-			array('value', 'safe'),
+			array('cat_id, widget_source', 'required'),
+			array('publish, cat_id', 'numerical', 'integerOnly'=>true),
+			array('creation_id, modified_id', 'length', 'max'=>11),
+			array('modified_date', 'safe'),
 			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('id, publish, cat_id, value, creation_date, creation_id, modified_date, modified_id, 
+			// @todo Please remove those attributes that should not be searched.
+			array('widget_id, publish, cat_id, widget_source, creation_date, creation_id, modified_date, modified_id,
 				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
@@ -84,9 +87,9 @@ class SupportContacts extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'cat' => array(self::BELONGS_TO, 'SupportContactCategory', 'cat_id'),
-			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
-			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
+			'cat_TO' => array(self::BELONGS_TO, 'SupportContactCategory', 'cat_id'),
+			'creation_TO' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified_TO' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -96,10 +99,10 @@ class SupportContacts extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'publish' => Phrase::trans(23095,1),
-			'cat_id' => Phrase::trans(23066,1),
-			'value' => Phrase::trans(23098,1),
+			'widget_id' => 'Widget',
+			'publish' => 'Publish',
+			'cat_id' => 'Cat',
+			'widget_source' => 'Widget Source',
 			'creation_date' => 'Creation Date',
 			'creation_id' => 'Creation',
 			'modified_date' => 'Modified Date',
@@ -111,61 +114,72 @@ class SupportContacts extends CActiveRecord
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 *
+	 * Typical usecase:
+	 * - Initialize the model fields with values from filter form.
+	 * - Execute this method to get CActiveDataProvider instance which will filter
+	 * models according to data in model fields.
+	 * - Pass data provider to CGridView, CListView or any similar widget.
+	 *
+	 * @return CActiveDataProvider the data provider that can return the models
+	 * based on the search/filter conditions.
 	 */
 	public function search()
 	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
+		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('t.id',$this->id);
-		if(isset($_GET['type']) && $_GET['type'] == 'publish') {
+		$criteria->compare('t.widget_id',strtolower($this->widget_id),true);
+		if(isset($_GET['type']) && $_GET['type'] == 'publish')
 			$criteria->compare('t.publish',1);
-		} elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish') {
+		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
 			$criteria->compare('t.publish',0);
-		} elseif(isset($_GET['type']) && $_GET['type'] == 'nopublish') {
+		elseif(isset($_GET['type']) && $_GET['type'] == 'trash')
 			$criteria->compare('t.publish',2);
-		} else {
-			$criteria->addInCondition('t.publish',array(0,1,2));
+		else {
+			$criteria->addInCondition('t.publish',array(0,1));
 			$criteria->compare('t.publish',$this->publish);
 		}
-
 		if(isset($_GET['category']))
 			$criteria->compare('t.cat_id',$_GET['category']);
 		else
 			$criteria->compare('t.cat_id',$this->cat_id);
-		$criteria->compare('t.value',$this->value,true);
+		$criteria->compare('t.widget_source',strtolower($this->widget_source),true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
-		$criteria->compare('t.creation_id',$this->creation_id);
+		if(isset($_GET['creation']))
+			$criteria->compare('t.creation_id',$_GET['creation']);
+		else
+			$criteria->compare('t.creation_id',$this->creation_id);
 		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
-		$criteria->compare('t.modified_id',$this->modified_id);
+		if(isset($_GET['modified']))
+			$criteria->compare('t.modified_id',$_GET['modified']);
+		else
+			$criteria->compare('t.modified_id',$this->modified_id);
 		
 		// Custom Search
 		$criteria->with = array(
-			'creation_relation' => array(
-				'alias'=>'creation_relation',
+			'creation_TO' => array(
+				'alias'=>'creation_TO',
 				'select'=>'displayname',
 			),
-			'modified_relation' => array(
-				'alias'=>'modified_relation',
+			'modified_TO' => array(
+				'alias'=>'modified_TO',
 				'select'=>'displayname',
 			),
 		);
-		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
-		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
-		
-		if(!isset($_GET['SupportContacts_sort'])) {
-			$criteria->order = 't.id DESC';
-		}
+		$criteria->compare('creation_TO.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified_TO.displayname',strtolower($this->modified_search), true);
+
+		if(!isset($_GET['SupportWidget_sort']))
+			$criteria->order = 't.widget_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'pagination'=>array(
-				'pageSize'=>20,
+				'pageSize'=>30,
 			),
 		));
 	}
@@ -187,11 +201,11 @@ class SupportContacts extends CActiveRecord
 				*/
 				$this->defaultColumns[] = $val;
 			}
-		}else {
-			//$this->defaultColumns[] = 'id';
+		} else {
+			//$this->defaultColumns[] = 'widget_id';
 			$this->defaultColumns[] = 'publish';
 			$this->defaultColumns[] = 'cat_id';
-			$this->defaultColumns[] = 'value';
+			$this->defaultColumns[] = 'widget_source';
 			$this->defaultColumns[] = 'creation_date';
 			$this->defaultColumns[] = 'creation_id';
 			$this->defaultColumns[] = 'modified_date';
@@ -206,6 +220,14 @@ class SupportContacts extends CActiveRecord
 	 */
 	protected function afterConstruct() {
 		if(count($this->defaultColumns) == 0) {
+			/*
+			$this->defaultColumns[] = array(
+				'class' => 'CCheckBoxColumn',
+				'name' => 'id',
+				'selectableRows' => 2,
+				'checkBoxHtmlOptions' => array('name' => 'trash_id[]')
+			);
+			*/
 			$this->defaultColumns[] = array(
 				'header' => 'No',
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
@@ -213,28 +235,60 @@ class SupportContacts extends CActiveRecord
 			if(!isset($_GET['category'])) {
 				$this->defaultColumns[] = array(
 					'name' => 'cat_id',
-					'value' => 'Phrase::trans($data->cat->name, 2)',
-					'filter'=> SupportContactCategory::getCategory(),
+					'value' => 'Phrase::trans($data->cat_TO->name, 2)',
+					'filter'=> SupportContactCategory::getCategory(1),
 					'type' => 'raw',
 				);
 			}
 			$this->defaultColumns[] = array(
-				'name' => 'value',
-				'value' => '$data->value',
+				'name' => 'widget_source',
+				'value' => '$data->widget_source',
 				'type' => 'raw',
 			);
 			$this->defaultColumns[] = array(
-				'name' => 'publish',
-				'value' => '$data->cat->publish == 2 ? "-" : Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->id)), $data->publish, 1) ',
+				'name' => 'creation_search',
+				'value' => '$data->creation_TO->displayname',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_date',
+				'value' => 'Utility::dateFormat($data->creation_date)',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
-				'filter'=>array(
-					1=>Yii::t('phrase', 'Yes'),
-					0=>Yii::t('phrase', 'No'),
-				),
-				'type' => 'raw',
+				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
+					'model'=>$this,
+					'attribute'=>'creation_date',
+					'language' => 'ja',
+					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
+					//'mode'=>'datetime',
+					'htmlOptions' => array(
+						'id' => 'creation_date_filter',
+					),
+					'options'=>array(
+						'showOn' => 'focus',
+						'dateFormat' => 'dd-mm-yy',
+						'showOtherMonths' => true,
+						'selectOtherMonths' => true,
+						'changeMonth' => true,
+						'changeYear' => true,
+						'showButtonPanel' => true,
+					),
+				), true),
 			);
+			if(!isset($_GET['type'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'publish',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->widget_id)), $data->publish, 1)',
+					'htmlOptions' => array(
+						'class' => 'center',
+					),
+					'filter'=>array(
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
+					),
+					'type' => 'raw',
+				);
+			}
 		}
 		parent::afterConstruct();
 	}
@@ -261,14 +315,12 @@ class SupportContacts extends CActiveRecord
 	 */
 	protected function beforeValidate() {
 		if(parent::beforeValidate()) {
-			if(!$this->isNewRecord) {
-				if($this->publish == 2 && $this->value == '') {
-					$this->addError('value', Phrase::trans($this->cat->name, 2).' '.Yii::t('phrase', 'cannot be blank.'));
-				}
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;		
+			else
 				$this->modified_id = Yii::app()->user->id;
-			} else
-				$this->creation_id = Yii::app()->user->id;	
 		}
 		return true;
 	}
+
 }

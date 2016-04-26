@@ -1,9 +1,9 @@
 <?php
-
 /**
+ * SupportMails
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Support
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -34,6 +34,10 @@
 class SupportMails extends CActiveRecord
 {
 	public $defaultColumns = array();
+	
+	// Variable Search
+	public $user_search;
+	public $reply_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -72,7 +76,8 @@ class SupportMails extends CActiveRecord
 			array('user_id, displayname, phone, message_reply, creation_date', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('mail_id, reply, user_id, email, displayname, phone, subject, message, message_reply, creation_date', 'safe', 'on'=>'search'),
+			array('mail_id, reply, user_id, email, displayname, phone, subject, message, message_reply, creation_date, reply_date,
+				user_search, reply_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -85,6 +90,7 @@ class SupportMails extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'user' => array(self::BELONGS_TO, 'Users', 'user_id'),
+			'reply_relation' => array(self::BELONGS_TO, 'Users', 'reply'),
 		);
 	}
 
@@ -104,6 +110,7 @@ class SupportMails extends CActiveRecord
 			'message' => Phrase::trans(23043,1),
 			'message_reply' => Phrase::trans(23050,1),
 			'creation_date' => 'Creation Date',
+			'reply_date' => 'Reply Date',
 		);
 	}
 	
@@ -129,9 +136,25 @@ class SupportMails extends CActiveRecord
 		$criteria->compare('t.message_reply',$this->message,true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		if($this->reply_date != null && !in_array($this->reply_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.reply_date)',date('Y-m-d', strtotime($this->reply_date)));
+		
+		// Custom Search
+		$criteria->with = array(
+			'user' => array(
+				'alias'=>'user',
+				'select'=>'displayname',
+			),
+			'reply_relation' => array(
+				'alias'=>'reply_relation',
+				'select'=>'displayname',
+			),
+		);
+		$criteria->compare('user.displayname',strtolower($this->user_search), true);
+		$criteria->compare('reply_relation.displayname',strtolower($this->reply_search), true);
 			
 		if(!isset($_GET['SupportMails_sort']))
-			$criteria->order = 'mail_id DESC';
+			$criteria->order = 't.mail_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -190,7 +213,7 @@ class SupportMails extends CActiveRecord
 			$this->defaultColumns[] = 'email';
 			$this->defaultColumns[] = array(
 				'name' => 'displayname',
-				'value' => '$data->user_id != 0 ? $data->displayname : ($data->displayname != "" ? $data->displayname : "-")',
+				'value' => '$data->user_id != 0 ? $data->user->displayname : ($data->displayname != "" ? $data->displayname : "-")',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'phone',
@@ -229,8 +252,8 @@ class SupportMails extends CActiveRecord
 					'class' => 'center',
 				),
 				'filter'=>array(
-					1=>Phrase::trans(588,0),
-					0=>Phrase::trans(589,0),
+					1=>Yii::t('phrase', 'Yes'),
+					0=>Yii::t('phrase', 'No'),
 				),
 				'type' => 'raw',
 			);

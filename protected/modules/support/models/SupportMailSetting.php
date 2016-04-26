@@ -1,9 +1,9 @@
 <?php
-
 /**
+ * SupportMailSetting
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Support
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -33,10 +33,15 @@
  * @property string $smtp_username
  * @property string $smtp_password
  * @property integer $smtp_ssl
+ * @property string $modified_date
+ * @property string $modified_id
  */
 class SupportMailSetting extends CActiveRecord
 {
 	public $defaultColumns = array();
+	
+	// Variable Search
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -65,12 +70,13 @@ class SupportMailSetting extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('mail_contact, mail_name, mail_from, mail_count', 'required'),
-			array('id, mail_count, mail_queueing, mail_smtp, smtp_authentication, smtp_ssl', 'numerical', 'integerOnly'=>true),
+			array('id, mail_count, mail_queueing, mail_smtp, smtp_authentication, smtp_ssl, modified_id', 'numerical', 'integerOnly'=>true),
 			array('mail_contact, mail_name, mail_from, smtp_address, smtp_username, smtp_password', 'length', 'max'=>32),
 			array('smtp_port', 'length', 'max'=>16),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, mail_contact, mail_name, mail_from, mail_count, mail_queueing, mail_smtp, smtp_address, smtp_port, smtp_authentication, smtp_username, smtp_password, smtp_ssl', 'safe', 'on'=>'search'),
+			array('id, mail_contact, mail_name, mail_from, mail_count, mail_queueing, mail_smtp, smtp_address, smtp_port, smtp_authentication, smtp_username, smtp_password, smtp_ssl, modified_date, modified_id,
+				modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -82,6 +88,7 @@ class SupportMailSetting extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -104,6 +111,9 @@ class SupportMailSetting extends CActiveRecord
 			'smtp_username' => Phrase::trans(23030,1),
 			'smtp_password' => Phrase::trans(23031,1),
 			'smtp_ssl' => Phrase::trans(23026,1),
+			'modified_date' => 'Modified Date',
+			'modified_id' => 'Modified ID',
+			'modified_search' => 'Modified',
 		);
 	}
 	
@@ -131,6 +141,21 @@ class SupportMailSetting extends CActiveRecord
 		$criteria->compare('t.smtp_username',$this->smtp_username,true);
 		$criteria->compare('t.smtp_password',$this->smtp_password,true);
 		$criteria->compare('t.smtp_ssl',$this->smtp_ssl);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->modified_id);
+		
+		// Custom Search
+		$criteria->with = array(
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname',
+			),
+		);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
+			
+		if(!isset($_GET['SupportMailSetting_sort']))
+			$criteria->order = 't.id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -168,6 +193,8 @@ class SupportMailSetting extends CActiveRecord
 			$this->defaultColumns[] = 'smtp_username';
 			$this->defaultColumns[] = 'smtp_password';
 			$this->defaultColumns[] = 'smtp_ssl';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -194,10 +221,95 @@ class SupportMailSetting extends CActiveRecord
 			$this->defaultColumns[] = 'smtp_username';
 			$this->defaultColumns[] = 'smtp_password';
 			$this->defaultColumns[] = 'smtp_ssl';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
+			$this->defaultColumns[] = array(
+				'name' => 'modified_search',
+				'value' => '$data->modified_relation->displayname',
+			);
 
 		}
 		parent::afterConstruct();
 	}
+
+	/**
+	 * User get information
+	 */
+	public static function getInfo($id, $column=null)
+	{
+		if($column != null) {
+			$model = self::model()->findByPk($id,array(
+				'select' => $column
+			));
+			return $model->$column;
+			
+		} else {
+			$model = self::model()->findByPk($id);
+			return $model;			
+		}
+	}
+
+    /**
+	 * Sent Email
+	 */
+	public static function sendEmail($to_email, $to_name, $subject, $message, $type, $cc=null, $attachment=null) {
+		Yii::import('application.extensions.phpmailer.JPhpMailer');
+		$model = self::model()->findByPk(1,array(
+			'select' => 'mail_contact, mail_name, mail_from, mail_smtp, smtp_address, smtp_port, smtp_username, smtp_password, smtp_ssl',
+		));
+
+		$mail=new JPhpMailer;
+
+		if($model->mail_smtp == 1 || $_SERVER["SERVER_ADDR"]=='127.0.0.1' || $_SERVER["HTTP_HOST"]=='localhost') {
+			//in localhost or testing condition
+			//smtp google 
+			$mail->IsSMTP();								// Set mailer to use SMTP
+			$mail->Host			= $model->smtp_address;		// Specify main and backup server
+			$mail->Port			= $model->smtp_port;		// set the SMTP port
+			$mail->SMTPAuth		= true;						// Enable SMTP authentication
+			$mail->Username		= $model->smtp_username;	// SES SMTP  username
+			$mail->Password		= $model->smtp_password;	// SES SMTP password
+			if($model->smtp_ssl != 0)
+				$mail->SMTPSecure	= $model->smtp_ssl == 1 ? "tls" : "ssl";	// Enable encryption, 'ssl' also accepted
+
+		} else {
+			//live server 
+			$mail->IsMail();
+		}
+		
+		/**
+		 * 0 = to admin
+		 * 1 = to user
+		 */
+		if($type == '0') {
+			$mail->SetFrom($to_email, $to_name);
+			$mail->AddReplyTo($to_email, $to_name);
+			$mail->AddAddress($model->mail_contact, $model->mail_name);
+		} else {
+			$mail->SetFrom($model->mail_from, $model->mail_name);
+			$mail->AddReplyTo($model->mail_from, $model->mail_name);
+			$mail->AddAddress($to_email, $to_name);
+		}
+		// cc
+		if ($cc != null && count($cc) > 0) {
+			foreach ($cc as $email => $name)
+				$mail->AddAddress($email, $name);
+		}
+		// attachment
+		if ($attachment != null)
+			$mail->addAttachment($attachment);
+		
+		$mail->Subject = $subject;
+		$mail->MsgHTML($message);
+
+		if($mail->Send()) {
+			return true;
+			//echo 'send';
+		} else {
+			return false;
+			//echo 'no send';
+		}
+    }
 
 	/**
 	 * before validate attributes
@@ -219,63 +331,11 @@ class SupportMailSetting extends CActiveRecord
 						$this->addError('smtp_password', Phrase::trans(23035,1));
 					}
 				}
-			}		
+			}
+
+			$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}
-
-    /**
-	 * Sent Email
-	 */
-	public static function sendEmail($to_email, $to_name, $subject, $message, $type) {
-		Yii::import('application.extensions.phpmailer.JPhpMailer');
-		$model = self::model()->findByPk(1,array(
-			'select' => 'mail_contact, mail_name, mail_from, mail_smtp, smtp_address, smtp_port, smtp_username, smtp_password, smtp_ssl',
-		));
-
-		$mail=new JPhpMailer;
-
-		if($model->mail_smtp == 1 || $_SERVER["SERVER_ADDR"]=='127.0.0.1' || $_SERVER["HTTP_HOST"]=='localhost') {
-			//in localhost or testing condition
-			//smtp google 
-			$mail->IsSMTP();								// Set mailer to use SMTP
-			$mail->Host			= $model->smtp_address;		// Specify main and backup server
-			$mail->Port			= $model->smtp_port;		// set the SMTP port
-			$mail->SMTPAuth		= true;						// Enable SMTP authentication
-			$mail->Username		= $model->smtp_username;	// SES SMTP  username
-			$mail->Password		= $model->smtp_password;	// SES SMTP password
-			if($model->smtp_ssl != 0) {
-				$mail->SMTPSecure	= $model->smtp_ssl == 1 ? "tls" : "ssl";	// Enable encryption, 'ssl' also accepted
-			}
-
-		} else {
-			//live server 
-			$mail->IsMail();
-		}
-		
-		/**
-		 * 0 = to admin
-		 * 1 = to user
-		 */
-		if($type == '0') {
-			$mail->SetFrom($to_email, $to_name);
-			$mail->AddReplyTo($to_email, $to_name);
-			$mail->AddAddress($model->mail_contact, $model->mail_name);
-		} else {
-			$mail->SetFrom($model->mail_from, $model->mail_name);
-			$mail->AddReplyTo($model->mail_from, $model->mail_name);
-			$mail->AddAddress($to_email, $to_name);
-		}
-		$mail->Subject = $subject;
-		$mail->MsgHTML($message);
-
-		if($mail->Send()) {
-			return true;
-			//echo 'send';
-		} else {
-			return false;
-			//echo 'no send';
-		}
-    }
 
 }

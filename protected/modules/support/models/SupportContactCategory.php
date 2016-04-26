@@ -1,9 +1,9 @@
 <?php
-
 /**
+ * SupportContactCategory
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Support
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -25,6 +25,10 @@
  * @property integer $orders
  * @property string $icons
  * @property integer $name
+ * @property string $creation_date
+ * @property string $creation_id
+ * @property string $modified_date
+ * @property string $modified_id
  *
  * The followings are the available model relations:
  * @property OmmuSupportContacts[] $ommuSupportContacts
@@ -33,6 +37,11 @@ class SupportContactCategory extends CActiveRecord
 {
 	public $defaultColumns = array();
 	public $title;
+	public $old_icon;
+	
+	// Variable Search
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -61,11 +70,14 @@ class SupportContactCategory extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('title', 'required'),
-			array('publish, orders, name', 'numerical', 'integerOnly'=>true),
+			array('publish, orders, name, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
 			array('title, icons', 'length', 'max'=>32),
+			array('icons,
+				old_icon', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('cat_id, publish, orders, icons, name', 'safe', 'on'=>'search'),
+			array('cat_id, publish, orders, icons, name, creation_date, creation_id, modified_date, modified_id,
+				title, creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -77,7 +89,10 @@ class SupportContactCategory extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			//'ommuSupportContacts' => array(self::HAS_MANY, 'OmmuSupportContacts', 'cat_id'),
+			'view_cat' => array(self::BELONGS_TO, 'ViewSupportContactCategory', 'cat_id'),
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
+			'contact' => array(self::HAS_MANY, 'SupportContacts', 'cat_id'),
 		);
 	}
 
@@ -92,7 +107,14 @@ class SupportContactCategory extends CActiveRecord
 			'orders' => Phrase::trans(23096,1),
 			'icons' => Phrase::trans(23097,1),
 			'name' => Phrase::trans(23066,1),
+			'creation_date' => 'Creation Date',
+			'creation_id' => 'Creation',
+			'modified_date' => 'Modified Date',
+			'modified_id' => 'Modified',
 			'title' => Phrase::trans(23066,1),
+			'old_icon' => 'Old Icon',
+			'creation_search' => 'Creation',
+			'modified_search' => 'Modified',
 		);
 	}
 	
@@ -121,10 +143,34 @@ class SupportContactCategory extends CActiveRecord
 		$criteria->compare('t.orders',$this->orders);
 		$criteria->compare('t.icons',$this->icons,true);
 		$criteria->compare('t.name',$this->name);
+		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		$criteria->compare('t.creation_id',$this->creation_id);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->modified_id);
 		
-		if(!isset($_GET['SupportContactCategory_sort'])) {
-			$criteria->order = 'cat_id DESC';
-		}
+		// Custom Search
+		$criteria->with = array(
+			'view_cat' => array(
+				'alias'=>'view_cat',
+				'select'=>'category_name'
+			),
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname',
+			),
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname',
+			),
+		);
+		$criteria->compare('view_cat.category_name',strtolower($this->title), true);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
+		
+		if(!isset($_GET['SupportContactCategory_sort']))
+			$criteria->order = 't.cat_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -157,6 +203,10 @@ class SupportContactCategory extends CActiveRecord
 			$this->defaultColumns[] = 'orders';
 			$this->defaultColumns[] = 'icons';
 			$this->defaultColumns[] = 'name';
+			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -172,10 +222,44 @@ class SupportContactCategory extends CActiveRecord
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
 			$this->defaultColumns[] = array(
-				'name' => 'name',
+				'name' => 'title',
 				'value' => 'Phrase::trans($data->name, 2)',
 			);
-			$this->defaultColumns[] = 'icons';
+			$this->defaultColumns[] = array(
+				'name' => 'icons',
+				'value' => '$data->icons != "" ? CHtml::link($data->icons, Yii::app()->request->baseUrl.\'/public/support/\'.$data->icons, array(\'target\' => \'_blank\')) : "-"',
+				'type' => 'raw',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation_relation->displayname',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_date',
+				'value' => 'Utility::dateFormat($data->creation_date)',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
+					'model'=>$this,
+					'attribute'=>'creation_date',
+					'language' => 'ja',
+					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
+					//'mode'=>'datetime',
+					'htmlOptions' => array(
+						'id' => 'creation_date_filter',
+					),
+					'options'=>array(
+						'showOn' => 'focus',
+						'dateFormat' => 'dd-mm-yy',
+						'showOtherMonths' => true,
+						'selectOtherMonths' => true,
+						'changeMonth' => true,
+						'changeYear' => true,
+						'showButtonPanel' => true,
+					),
+				), true),
+			);
 			$this->defaultColumns[] = array(
 				'name' => 'publish',
 				'value' => '$data->publish == 2 ? "-" : Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->cat_id)), $data->publish, 1) ',
@@ -187,6 +271,23 @@ class SupportContactCategory extends CActiveRecord
 
 		}
 		parent::afterConstruct();
+	}
+
+	/**
+	 * User get information
+	 */
+	public static function getInfo($id, $column=null)
+	{
+		if($column != null) {
+			$model = self::model()->findByPk($id,array(
+				'select' => $column
+			));
+			return $model->$column;
+			
+		} else {
+			$model = self::model()->findByPk($id);
+			return $model;			
+		}
 	}
 
 	/**
@@ -218,6 +319,26 @@ class SupportContactCategory extends CActiveRecord
 			return false;
 		}
 	}
+
+	/**
+	 * before validate attributes
+	 */
+	protected function beforeValidate() {
+		if(parent::beforeValidate()) {
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;
+			else
+				$this->modified_id = Yii::app()->user->id;
+			
+			$media = CUploadedFile::getInstance($this, 'icons');
+			if($media->name != '') {
+				$extension = pathinfo($media->name, PATHINFO_EXTENSION);
+				if(!in_array(strtolower($extension), array('bmp','gif','jpg','png')))
+					$this->addError('icons', 'The file "'.$media->name.'" cannot be uploaded. Only files with these extensions are allowed: bmp, gif, jpg, png.');
+			}
+		}
+		return true;
+	}
 	
 	/**
 	 * before save attributes
@@ -225,23 +346,51 @@ class SupportContactCategory extends CActiveRecord
 	protected function beforeSave() {
 		if(parent::beforeSave()) {
 			$action = strtolower(Yii::app()->controller->action->id);
+			
 			if($this->isNewRecord) {
-				$currentAction = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id);
+				$location = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id);
 				$title=new OmmuSystemPhrase;
-				$title->location = $currentAction;
+				$title->location = $location.'_title';
 				$title->en = $this->title;
-				if($title->save()) {
+				if($title->save())
 					$this->name = $title->phrase_id;
-				}
 			
 			} else {
-				if($action == 'edit') {
-					$title = OmmuSystemPhrase::model()->findByPk($this->name);
-					$title->en = $this->title;
-					$title->save();
+				$title = OmmuSystemPhrase::model()->findByPk($this->name);
+				$title->en = $this->title;
+				$title->save();
+			}
+				
+			//upload proposal
+			if(in_array($action, array('add','edit'))) {
+				$support_path = "public/support";
+				$this->icons = CUploadedFile::getInstance($this, 'icons');
+				if($this->icons instanceOf CUploadedFile) {
+					$fileName = Utility::getUrlTitle($this->title).'_'.time().'.'.strtolower($this->icons->extensionName);
+					if($this->icons->saveAs($support_path.'/'.$fileName)) {						
+						if(!$this->isNewRecord && $this->old_icon != '' && file_exists($support_path.'/'.$this->old_icon))
+							rename($support_path.'/'.$this->old_icon, 'public/support/verwijderen/'.$this->cat_id.'_'.$this->old_icon);
+						$this->icons = $fileName;
+					}
 				}
-			}			
+				
+				if(!$this->isNewRecord && $this->icons == '') {
+					$this->icons = $this->old_icon;
+				}
+			}
 		}
 		return true;
+	}
+
+	/**
+	 * After delete attributes
+	 */
+	protected function afterDelete() {
+		parent::afterDelete();
+		//delete support image
+		$support_path = "public/support";
+		if($this->icons != '' && file_exists($support_path.'/'.$this->icons)) {
+			rename($support_path.'/'.$this->icons, 'public/support/verwijderen/'.$this->cat_id.'_'.$this->icons);
+		}
 	}
 }

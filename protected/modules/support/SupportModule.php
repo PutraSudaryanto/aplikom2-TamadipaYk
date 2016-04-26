@@ -22,7 +22,6 @@ class SupportModule extends CWebModule
 			//list public controller in this module
 			$publicControllers = array(
 				'contact',
-				'newsletter',
 			);
 			
 			// pake ini untuk set theme per action di controller..
