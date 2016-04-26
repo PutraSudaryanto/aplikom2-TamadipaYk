@@ -1,11 +1,13 @@
 <?php
 /**
+ * User Verify (user-verify)
  * @var $this VerifyController
  * @var $model UserVerify
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -29,7 +31,7 @@ if(!isset($_GET['name']) && !isset($_GET['email'])) {?>
 					echo $form->hiddenField($model,'unsubscribe');
 					?>
 					<div class="table">
-						<?php echo $form->textField($model,'email',array('maxlength'=>32, 'placeholder'=>$model->getAttributeLabel('email'))); ?><?php echo CHtml::submitButton($launch != 0 ? Phrase::trans(23109,1) : Phrase::trans(23057,1), array('onclick' => 'setEnableSave()')); ?>
+						<?php echo $form->textField($model,'email',array('maxlength'=>32, 'placeholder'=>$model->getAttributeLabel('email'))); ?><?php echo CHtml::submitButton($launch != 0 ? Yii::t('phrase', 'Notify Me!') : Yii::t('phrase', 'Subscribe'), array('onclick' => 'setEnableSave()')); ?>
 					</div>
 					<?php echo $form->error($model,'email'); ?>
 				</div>

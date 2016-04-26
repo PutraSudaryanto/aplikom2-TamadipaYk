@@ -19,9 +19,7 @@ class Phrase
 	} */
 	
 	public static function trans($id, $type, $other=null) {
-		if($type == 0) {
-			$model = OmmuPhrases::model()->findByPk($id);
-		} else if($type == 1) {
+		if($type == 1) {
 			$model = OmmuPluginPhrase::model()->findByPk($id);
 		} else if($type == 2) {
 			$model = OmmuSystemPhrase::model()->findByPk($id);
@@ -29,11 +27,12 @@ class Phrase
 		
 		if(isset(Yii::app()->session['language'])) {
 			$language = Yii::app()->session['language'];
+			$language = 'en_us';
 			if($model->$language == '') {
-				$language = 'en';
+				$language = 'en_us';
 			}
 		} else {
-			$language = 'en';
+			$language = 'en_us';
 		}
 		
 		if(!empty($other)) {

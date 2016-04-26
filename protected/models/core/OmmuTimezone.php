@@ -1,9 +1,11 @@
 <?php
-
 /**
+ * OmmuTimezone
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -82,10 +84,10 @@ class OmmuTimezone extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'timezone_id' => Phrase::trans(425,0),
-			'defaults' => Phrase::trans(156,0),
-			'timezone' => Phrase::trans(425,0),
-			'title' => Phrase::trans(190,0),
+			'timezone_id' => Yii::t('attribute', 'timezone_id'),
+			'defaults' => Yii::t('attribute', 'defaults'),
+			'timezone' => Yii::t('attribute', 'timezone'),
+			'title' => Yii::t('attribute', 'title'),
 		);
 	}
 	
@@ -106,7 +108,7 @@ class OmmuTimezone extends CActiveRecord
 		$criteria->compare('t.title',strtolower($this->title),true);
 
 		if(!isset($_GET['OmmuTimezone_sort']))
-			$criteria->order = 'timezone_id DESC';
+			$criteria->order = 't.timezone_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

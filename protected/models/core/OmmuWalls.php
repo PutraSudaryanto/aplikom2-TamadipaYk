@@ -1,9 +1,11 @@
 <?php
 /**
  * OmmuWalls
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -104,16 +106,16 @@ class OmmuWalls extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'wall_id' => 'Wall',
-			'publish' => Phrase::trans(192,0),
-			'user_id' => Phrase::trans(191,0),
-			'wall_media' => 'Wall Media',
-			'wall_status' => 'Wall Status',
-			'comments' => 'Comments',
-			'likes' => 'Likes',
-			'creation_date' => Phrase::trans(365,0),
-			'modified_date' => Phrase::trans(446,0),
-			'user_search' => Phrase::trans(191,0),
+			'wall_id' => Yii::t('attribute', 'wall_id'),
+			'publish' => Yii::t('attribute', 'publish'),
+			'user_id' => Yii::t('attribute', 'user_id'),
+			'wall_media' => Yii::t('attribute', 'wall_media'),
+			'wall_status' => Yii::t('attribute', 'wall_status'),
+			'comments' => Yii::t('attribute', 'comments'),
+			'likes' => Yii::t('attribute', 'likes'),
+			'creation_date' => Yii::t('attribute', 'creation_date'),
+			'modified_date' => Yii::t('attribute', 'modified_date'),
+			'user_search' => Yii::t('attribute', 'user_id'),
 		);
 	}
 
@@ -170,7 +172,7 @@ class OmmuWalls extends CActiveRecord
 		$criteria->compare('user.displayname',strtolower($this->user_search), true);
 
 		if(!isset($_GET['OmmuWalls_sort']))
-			$criteria->order = 'wall_id DESC';
+			$criteria->order = 't.wall_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -287,8 +289,8 @@ class OmmuWalls extends CActiveRecord
 						'class' => 'center',
 					),
 					'filter'=>array(
-						1=>Phrase::trans(588,0),
-						0=>Phrase::trans(589,0),
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
 					),
 					'type' => 'raw',
 				);

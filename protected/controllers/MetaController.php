@@ -2,8 +2,8 @@
 /**
 * MetaController
 * Handle MetaController
-* Copyright (c) 2012, Ommu Platform (Nirwasita Studio). All rights reserved.
-* version: 0.0.1
+* Copyright (c) 2012, Ommu Platform (ommu.co). All rights reserved.
+* version: 1.1.0
 * Reference start
 *
 * TOC :
@@ -22,7 +22,7 @@
 *
 * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
 * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
+* @link https://github.com/oMMu/Ommu-Core
 * @contact (+62)856-299-4114
 *
 *----------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ class MetaController extends Controller
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 			}
 		} else {
 			$this->redirect(Yii::app()->createUrl('site/login'));
@@ -124,12 +124,12 @@ class MetaController extends Controller
 			$model->scenario = 'setting';
 			
 			if($model->save()) {
-				Yii::app()->user->setFlash('success', Phrase::trans(552,0));
+				Yii::app()->user->setFlash('success', Yii::t('phrase', 'Global Meta success updated.'));
 				$this->redirect(array('edit'));
 			}
 		}
 
-		$this->pageTitle = Phrase::trans(551,0);
+		$this->pageTitle = Yii::t('phrase', 'Meta Settings');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_edit',array(
@@ -156,7 +156,7 @@ class MetaController extends Controller
 			$jsonError = CActiveForm::validate($model);
 			if(strlen($jsonError) > 2) {
 				$errors = $model->getErrors();
-				$summary['msg'] = "<div class='errorSummary'><strong>".Phrase::trans(163,0)."</strong>";
+				$summary['msg'] = "<div class='errorSummary'><strong>".Yii::t('phrase', 'Please fix the following input errors:')."</strong>";
 				$summary['msg'] .= "<ul>";
 				foreach($errors as $key => $value) {
 					$summary['msg'] .= "<li>{$value[0]}</li>";
@@ -173,7 +173,7 @@ class MetaController extends Controller
 					if($model->save()) {
 						echo CJSON::encode(array(
 							'type' => 0,
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(553,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Google Owner Meta success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -183,7 +183,7 @@ class MetaController extends Controller
 			Yii::app()->end();
 
 		} else {
-			$this->pageTitle = Phrase::trans(551,0).': Google Owner';
+			$this->pageTitle = Yii::t('phrase', 'Meta Settings: {meta}', array('{meta}'=>'Google Owner'));
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_google',array(
@@ -214,7 +214,7 @@ class MetaController extends Controller
 			$jsonError = CActiveForm::validate($model);
 			if(strlen($jsonError) > 2) {
 				$errors = $model->getErrors();
-				$summary['msg'] = "<div class='errorSummary'><strong>".Phrase::trans(163,0)."</strong>";
+				$summary['msg'] = "<div class='errorSummary'><strong>".Yii::t('phrase', 'Please fix the following input errors:')."</strong>";
 				$summary['msg'] .= "<ul>";
 				foreach($errors as $key => $value) {
 					$summary['msg'] .= "<li>{$value[0]}</li>";
@@ -231,7 +231,7 @@ class MetaController extends Controller
 					if($model->save()) {
 						echo CJSON::encode(array(
 							'type' => 0,
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(556,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Facebook Meta success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -241,7 +241,7 @@ class MetaController extends Controller
 			Yii::app()->end();
 
 		} else {
-			$this->pageTitle = Phrase::trans(551,0).': Facebook OpenGraph';
+			$this->pageTitle = Yii::t('phrase', 'Meta Settings: {meta}', array('{meta}'=>'Facebook OpenGraph'));
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_facebook',array(
@@ -272,7 +272,7 @@ class MetaController extends Controller
 			$jsonError = CActiveForm::validate($model);
 			if(strlen($jsonError) > 2) {
 				$errors = $model->getErrors();
-				$summary['msg'] = "<div class='errorSummary'><strong>".Phrase::trans(163,0)."</strong>";
+				$summary['msg'] = "<div class='errorSummary'><strong>".Yii::t('phrase', 'Please fix the following input errors:')."</strong>";
 				$summary['msg'] .= "<ul>";
 				foreach($errors as $key => $value) {
 					$summary['msg'] .= "<li>{$value[0]}</li>";
@@ -289,7 +289,7 @@ class MetaController extends Controller
 					if($model->save()) {
 						echo CJSON::encode(array(
 							'type' => 0,
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(557,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Twitter Meta success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -299,7 +299,7 @@ class MetaController extends Controller
 			Yii::app()->end();
 
 		} else {
-			$this->pageTitle = Phrase::trans(551,0).': Twitter';
+			$this->pageTitle = Yii::t('phrase', 'Meta Settings: {meta}', array('{meta}'=>'Twitter'));
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_twitter',array(
@@ -317,7 +317,7 @@ class MetaController extends Controller
 	{
 		$model = OmmuMeta::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

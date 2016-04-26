@@ -1,10 +1,13 @@
 <?php
 /**
  * Ommu Wall Users (ommu-wall-user)
- * @var $this WalluserController * @var $model OmmuWallUser *
+ * @var $this WalluserController
+ * @var $model OmmuWallUser
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contect (+62)856-299-4114
  *
  */
@@ -15,16 +18,16 @@
 	);
 	$this->menu=array(
 		array(
-			'label' => Phrase::trans(307,0), 
+			'label' => Yii::t('phrase', 'Filter'), 
 			'url' => array('javascript:void(0);'),
 			'itemOptions' => array('class' => 'search-button'),
-			'linkOptions' => array('title' => Phrase::trans(307,0)),
+			'linkOptions' => array('title' => Yii::t('phrase', 'Filter')),
 		),
 		array(
-			'label' => Phrase::trans(308,0), 
+			'label' => Yii::t('phrase', 'Grid Options'), 
 			'url' => array('javascript:void(0);'),
 			'itemOptions' => array('class' => 'grid-button'),
-			'linkOptions' => array('title' => Phrase::trans(308,0)),
+			'linkOptions' => array('title' => Yii::t('phrase', 'Grid Options')),
 		),
 	);
 

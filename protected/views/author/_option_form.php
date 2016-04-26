@@ -1,11 +1,14 @@
 <?php
 /**
  * Ommu Authors (ommu-authors)
- * @var $this AuthorController * @var $model OmmuAuthors * @var $form CActiveForm
+ * @var $this AuthorController
+ * @var $model OmmuAuthors
+ * @var $form CActiveForm
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contect (+62)856-299-4114
  *
  */

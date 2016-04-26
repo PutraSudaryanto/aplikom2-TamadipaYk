@@ -1,9 +1,11 @@
 <?php
 /**
  * OmmuWallComment
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -99,16 +101,16 @@ class OmmuWallComment extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'comment_id' => 'Comment',
-			'publish' => Phrase::trans(192,0),
-			'parent_id' => 'Parent',
-			'wall_id' => 'Wall',
-			'user_id' => Phrase::trans(191,0),
-			'comment' => 'Comment',
-			'creation_date' => Phrase::trans(365,0),
-			'modified_date' => Phrase::trans(446,0),
-			'wall_search' => 'Wall',
-			'user_search' => Phrase::trans(191,0),
+			'comment_id' => Yii::t('attribute', 'comment_id'),
+			'publish' => Yii::t('attribute', 'publish'),
+			'parent_id' => Yii::t('attribute', 'parent_id'),
+			'wall_id' => Yii::t('attribute', 'wall_id'),
+			'user_id' => Yii::t('attribute', 'user_id'),
+			'comment' => Yii::t('attribute', 'comment'),
+			'creation_date' => Yii::t('attribute', 'creation_date'),
+			'modified_date' => Yii::t('attribute', 'modified_date'),
+			'wall_search' => Yii::t('attribute', 'wall_id'),
+			'user_search' => Yii::t('attribute', 'user_id'),
 		);
 	}
 
@@ -173,7 +175,7 @@ class OmmuWallComment extends CActiveRecord
 		$criteria->compare('user.displayname',strtolower($this->user_search), true);
 
 		if(!isset($_GET['OmmuWallComment_sort']))
-			$criteria->order = 'comment_id DESC';
+			$criteria->order = 't.comment_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -279,8 +281,8 @@ class OmmuWallComment extends CActiveRecord
 						'class' => 'center',
 					),
 					'filter'=>array(
-						1=>Phrase::trans(588,0),
-						0=>Phrase::trans(589,0),
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
 					),
 					'type' => 'raw',
 				);

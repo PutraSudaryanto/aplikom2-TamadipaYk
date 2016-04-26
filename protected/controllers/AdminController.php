@@ -1,25 +1,24 @@
 <?php
 /**
-* AdminController
-* Handle AdminController
-* Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
-* version: 2.0.0
-* Reference start
-*
-* TOC :
-*	Index
-*	Dashboard
-*
-*	LoadModel
-*	performAjaxValidation
-*
-* @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
-* @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
-* @contact (+62)856-299-4114
-*
-*----------------------------------------------------------------------------------------------------------
-*/
+ * AdminController
+ * @var $this AdminController
+ * version: 1.1.0
+ * Reference start
+ *
+ * TOC :
+ *	Index
+ *	Dashboard
+ *
+ *	LoadModel
+ *	performAjaxValidation
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contact (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class AdminController extends Controller
 {
@@ -41,7 +40,7 @@ class AdminController extends Controller
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 			}
 		} else {
 			$this->redirect(Yii::app()->createUrl('site/login'));
@@ -140,10 +139,10 @@ class AdminController extends Controller
 		}
 		$nextPager = $pager['nextPage'] != 0 ? Yii::app()->createUrl('wall/get', array($pager['pageVar']=>$pager['nextPage'])) : 0;
 		
-		$this->pageTitle = Phrase::trans(248,0).', '.Yii::app()->user->displayname.'!';
-		$this->pageDescription = Phrase::trans(247,0);
+		$this->pageTitle = Yii::t('phrase', 'Welcome').', '.Yii::app()->user->displayname.'!';
+		$this->pageDescription = Yii::t('phrase', 'Welcome to your social network control panel. Here you can manage and modify every aspect of your social network. Directly below, you will find a quick snapshot of your social network including some useful statistics.');
 		$this->pageMeta = '';
-		$this->render('admin_dashboard', array(
+		$this->render('application.webs.admin.admin_dashboard', array(
 			'model'=>$model,			
 			'data'=>$data,
 			'pager'=>$pager,

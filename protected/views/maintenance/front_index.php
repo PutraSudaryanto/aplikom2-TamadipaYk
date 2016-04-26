@@ -1,11 +1,13 @@
 <?php
 /**
+ * User Verify (user-verify)
  * @var $this VerifyController
  * @var $model UserVerify
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -30,19 +32,19 @@ EOP;
 	<ul class="clearfix">
 		<li>
 			<span id="days">0</span>
-			<?php echo Phrase::trans(334,0);?>
+			<?php echo Yii::t('phrase', 'Days');?>
 		</li>
 		<li>
 			<span id="hours">0</span>
-			<?php echo Phrase::trans(335,0);?>
+			<?php echo Yii::t('phrase', 'Hours');?>
 		</li>
 		<li>
 			<span id="minutes">0</span>
-			<?php echo Phrase::trans(336,0);?>
+			<?php echo Yii::t('phrase', 'Minutes');?>
 		</li>
 		<li>
 			<span id="seconds">0</span>
-			<?php echo Phrase::trans(337,0);?>
+			<?php echo Yii::t('phrase', 'Seconds');?>
 		</li>
 	</ul>
 </div>

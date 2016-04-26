@@ -1,12 +1,14 @@
 <?php
 /**
+ * Ommu System Phrase (ommu-system-phrase)
  * @var $this TranslateController
  * @var $model OmmuSystemPhrase
  * @var $form CActiveForm
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -37,14 +39,20 @@
 					'model'=>$model,
 					'attribute'=>$val->code,
 					// Redactor options
-					/* ''options'=>array(
+					'options'=>array(
 						//'lang'=>'fi',
-						buttons'=>array(
-							'formatting', '|', 'bold', 'italic', 'deleted', '|',
+						'buttons'=>array(
+							'html', 'formatting', '|', 
+							'bold', 'italic', 'deleted', '|',
 							'unorderedlist', 'orderedlist', 'outdent', 'indent', '|',
-							'image', 'video', 'link', '|', 'html',
+							'link', '|',
 						),
-					), */
+					),
+					'plugins' => array(
+						'fontcolor' => array('js' => array('fontcolor.js')),
+						'table' => array('js' => array('table.js')),
+						'fullscreen' => array('js' => array('fullscreen.js')),
+					),
 				)); ?>
 				<?php echo $form->error($model, $val->code); ?>
 			</div>
@@ -56,14 +64,14 @@
 			<div class="desc">
 				<?php echo $form->textArea($model,'location',array('class'=>'span-11 smaller')); ?>
 				<?php echo $form->error($model,'location'); ?>
-				<span class="small-px"><?php echo Phrase::trans(299,0);?></span>
+				<span class="small-px"><?php echo Yii::t('phrase', 'We recommend you to use location field. It helps you to know where this phrase is used. Example: you can use "event.create" location for "Create" button\'s label on create a new event page');?></span>
 			</div>
 		</div>
 
 	</fieldset>
 </div>
 <div class="dialog-submit">
-	<?php echo CHtml::submitButton($model->isNewRecord ? Phrase::trans(1,0) : Phrase::trans(2,0), array('onclick' => 'setEnableSave()')); ?>
-	<?php echo CHtml::button(Phrase::trans(4,0), array('id'=>'closed')); ?>
+	<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('phrase', 'Create') : Yii::t('phrase', 'Save'), array('onclick' => 'setEnableSave()')); ?>
+	<?php echo CHtml::button(Yii::t('phrase', 'Close'), array('id'=>'closed')); ?>
 </div>
 <?php $this->endWidget(); ?>

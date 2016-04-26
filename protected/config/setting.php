@@ -16,7 +16,11 @@ return array(
 		'timthumb_url_replace' => 0,		
 		'timthumb_url_replace_website' => 'http://nirwasita.com',	//default http
 		// access system *from product
-		'product_access_system' => 'tamadipa-yk.sch.id',
+		'product_access_system' => 'sso.bpadjogja.info',
+		'oauth_server_options' => array(
+			//'http://ommu.co',
+			'http://localhost/_product_ommu.co',
+		),
 	),
 );
 ?>

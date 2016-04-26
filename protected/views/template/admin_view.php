@@ -1,10 +1,13 @@
 <?php
 /**
  * Ommu Templates (ommu-template)
- * @var $this TemplateController * @var $model OmmuTemplate *
+ * @var $this TemplateController
+ * @var $model OmmuTemplate
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contect (+62)856-299-4114
  *
  */
@@ -44,5 +47,5 @@
 	)); ?>
 </div>
 <div class="dialog-submit">
-	<?php echo CHtml::button(Phrase::trans(4,0), array('id'=>'closed')); ?>
+	<?php echo CHtml::button(Yii::t('phrase', 'Close'), array('id'=>'closed')); ?>
 </div>

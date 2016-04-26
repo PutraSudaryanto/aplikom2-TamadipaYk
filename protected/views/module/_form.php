@@ -1,12 +1,14 @@
 <?php
 /**
+ * Ommu Plugins (ommu-plugins)
  * @var $this ModuleController
  * @var $model OmmuPlugins
  * @var $form CActiveForm
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -61,6 +63,15 @@
 		<?php }?>
 
 		<div class="clearfix publish">
+			<?php echo $form->labelEx($model,'search'); ?>
+			<div class="desc">
+				<?php echo $form->checkBox($model,'search'); ?>
+				<?php echo $form->labelEx($model,'search'); ?>
+				<?php echo $form->error($model,'search'); ?>
+			</div>
+		</div>
+
+		<div class="clearfix publish">
 			<?php echo $form->labelEx($model,'defaults'); ?>
 			<div class="desc">
 				<?php echo $form->checkBox($model,'defaults'); ?>
@@ -72,8 +83,8 @@
 	</fieldset>
 </div>
 <div class="dialog-submit">
-	<?php echo CHtml::submitButton($model->isNewRecord ? Phrase::trans(1,0) : Phrase::trans(2,0), array('onclick' => 'setEnableSave()')); ?>
-	<?php echo CHtml::button(Phrase::trans(4,0), array('id'=>'closed')); ?>
+	<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('phrase', 'Create') : Yii::t('phrase', 'Save'), array('onclick' => 'setEnableSave()')); ?>
+	<?php echo CHtml::button(Yii::t('phrase', 'Close'), array('id'=>'closed')); ?>
 </div>
 <?php $this->endWidget(); ?>
 

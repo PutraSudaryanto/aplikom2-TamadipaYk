@@ -1,8 +1,18 @@
 <?php
 /**
+ * Ommu Pages (ommu-pages)
  * @var $this PageController
  * @var $model OmmuPages
- * @var $form CActiveForm */
+ * @var $form CActiveForm
+ * version: 1.1.0
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contact (+62)856-299-4114
+ *
+ */
+ 
 	$cs = Yii::app()->getClientScript();
 $js=<<<EOP
 	$('input#OmmuPages_media_show').change(function(){
@@ -41,6 +51,33 @@ EOP;
 						<?php echo $form->error($model,'title'); ?>
 					</div>
 				</div>
+				
+				<div class="clearfix">
+					<?php echo $form->labelEx($model,'quotes'); ?>
+					<div class="desc">
+						<?php 
+						$model->quotes = Phrase::trans($model->quote, 2);
+						//echo $form->textArea($model,'body',array('rows'=>6, 'cols'=>50, 'class'=>'span-10 small'));
+						$this->widget('application.extensions.imperavi.ImperaviRedactorWidget', array(
+							'model'=>$model,
+							'attribute'=>quotes,
+							// Redactor options
+							'options'=>array(
+								//'lang'=>'fi',
+								'buttons'=>array(
+									'html', '|', 
+									'bold', 'italic', 'deleted', '|',
+								),
+							),
+							'plugins' => array(
+								'fontcolor' => array('js' => array('fontcolor.js')),
+								'fullscreen' => array('js' => array('fullscreen.js')),
+							),
+						)); ?>
+						<span class="small-px">Note : add {$quote} in description static pages</span>
+						<?php echo $form->error($model,'quotes'); ?>
+					</div>
+				</div>
 
 				<div class="clearfix">
 					<?php echo $form->labelEx($model,'description'); ?>
@@ -52,14 +89,20 @@ EOP;
 							'model'=>$model,
 							'attribute'=>description,
 							// Redactor options
-							/* ''options'=>array(
+							'options'=>array(
 								//'lang'=>'fi',
-								buttons'=>array(
-									'formatting', '|', 'bold', 'italic', 'deleted', '|',
+								'buttons'=>array(
+									'html', 'formatting', '|', 
+									'bold', 'italic', 'deleted', '|',
 									'unorderedlist', 'orderedlist', 'outdent', 'indent', '|',
-									'image', 'video', 'link', '|', 'html',
+									'link', '|',
 								),
-							), */
+							),
+							'plugins' => array(
+								'fontcolor' => array('js' => array('fontcolor.js')),
+								'table' => array('js' => array('table.js')),
+								'fullscreen' => array('js' => array('fullscreen.js')),
+							),
 						)); ?>
 						<?php echo $form->error($model,'description'); ?>
 					</div>
@@ -94,7 +137,7 @@ EOP;
 					<div class="clearfix">
 						<?php echo $form->labelEx($model,'media'); ?>
 						<div class="desc">
-							<?php echo $form->fileField($model,'media',array('maxlength'=>64)); ?>
+							<?php echo $form->fileField($model,'media'); ?>
 							<?php echo $form->error($model,'media'); ?>
 						</div>
 					</div>
@@ -132,9 +175,9 @@ EOP;
 							<?php echo $form->labelEx($model,'media_type'); ?>
 							<div class="desc">
 								<?php echo $form->dropDownList($model,'media_type', array(
-									1 => Phrase::trans(344,0),
-									2 => Phrase::trans(345,0),
-								), array('prompt'=>Phrase::trans(346,0))); ?>
+									1 => Yii::t('phrase', 'Large'),
+									2 => Yii::t('phrase', 'Medium'),
+								), array('prompt'=>Yii::t('phrase', 'Select type'))); ?>
 								<?php echo $form->error($model,'media_type'); ?>
 							</div>
 						</div>
@@ -154,7 +197,7 @@ EOP;
 		<div class="submit clearfix">
 			<label>&nbsp;</label>
 			<div class="desc">
-				<?php echo CHtml::submitButton($model->isNewRecord ? Phrase::trans(1,0) : Phrase::trans(2,0), array('onclick' => 'setEnableSave()')); ?>
+				<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('phrase', 'Create') : Yii::t('phrase', 'Save'), array('onclick' => 'setEnableSave()')); ?>
 			</div>
 		</div>
 

@@ -1,9 +1,11 @@
 <?php
-
 /**
+ * OmmuPluginPhrase
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -23,7 +25,7 @@
  * @property string $phrase_id
  * @property integer $plugin_id
  * @property string $location
- * @property string $en
+ * @property string $en_us
  *
  * The followings are the available model relations:
  * @property OmmuCorePlugins $plugin
@@ -58,7 +60,7 @@ class OmmuPluginPhrase extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('en', 'required'),
+			array('en_us', 'required'),
 			array('plugin_id', 'numerical', 'integerOnly'=>true),
 			array('phrase_id', 'length', 'max'=>11),
 			array('location', 'length', 'max'=>32),
@@ -66,7 +68,7 @@ class OmmuPluginPhrase extends CActiveRecord
 				id', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('phrase_id, plugin_id, location, en', 'safe', 'on'=>'search'),
+			array('phrase_id, plugin_id, location, en_us', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -88,10 +90,10 @@ class OmmuPluginPhrase extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'phrase_id' => Phrase::trans(176,0),
-			'plugin_id' => Phrase::trans(161,0),
-			'location' => Phrase::trans(359,0),
-			'en' => 'En',
+			'phrase_id' => Yii::t('phrase', 'Phrase'),
+			'plugin_id' => Yii::t('phrase', 'Plugins'),
+			'location' => Yii::t('phrase', 'Location'),
+			'en_us' => 'En',
 		);
 	}
 	
@@ -113,10 +115,10 @@ class OmmuPluginPhrase extends CActiveRecord
 			$criteria->compare('t.plugin_id',$this->plugin_id);
 		}
 		$criteria->compare('t.location',strtolower($this->location),true);
-		$criteria->compare('t.en',strtolower($this->en),true);
+		$criteria->compare('t.en_us',strtolower($this->en_us),true);
 
 		if(!isset($_GET['OmmuPluginPhrase_sort']))
-			$criteria->order = 'phrase_id DESC';
+			$criteria->order = 't.phrase_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -147,7 +149,7 @@ class OmmuPluginPhrase extends CActiveRecord
 			//$this->defaultColumns[] = 'phrase_id';
 			$this->defaultColumns[] = 'plugin_id';
 			$this->defaultColumns[] = 'location';
-			$this->defaultColumns[] = 'en';
+			$this->defaultColumns[] = 'en_us';
 		}
 
 		return $this->defaultColumns;
@@ -172,10 +174,10 @@ class OmmuPluginPhrase extends CActiveRecord
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
-				'filter'=>OmmuPlugins::getPluginArray('id', 0),
+				'filter'=>OmmuPlugins::getPlugin(0, 'id'),
 				'type' => 'raw',
 			);
-			$this->defaultColumns[] = 'en';
+			$this->defaultColumns[] = 'en_us';
 			$this->defaultColumns[] = 'id';
 			$this->defaultColumns[] = 'location';
 		}

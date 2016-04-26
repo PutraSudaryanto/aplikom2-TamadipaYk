@@ -1,11 +1,13 @@
 <?php
 /**
+ * Ommu Plugins (ommu-plugins)
  * @var $this ModuleController
  * @var $model OmmuPlugins
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -17,20 +19,20 @@
 
 	$this->menu=array(
 		array(
-			'label' => 'Filter', 
+			'label' => Yii::t('phrase', 'Filter'), 
 			'url' => array('javascript:void(0);'),
 			'itemOptions' => array('class' => 'search-button'),
 			'linkOptions' => array(
-				'title' => Phrase::trans(307,0),
+				'title' => Yii::t('phrase', 'Filter'),
 				'off_address' => '',
 			),
 		),
 		array(
-			'label' => Phrase::trans(308,0), 
+			'label' => Yii::t('phrase', 'Grid Options'), 
 			'url' => array('javascript:void(0);'),
 			'itemOptions' => array('class' => 'grid-button'),
 			'linkOptions' => array(
-				'title' => Phrase::trans(308,0),
+				'title' => Yii::t('phrase', 'Grid Options'),
 				'off_address' => '',
 			),
 		),
@@ -71,7 +73,7 @@
 		<?php 
 			$columnData   = $columns;
 			array_push($columnData, array(
-				'header' => Phrase::trans(151,0),
+				'header' => Yii::t('phrase', 'Options'),
 				'class'=>'CButtonColumn',
 				'buttons' => array(
 					'view' => array(

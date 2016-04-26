@@ -1,9 +1,11 @@
 <?php
 /**
  * OmmuTemplate
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -26,6 +28,7 @@
  * @property string $template
  * @property string $variable
  * @property string $creation_date
+ * @property string $creation_id
  * @property string $modified_date
  * @property string $modified_id
  */
@@ -35,6 +38,8 @@ class OmmuTemplate extends CActiveRecord
 	
 	// Variable Search
 	public $user_search;
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -70,8 +75,8 @@ class OmmuTemplate extends CActiveRecord
 			array('modified_date', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('template_key, plugin_id, user_id, template, variable, creation_date, modified_date, modified_id,
-				user_search', 'safe', 'on'=>'search'),
+			array('template_key, plugin_id, user_id, template, variable, creation_date, creation_id, modified_date, modified_id,
+				user_search, creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -83,9 +88,11 @@ class OmmuTemplate extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'user' => array(self::BELONGS_TO, 'Users', 'user_id'),
 			'plugin' => array(self::BELONGS_TO, 'OmmuPlugins', 'plugin_id'),
 			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
+			'user' => array(self::BELONGS_TO, 'Users', 'user_id'),
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -95,15 +102,18 @@ class OmmuTemplate extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'template_key' => 'Template Key',
-			'plugin_id' => Phrase::trans(161,0),
-			'user_id' => Phrase::trans(191,0),
-			'template' => 'Template',
-			'variable' => 'Variable',
-			'creation_date' => Phrase::trans(365,0),
-			'modified_date' => Phrase::trans(446,0),
-			'modified_id' => 'Modified',
-			'user_search' => Phrase::trans(191,0),
+			'template_key' => Yii::t('attribute', 'template_key'),
+			'plugin_id' => Yii::t('attribute', 'plugin_id'),
+			'user_id' => Yii::t('attribute', 'user_id'),
+			'template' => Yii::t('attribute', 'template'),
+			'variable' => Yii::t('attribute', 'variable'),
+			'creation_date' => Yii::t('attribute', 'creation_date'),
+			'creation_id' => Yii::t('attribute', 'creation_id'),
+			'modified_date' => Yii::t('attribute', 'modified_date'),
+			'modified_id' => Yii::t('attribute', 'modified_id'),
+			'user_search' => Yii::t('attribute', 'user_id'),
+			'creation_search' => Yii::t('attribute', 'creation_id'),
+			'modified_search' => Yii::t('attribute', 'modified_id'),
 		);
 	}
 
@@ -136,13 +146,16 @@ class OmmuTemplate extends CActiveRecord
 		$criteria->compare('t.variable',$this->variable,true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		if(isset($_GET['creation']))
+			$criteria->compare('t.creation_id',$_GET['creation']);
+		else
+			$criteria->compare('t.creation_id',$this->creation_id);
 		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
-		if(isset($_GET['modified'])) {
+		if(isset($_GET['modified']))
 			$criteria->compare('t.modified_id',$_GET['modified']);
-		} else {
+		else
 			$criteria->compare('t.modified_id',$this->modified_id);
-		}
 		
 		// Custom Search
 		$criteria->with = array(
@@ -150,11 +163,21 @@ class OmmuTemplate extends CActiveRecord
 				'alias'=>'user',
 				'select'=>'displayname'
 			),
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname'
+			),
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
+			),
 		);
 		$criteria->compare('user.displayname',strtolower($this->user_search), true);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['OmmuTemplate_sort']))
-			$criteria->order = 'template_key DESC';
+			$criteria->order = 't.template_key DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -188,6 +211,7 @@ class OmmuTemplate extends CActiveRecord
 			$this->defaultColumns[] = 'template';
 			$this->defaultColumns[] = 'variable';
 			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
 			$this->defaultColumns[] = 'modified_date';
 			$this->defaultColumns[] = 'modified_id';
 		}
@@ -210,7 +234,7 @@ class OmmuTemplate extends CActiveRecord
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
-				'filter'=>OmmuPlugins::getPluginArray('id', 0),
+				'filter'=>OmmuPlugins::getPlugin(0, 'id'),
 				'type' => 'raw',
 			);
 			$this->defaultColumns[] = array(
@@ -220,8 +244,8 @@ class OmmuTemplate extends CActiveRecord
 			//$this->defaultColumns[] = 'template';
 			$this->defaultColumns[] = 'variable';
 			$this->defaultColumns[] = array(
-				'name' => 'user_search',
-				'value' => '$data->user->displayname',
+				'name' => 'creation_search',
+				'value' => '$data->creation_relation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
@@ -304,11 +328,10 @@ class OmmuTemplate extends CActiveRecord
 	 */
 	protected function beforeValidate() {
 		if(parent::beforeValidate()) {	
-			if($this->isNewRecord) {
+			if($this->isNewRecord)
 				$this->user_id = Yii::app()->user->id;
-			} else {
-				$this->modified_id = Yii::app()->user->id;	
-			}
+			else
+				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}

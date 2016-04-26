@@ -1,11 +1,14 @@
 <?php
 /**
+ * Support Mails (support-mails)
  * @var $this ContactController
  * @var $model SupportMails
+ * @var $form CActiveForm
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -74,7 +77,7 @@
 				</div>
 
 				<div class="submit clearfix">
-					<?php echo CHtml::submitButton($model->isNewRecord ? Phrase::trans(328,0) : Phrase::trans(328,0), array('onclick' => 'setEnableSave()')); ?>
+					<?php echo CHtml::submitButton(Yii::t('phrase', 'Send Message'), array('onclick' => 'setEnableSave()')); ?>
 				</div>
 
 			</fieldset>

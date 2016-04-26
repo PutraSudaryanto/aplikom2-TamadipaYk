@@ -2,35 +2,38 @@
 /**
  * Utility class file
  *
+ * Contains many function that most used :
+ *	getCurrentTemplate
+ *	applyCurrentTheme
+ *	getProtocol
+ *	getContentMenu 
+ *	flashSuccess
+ *	flashError
+ *	getDifferenceDay
+ *	getLocalDayName
+ *	getLocalMonthName
+ *	dateFormat
+ *	getTimThumb
+ *	replaceSpaceWithUnderscore
+ *	getUrlTitle
+ *	deleteFolder
+ *	getPublish
+ *	shortText
+ *	convert_smart_quotes
+ *	softDecode
+ *	hardDecode
+ *	cleanImageContent
+ *	chmodr
+ *	recursiveDelete
+ *	formatSizeUnits
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @create date November 27, 2013 15:02 WIB
+ * @update date April 3, 2014 15:02 WIB
  * @version 1.0
- * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
- *
- * Contains many function that most used
- * 
- * getCurrentTemplate
- * applyCurrentTheme
- * getProtocol
- * flashSuccess
- * flashError
- * getDifferenceDay
- * getLocalDayName
- * getLocalMonthName
- * dateFormat
- * getTimThumb
- * replaceSpaceWithUnderscore
- * getUrlTitle
- * deleteFolder
- * getPublish
- * shortText
- * convert_smart_quotes
- * softDecode
- * hardDecode
- * cleanImageContent
- * chmodr
- * recursiveDelete
- * formatSizeUnits
+ * @copyright Copyright (c) 2013 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contect (+62)856-299-4114
  *
  */
 
@@ -76,7 +79,94 @@ class Utility
 			return 'https';
 		return 'http';
 	}
-
+	
+	/**
+	* Return setting template with typePage: public, admin_sweeto or back_office
+	*/
+	public static function getContentMenu() {		
+		$module = strtolower(Yii::app()->controller->module->id);
+		
+		Yii::import('application.components.plugin.Spyc');
+		define('DS', DIRECTORY_SEPARATOR);
+		
+		if($module != null)
+			$contentMenuPath = Yii::getPathOfAlias('application.modules.'.$module).DS.$module.'.yaml';			
+		else
+			$contentMenuPath = Yii::getPathOfAlias('application.ommu').DS.'ommu.yaml';
+			
+		if(file_exists($contentMenuPath)) {
+			$arraySpyc = Spyc::YAMLLoad($contentMenuPath);
+			$contentMenu = $arraySpyc[content_menu];
+			/* echo '<pre>';
+			print_r($contentMenu);
+			echo '</pre>';
+			exit(); */
+			
+			if($contentMenu != null) {
+				$contentMenuData = array_filter($contentMenu, function($a){
+					$module = strtolower(Yii::app()->controller->module->id);
+					$controller = strtolower(Yii::app()->controller->id);
+					$action = strtolower(Yii::app()->controller->action->id);
+					//echo $module.'/'.$controller.'/'.$action;
+					
+					$siteType = explode(',', $a[urlRules][siteType]);
+					$userLevel = explode(',', $a[urlRules][userLevel]);
+					
+					if(count($a[urlRules]) == 5) {
+						$actionArray = explode(',', $a[urlRules][2]);
+						return $a[urlRules][0] == $module && $a[urlRules][1] == $controller && in_array($action, $actionArray) && in_array(OmmuSettings::getInfo('site_type'), $siteType) && in_array(Yii::app()->user->level, $userLevel);					
+					} else {
+						$actionArray = explode(',', $a[urlRules][1]);
+						return $a[urlRules][0] == $controller && in_array($action, $actionArray) && in_array(OmmuSettings::getInfo('site_type'), $siteType) && in_array(Yii::app()->user->level, $userLevel);					
+					}
+				});
+				return $contentMenuData;
+				
+			} else
+				return false;
+			
+		} else
+			return false;
+	}
+	
+	/**
+	* Return setting template with typePage: public, admin_sweeto or back_office
+	*/
+	public static function getPluginMenu($module=null) 
+	{		
+		Yii::import('application.components.plugin.Spyc');
+		define('DS', DIRECTORY_SEPARATOR);
+		
+		if($module == null)
+			return false;
+		else
+			$pluginMenuPath = Yii::getPathOfAlias('application.modules.'.$module).DS.$module.'.yaml';
+			
+			
+		if(file_exists($pluginMenuPath)) {
+			$arraySpyc = Spyc::YAMLLoad($pluginMenuPath);
+			$pluginMenu = $arraySpyc[plugin_menu];
+			/* echo '<pre>';
+			print_r($pluginMenu);
+			echo '</pre>';
+			exit(); */
+			
+			if($pluginMenu != null) {
+				$pluginMenuData = array_filter($pluginMenu, function($a){					
+					$siteType = explode(',', $a[urlRules][siteType]);
+					$userLevel = explode(',', $a[urlRules][userLevel]);
+					
+					return in_array(OmmuSettings::getInfo('site_type'), $siteType) && in_array(Yii::app()->user->level, $userLevel);	
+				});
+				return $pluginMenuData;
+				
+			} else
+				return false;
+			
+		} else
+			return false;
+	}
+	
 	/**
 	 * Provide style for success message
 	 *
@@ -100,6 +190,22 @@ class Utility
 		}
 		return $result;
 	}
+	
+	/**
+	 * get Language
+	 *
+	 */
+    public static function getLanguage(){
+		if(Yii::app()->session['language'] != null)
+            $lang = Yii::app()->session['language'];
+			
+        else {
+            $lang = isset($_GET['lang']) && $_GET['lang'] != '' ? $_GET['lang'] : null;
+            if($lang == null) //find default language 
+                $lang = Yii::app()->params['primaryLang'];
+        }
+        return $lang;
+    }
 
 	/**
 	 * Difference day
@@ -131,49 +237,48 @@ class Utility
 	Mengembalikan nama hari dalam bahasa indonesia.
 	@params short=true, tampilkan dalam 3 huruf, JUM, SAB
 	*/
-	public static function getLocalDayName($dayName, $short=true) {
+	public static function getLocalDayName($date, $short=true) {
+		$dayName = date('N', strtotime($date));
 		switch($dayName) {
-			case 0:
-				return ($short ? Phrase::trans(478,0) : Phrase::trans(471,0));
-				break;
+            case 0:
+                return ($short ? 'Min' : 'Minggu');
+            break;
 
-			case 1:
-				return ($short ? Phrase::trans(479,0) : Phrase::trans(472,0));
-				break;
+            case 1:
+                return ($short ? 'Sen' : 'Senin');
+            break;
 
-			case 2:
-				return ($short ? Phrase::trans(480,0): Phrase::trans(473,0));
-				break;
+            case 2:
+                return ($short ? 'Sel' : 'Selasa');
+            break;
 
-			case 3:
-				return ($short ? Phrase::trans(481,0) : Phrase::trans(474,0));
-				break;
+            case 3:
+                return ($short ? 'Rab' : 'Rabu');
+            break;
 
-			case 4:
-				return ($short ? Phrase::trans(482,0) : Phrase::trans(475,0));
-				break;
+            case 4:
+                return ($short ? 'Kam' : 'Kamis');
+            break;
 
-			case 5:
-				return ($short ? Phrase::trans(483,0) : Phrase::trans(476,0));
-				break;
+            case 5:
+                return ($short ? 'Jum' : 'Jumat');
+            break;
 
-			case 6:
-				return ($short ? Phrase::trans(484,0) : Phrase::trans(477,0));
-				break;
+            case 6:
+                return ($short ? 'Sab' : 'Sabtu');
+            break;
 		}
 	}
 
 	/* Ubah bulan angka ke nama bulan */
-	public static function getLocalMonthName($month, $short=false) {
-		if(empty($month))
+	public static function getLocalMonthName($date, $short=false) {
+		if(empty($date))
 			return false;
+		
+		$month = date('m', strtotime($date));
 
-		$bulan = array(
-			Phrase::trans(447,0), Phrase::trans(448,0), Phrase::trans(449,0), Phrase::trans(450,0), Phrase::trans(451,0), Phrase::trans(452,0), Phrase::trans(453,0), Phrase::trans(454,0), Phrase::trans(455,0), Phrase::trans(456,0), Phrase::trans(457,0), Phrase::trans(458,0)
-		);
-		$shortBulan = array(
-			Phrase::trans(459,0), Phrase::trans(460,0), Phrase::trans(461,0), Phrase::trans(462,0), Phrase::trans(463,0), Phrase::trans(464,0), Phrase::trans(465,0), Phrase::trans(466,0), Phrase::trans(467,0), Phrase::trans(468,0), Phrase::trans(469,0), Phrase::trans(470,0)
-		);
+		$bulan = array('Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember');
+		$shortBulan = array('Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des');
 
 		if($short == true)
 			return $shortBulan[$month-1];
@@ -200,10 +305,11 @@ class Utility
 	/**
 	 * getTimThumb function
 	 */
-	public static function getTimThumb($src, $width, $height, $zoom, $crop='c') {
-		if(isset(Yii::app()->session['timthumb_url_replace'])) {
-			$src = str_replace(Yii::app()->request->baseUrl, Yii::app()->session['timthumb_url_replace'], $src);		
-		}
+	public static function getTimThumb($src, $width, $height, $zoom, $crop='c') 
+	{
+		if(Yii::app()->params['timthumb_url_replace'] == 1)
+			$src = str_replace(Yii::app()->request->baseUrl, Yii::app()->params['timthumb_url_replace_website'], $src);
+		
 		$image = self::getProtocol().'://'.Yii::app()->request->serverName.Yii::app()->request->baseUrl.'/timthumb.php?src='.$src.'&h='.$height.'&w='.$width.'&zc='.$zoom.'&a='.$crop;
         return $image;
     }
@@ -297,35 +403,35 @@ class Utility
 			$min = $arrType[1];
 		} else {
 			if($type == '1') {
-				$plus = Phrase::trans(275,0);
-				$min = Phrase::trans(276,0);
+				$plus = Yii::t('phrase', 'Publish');
+				$min = Yii::t('phrase', 'Unpublish');
 			} else if($type == '2') {
-				$plus = Phrase::trans(277,0);
-				$min = Phrase::trans(278,0);
+				$plus = Yii::t('phrase', 'Actived');
+				$min = Yii::t('phrase', 'Deactived');
 			} else if($type == '3') {
-				$plus = Phrase::trans(283,0);
-				$min = Phrase::trans(284,0);
+				$plus = Yii::t('phrase', 'Enabled');
+				$min = Yii::t('phrase', 'Disabled');
 			} else if($type == '4') {
-				$plus = Phrase::trans(287,0);
-				$min = Phrase::trans(288,0);
+				$plus = Yii::t('phrase', 'Enabled Dialog');
+				$min = Yii::t('phrase', 'Disable Dialog');
 			} else if($type == '5') {
-				$plus = Phrase::trans(292,0);
-				$min = Phrase::trans(291,0);
+				$plus = Yii::t('phrase', 'Unresolved');
+				$min = Yii::t('phrase', 'Resolved');
 			} else if($type == '6') {
-				$plus = Phrase::trans(156,0);
-				$min = Phrase::trans(156,0);
+				$plus = Yii::t('phrase', 'Defaults');
+				$min = Yii::t('phrase', 'Defaults');
 			} else if($type == '7') {
-				$plus = Phrase::trans(303,0);
-				$min = Phrase::trans(304,0);
+				$plus = Yii::t('phrase', 'Verified');
+				$min = Yii::t('phrase', 'Unverified');
 			} else if($type == '8') {
-				$plus = Phrase::trans(310,0);
-				$min = Phrase::trans(309,0);
+				$plus = Yii::t('phrase', 'Subcribe');
+				$min = Yii::t('phrase', 'Unsubcribe');
 			} else if($type == '9') {
-				$plus = Phrase::trans(338,0);
-				$min = Phrase::trans(338,0);
+				$plus = Yii::t('phrase', 'Headline');
+				$min = Yii::t('phrase', 'Headline');
 			} else if($type == '9') {
-				$plus = Phrase::trans(506,0);
-				$min = Phrase::trans(506,0);
+				$plus = Yii::t('phrase', 'Install Module');
+				$min = Yii::t('phrase', 'Install Module');
 			}
 		}
 		if(!empty(Yii::app()->theme->name))

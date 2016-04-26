@@ -1,28 +1,29 @@
 <?php
 /**
-* TranslateController
-* Handle TranslateController
-* Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
-* version: 2.0.0
-* Reference start
-*
-* TOC :
-*	Index
-*	Manage
-*	Add
-*	Edit
-*	Delete
-*
-*	LoadModel
-*	performAjaxValidation
-*
-* @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
-* @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
-* @contact (+62)856-299-4114
-*
-*----------------------------------------------------------------------------------------------------------
-*/
+ * TranslateController
+ * @var $this TranslateController
+ * @var $model OmmuSystemPhrase
+ * @var $form CActiveForm
+ * version: 1.1.0
+ * Reference start
+ *
+ * TOC :
+ *	Index
+ *	Manage
+ *	Add
+ *	Edit
+ *	Delete
+ *
+ *	LoadModel
+ *	performAjaxValidation
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contact (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class TranslateController extends Controller
 {
@@ -44,7 +45,7 @@ class TranslateController extends Controller
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				$this->redirect(Yii::app()->createUrl('site/login'));
 			}
 		} else {
 			$this->redirect(Yii::app()->createUrl('site/login'));
@@ -124,7 +125,7 @@ class TranslateController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Phrase::trans(352,0);
+		$this->pageTitle = Yii::t('phrase', 'Front Phrases');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -155,13 +156,13 @@ class TranslateController extends Controller
 			} else {
 				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
 					if($model->validate()) {
-						$model->phrase_id = 1000 + (count(OmmuSystemPhrase::getPublicPhrase('phrase_id')) + 1);
 						if($model->save()) {
 							echo CJSON::encode(array(
 								'type' => 5,
 								'get' => Yii::app()->controller->createUrl('manage'),
 								'id' => 'partial-ommu-system-phrase',
-								'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(355,0, array ($model->phrase_id)).'</strong></div>',
+								'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', '{phrase} Front Phrase success created.', array('{phrase}'=>$model->phrase_id)).'</strong></div>',
+								
 							));
 						}
 					} else {
@@ -176,7 +177,7 @@ class TranslateController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 600;
 			
-			$this->pageTitle = Phrase::trans(353,0);
+			$this->pageTitle = Yii::t('phrase', 'Add Front Phrase');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_add',array(
@@ -213,7 +214,7 @@ class TranslateController extends Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('manage'),
 							'id' => 'partial-ommu-system-phrase',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(356,0, array($model->phrase_id)).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', '{phrase} Front Phrase success updated.', array('{phrase}'=>$model->phrase_id)).'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -227,7 +228,7 @@ class TranslateController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 600;
 			
-			$this->pageTitle = Phrase::trans(354,0);
+			$this->pageTitle = Yii::t('phrase', 'Update Front Phrase');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_edit',array(
@@ -253,7 +254,7 @@ class TranslateController extends Controller
 					'type' => 5,
 					'get' => Yii::app()->controller->createUrl('manage'),
 					'id' => 'partial-ommu-system-phrase',
-					'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(358,0).'</strong></div>',
+					'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Front Phrase success deleted.').'</strong></div>',
 				));
 			}
 
@@ -262,7 +263,7 @@ class TranslateController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(357,0);
+			$this->pageTitle = Yii::t('phrase', 'Delete Front Phrase');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -278,7 +279,7 @@ class TranslateController extends Controller
 	{
 		$model = OmmuSystemPhrase::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

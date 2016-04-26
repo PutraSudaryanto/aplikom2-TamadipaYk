@@ -1,29 +1,27 @@
 <?php
 /**
-* SiteController
-* Handle SiteController
-* Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
-* version: 2.0.0
-* Reference start
-*
-* TOC :
-*	Error
-*	Index
-*	Login
-*	Logout
-*	Contact
-*	SendEmail
-*
-*	LoadModel
-*	performAjaxValidation
-*
-* @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
-* @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
-* @contact (+62)856-299-4114
-*
-*----------------------------------------------------------------------------------------------------------
-*/
+ * SiteController
+ * @var $this SiteController
+ * version: 1.1.0
+ * Reference start
+ *
+ * TOC :
+ *	Error
+ *	Index
+ *	Login
+ *	Logout
+ *	SendEmail
+ *
+ *	LoadModel
+ *	performAjaxValidation
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contact (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class SiteController extends Controller
 {
@@ -58,6 +56,41 @@ class SiteController extends Controller
 	}
 
 	/**
+	 * @return array action filters
+	 */
+	public function filters() 
+	{
+		return array(
+			'accessControl', // perform access control for CRUD operations
+			//'postOnly + delete', // we only allow deletion via POST request
+		);
+	}
+
+	/**
+	 * Specifies the access control rules.
+	 * This method is used by the 'accessControl' filter.
+	 * @return array access control rules
+	 */
+	public function accessRules() 
+	{
+		return array(
+			array('allow',  // allow all users to perform 'index' and 'view' actions
+				'actions'=>array('index','error','login','logout','sendemail'),
+				'users'=>array('*'),
+			),
+			array('allow', // allow authenticated user to perform 'create' and 'update' actions
+				'actions'=>array(),
+				'users'=>array('@'),
+				'expression'=>'isset(Yii::app()->user->level)',
+				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
+			),
+			array('deny',  // deny all users
+				'users'=>array('*'),
+			),
+		);
+	}
+
+	/**
 	 * This is the action to handle external exceptions.
 	 */
 	public function actionError()
@@ -69,9 +102,9 @@ class SiteController extends Controller
 			if(Yii::app()->request->isAjaxRequest)
 				echo $error['message'];
 			else
-				$this->render('front_error', $error);
+				$this->render('application.webs.site.front_error', $error);
 		} else {
-			$this->render('front_error', $error);
+			$this->render('application.webs.site.front_error', $error);
 		}
 	}
 
@@ -97,16 +130,17 @@ class SiteController extends Controller
 			/* if(!Yii::app()->user->isGuest) {
 				$this->redirect(Yii::app()->createUrl('pose/site/index'));
 			} else {
-				$render = 'front_index';
+				$render = 'application.webs.site.front_index';
 			} */
 			
 			$this->adsSidebar = false;
 			$this->pageTitle = 'Home';
 			$this->pageDescription = '';
 			$this->pageMeta = '';
-			$this->render('front_index', array(
+			$this->render('application.webs.site.front_index', array(
 				'setting'=>$setting,
 			));
+			
 		}
 	}
 
@@ -115,141 +149,15 @@ class SiteController extends Controller
 	 */
 	public function actionLogin()
 	{
-		if(!Yii::app()->user->isGuest) {
+		if(!Yii::app()->user->isGuest)
 			$this->redirect(array('site/index'));
 
-		} else {
+		else {
 			$setting = OmmuSettings::getInfo('site_type');
-			if($setting == 1) {
-				$arrThemes = Utility::getCurrentTemplate('public');
-				Yii::app()->theme = $arrThemes['folder'];
-				$this->layout = $arrThemes['layout'];
-				
-				$model=new LoginForm;
-				$modelForm = 'LoginForm';
-				$title = Phrase::trans(411,0);
-				$desc = '';
-				$render = 'front_login';
-			} else {
-				$arrThemes = Utility::getCurrentTemplate('admin');
-				Yii::app()->theme = $arrThemes['folder'];
-				$this->layout = $arrThemes['layout'];
-				
-				$model=new LoginFormAdmin;
-				$modelForm = 'LoginFormAdmin';
-				$title = Phrase::trans(411,0);
-				$desc = '';
-				$render = 'admin_login';
-			}
-
-			// if it is ajax validation request
-			if(isset($_POST['ajax']) && $_POST['ajax']==='login-form') {
-				echo CActiveForm::validate($model);
-				Yii::app()->end();
-			}
-
-			// collect user input data
-			if(isset($_POST[$modelForm]))
-			{
-				$model->attributes=$_POST[$modelForm];
-				
-				if($setting == 1) {
-					if(!isset($_GET['email'])) {
-						$model->scenario = 'loginemail';
-					} else {
-						$model->scenario = 'loginpassword';
-					}
-				}
-
-				$jsonError = CActiveForm::validate($model);
-				if(strlen($jsonError) > 2) {
-					echo $jsonError;
-
-				} else {
-					if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
-						if($setting == 1) {
-							if(!isset($_GET['email'])) {
-								if($model->validate()) {
-									echo CJSON::encode(array(
-										'type' => 5,
-										'get' => Yii::app()->createUrl('site/login', array('email'=>$model->email)),
-									));
-								} else {
-									print_r($model->getErrors());
-								}
-							} else {
-								// validate user input and redirect to the previous page if valid
-								if($model->validate() && $model->login()) {
-									Users::model()->updateByPk(Yii::app()->user->id, array(
-										'lastlogin_date'=>date('Y-m-d H:i:s'), 
-										'lastlogin_ip'=>$_SERVER['REMOTE_ADDR'],
-										'lastlogin_from'=>Yii::app()->params['product_access_system'],
-									));
-									
-									echo CJSON::encode(array(
-										'redirect' => Yii::app()->user->level == 1 ? Yii::app()->createUrl('admin/index') : Yii::app()->user->returnUrl,
-									));
-								} else {
-									print_r($model->getErrors());
-								}
-							}
-						
-						} else {
-							// validate user input and redirect to the previous page if valid
-							if($model->validate() && $model->login()) {
-								Users::model()->updateByPk(Yii::app()->user->id, array(
-									'lastlogin_date'=>date('Y-m-d H:i:s'), 
-									'lastlogin_ip'=>$_SERVER['REMOTE_ADDR'],
-									'lastlogin_from'=>Yii::app()->params['product_access_system'],
-								));
-								if(isset($_GET['type'])) {
-									echo CJSON::encode(array(
-										'type' => 6,
-									));
-								} else {
-									echo CJSON::encode(array(
-										'redirect' => Yii::app()->user->level == 1 ? Yii::app()->createUrl('admin/index') : Yii::app()->user->returnUrl,
-									));
-								}
-								//$this->redirect(Yii::app()->user->returnUrl);
-							} else {
-								print_r($model->getErrors());
-							}
-						}
-					}
-				}
-				Yii::app()->end();
-				
-			}
-			
-			if($setting == 1) {
-				// display the login form
-				$this->dialogDetail = true;
-				$this->dialogGroundUrl = Yii::app()->createUrl('site/index');
-
-				$this->dialogFixed = true;
-				if(!isset($_GET['email'])) {
-					$this->dialogFixedClosed=array(
-						Phrase::trans(596,0)=>Yii::app()->createUrl('users/signup/index'),
-					);
-				} else {
-					$this->dialogFixedClosed=array(
-						Phrase::trans(597,0)=>Yii::app()->createUrl('users/forgot/get'),
-					);
-				}		
-				
-			} else {
-				// display the login form
-				$this->dialogDetail = true;
-				$this->dialogWidth = 600;
-			}
-			
-			$this->pageTitle = $title;
-			$this->pageDescription = $desc;
-			$this->pageMeta = '';
-			$this->render($render,array(
-				'model'=>$model,
-			));
+			if($setting == 1)
+				$this->redirect(Yii::app()->createUrl('users/account'));
+			else
+				$this->redirect(Yii::app()->createUrl('users/admin'));
 		}
 	}
 

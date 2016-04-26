@@ -4,8 +4,7 @@
  * @var $this WallcommentController
  * @var $model OmmuWallComment
  * @var $form CActiveForm
- * Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
- * version: 0.0.1
+ * version: 1.1.0
  * Reference start
  *
  * TOC :
@@ -24,7 +23,7 @@
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Core
  * @contect (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
@@ -50,7 +49,7 @@ class WallcommentController extends Controller
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 			}
 		} else {
 			$this->redirect(Yii::app()->createUrl('site/login'));
@@ -341,10 +340,10 @@ class WallcommentController extends Controller
 		$model=$this->loadModel($id);
 		
 		if($model->publish == 1) {
-			$title = Phrase::trans(276,0);
+			$title = Yii::t('phrase', 'Unpublish');
 			$replace = 0;
 		} else {
-			$title = Phrase::trans(275,0);
+			$title = Yii::t('phrase', 'Publish');
 			$replace = 1;
 		}
 
@@ -422,7 +421,7 @@ class WallcommentController extends Controller
 			echo CJSON::encode($return);
 			
 		} else {
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		}
 	}
 
@@ -435,7 +434,7 @@ class WallcommentController extends Controller
 	{
 		$model = OmmuWallComment::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

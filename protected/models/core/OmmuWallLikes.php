@@ -1,9 +1,11 @@
 <?php
 /**
  * OmmuWallLikes
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -94,13 +96,13 @@ class OmmuWallLikes extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'like_id' => 'Like',
-			'wall_id' => 'Wall',
-			'user_id' => Phrase::trans(191,0),
-			'likes_date' => 'Likes Date',
-			'likes_ip' => 'Likes Ip',
-			'wall_search' => 'Wall',
-			'user_search' => Phrase::trans(191,0),
+			'like_id' => Yii::t('attribute', 'like_id'),
+			'wall_id' => Yii::t('attribute', 'wall_id'),
+			'user_id' => Yii::t('attribute', 'user_id'),
+			'likes_date' => Yii::t('attribute', 'likes_date'),
+			'likes_ip' => Yii::t('attribute', 'likes_ip'),
+			'wall_search' => Yii::t('attribute', 'wall_id'),
+			'user_search' => Yii::t('attribute', 'user_id'),
 		);
 	}
 
@@ -152,7 +154,7 @@ class OmmuWallLikes extends CActiveRecord
 		$criteria->compare('user.displayname',strtolower($this->user_search), true);
 
 		if(!isset($_GET['OmmuWallLikes_sort']))
-			$criteria->order = 'like_id DESC';
+			$criteria->order = 't.like_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

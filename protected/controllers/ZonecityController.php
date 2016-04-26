@@ -1,25 +1,32 @@
 <?php
 /**
-* ZonecityController
-* Handle ZonecityController
-* Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
-* version: 2.0.0
-* Reference start
-*
-* TOC :
-*	Index
-*	Suggest
-*
-*	LoadModel
-*	performAjaxValidation
-*
-* @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
-* @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
-* @contact (+62)856-299-4114
-*
-*----------------------------------------------------------------------------------------------------------
-*/
+ * ZonecityController
+ * @var $this ZonecityController
+ * @var $model OmmuZoneCity
+ * @var $form CActiveForm
+ * version: 1.1.0
+ * Reference start
+ *
+ * TOC :
+ *	Index
+ *	Suggest
+ *	Manage
+ *	Add
+ *	Edit
+ *	RunAction
+ *	Delete
+ *	Publish
+ *
+ *	LoadModel
+ *	performAjaxValidation
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contect (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class ZonecityController extends Controller
 {
@@ -41,7 +48,7 @@ class ZonecityController extends Controller
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				$this->redirect(Yii::app()->createUrl('site/login'));
 			}
 		} else {
 			$this->redirect(Yii::app()->createUrl('site/login'));
@@ -78,7 +85,7 @@ class ZonecityController extends Controller
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array(),
+				'actions'=>array('manage','add','edit','runaction','delete','publish'),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 1)',
 			),
@@ -97,7 +104,7 @@ class ZonecityController extends Controller
 	 */
 	public function actionIndex() 
 	{
-		$this->redirect(Yii::app()->createUrl('site/login'));
+		$this->redirect(array('manage'));
 	}
 
 	/**
@@ -106,11 +113,256 @@ class ZonecityController extends Controller
 	public function actionSuggest($id) 
 	{
 		$model = OmmuZoneCity::getCity($id);
-		$message['data'] = '<option value="">'.Phrase::trans(408,1).'</option>';
+		$message['data'] = '<option value="">'.Yii::t('phrase', 'Select one').'</option>';
 		foreach($model as $key => $val) {
 			$message['data'] .= '<option value="'.$key.'">'.$val.'</option>';
 		}
 		echo CJSON::encode($message);
+	}
+
+	/**
+	 * Manages all models.
+	 */
+	public function actionManage() 
+	{
+		$model=new OmmuZoneCity('search');
+		$model->unsetAttributes();  // clear any default values
+		if(isset($_GET['OmmuZoneCity'])) {
+			$model->attributes=$_GET['OmmuZoneCity'];
+		}
+
+		$columnTemp = array();
+		if(isset($_GET['GridColumn'])) {
+			foreach($_GET['GridColumn'] as $key => $val) {
+				if($_GET['GridColumn'][$key] == 1) {
+					$columnTemp[] = $key;
+				}
+			}
+		}
+		$columns = $model->getGridColumn($columnTemp);
+
+		$this->pageTitle = 'Ommu Zone Cities Manage';
+		$this->pageDescription = '';
+		$this->pageMeta = '';
+		$this->render('/zone_city/admin_manage',array(
+			'model'=>$model,
+			'columns' => $columns,
+		));
+	}	
+	
+	/**
+	 * Creates a new model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 */
+	public function actionAdd() 
+	{
+		$model=new OmmuZoneCity;
+
+		// Uncomment the following line if AJAX validation is needed
+		$this->performAjaxValidation($model);
+
+		if(isset($_POST['OmmuZoneCity'])) {
+			$model->attributes=$_POST['OmmuZoneCity'];
+			
+			$jsonError = CActiveForm::validate($model);
+			if(strlen($jsonError) > 2) {
+				echo $jsonError;
+
+			} else {
+				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
+					if($model->save()) {
+						echo CJSON::encode(array(
+							'type' => 5,
+							'get' => Yii::app()->controller->createUrl('manage'),
+							'id' => 'partial-ommu-zone-city',
+							'msg' => '<div class="errorSummary success"><strong>OmmuZoneCity success created.</strong></div>',
+						));
+					} else {
+						print_r($model->getErrors());
+					}
+				}
+			}
+			Yii::app()->end();
+			
+		} else {
+			$this->dialogDetail = true;
+			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+			$this->dialogWidth = 600;
+			
+			$this->pageTitle = 'Create Ommu Zone Cities';
+			$this->pageDescription = '';
+			$this->pageMeta = '';
+			$this->render('/zone_city/admin_add',array(
+				'model'=>$model,
+			));			
+		}
+	}
+
+	/**
+	 * Updates a particular model.
+	 * If update is successful, the browser will be redirected to the 'view' page.
+	 * @param integer $id the ID of the model to be updated
+	 */
+	public function actionEdit($id) 
+	{
+		$model=$this->loadModel($id);
+
+		// Uncomment the following line if AJAX validation is needed
+		$this->performAjaxValidation($model);
+
+		if(isset($_POST['OmmuZoneCity'])) {
+			$model->attributes=$_POST['OmmuZoneCity'];
+			
+			$jsonError = CActiveForm::validate($model);
+			if(strlen($jsonError) > 2) {
+				echo $jsonError;
+
+			} else {
+				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
+					if($model->save()) {
+						echo CJSON::encode(array(
+							'type' => 5,
+							'get' => Yii::app()->controller->createUrl('manage'),
+							'id' => 'partial-ommu-zone-city',
+							'msg' => '<div class="errorSummary success"><strong>OmmuZoneCity success updated.</strong></div>',
+						));
+					} else {
+						print_r($model->getErrors());
+					}
+				}
+			}
+			Yii::app()->end();
+			
+		} else {
+			$this->dialogDetail = true;
+			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+			$this->dialogWidth = 600;
+			
+			$this->pageTitle = 'Update Ommu Zone Cities';
+			$this->pageDescription = '';
+			$this->pageMeta = '';
+			$this->render('/zone_city/admin_edit',array(
+				'model'=>$model,
+			));			
+		}
+	}
+
+	/**
+	 * Displays a particular model.
+	 * @param integer $id the ID of the model to be displayed
+	 */
+	public function actionRunAction() {
+		$id       = $_POST['trash_id'];
+		$criteria = null;
+		$actions  = $_GET['action'];
+
+		if(count($id) > 0) {
+			$criteria = new CDbCriteria;
+			$criteria->addInCondition('id', $id);
+
+			if($actions == 'publish') {
+				OmmuZoneCity::model()->updateAll(array(
+					'publish' => 1,
+				),$criteria);
+			} elseif($actions == 'unpublish') {
+				OmmuZoneCity::model()->updateAll(array(
+					'publish' => 0,
+				),$criteria);
+			} elseif($actions == 'trash') {
+				OmmuZoneCity::model()->updateAll(array(
+					'publish' => 2,
+				),$criteria);
+			} elseif($actions == 'delete') {
+				OmmuZoneCity::model()->deleteAll($criteria);
+			}
+		}
+
+		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+		if(!isset($_GET['ajax'])) {
+			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('manage'));
+		}
+	}
+
+	/**
+	 * Deletes a particular model.
+	 * If deletion is successful, the browser will be redirected to the 'admin' page.
+	 * @param integer $id the ID of the model to be deleted
+	 */
+	public function actionDelete($id) 
+	{
+		$model=$this->loadModel($id);
+		
+		if(Yii::app()->request->isPostRequest) {
+			// we only allow deletion via POST request
+			if(isset($id)) {
+				if($model->delete()) {
+					echo CJSON::encode(array(
+						'type' => 5,
+						'get' => Yii::app()->controller->createUrl('manage'),
+						'id' => 'partial-ommu-zone-city',
+						'msg' => '<div class="errorSummary success"><strong>OmmuZoneCity success deleted.</strong></div>',
+					));
+				}
+			}
+
+		} else {
+			$this->dialogDetail = true;
+			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+			$this->dialogWidth = 350;
+
+			$this->pageTitle = 'OmmuZoneCity Delete.';
+			$this->pageDescription = '';
+			$this->pageMeta = '';
+			$this->render('/zone_city/admin_delete');
+		}
+	}
+
+	/**
+	 * Deletes a particular model.
+	 * If deletion is successful, the browser will be redirected to the 'admin' page.
+	 * @param integer $id the ID of the model to be deleted
+	 */
+	public function actionPublish($id) 
+	{
+		$model=$this->loadModel($id);
+		
+		if($model->publish == 1) {
+			$title = Yii::t('phrase', 'Unpublish');
+			$replace = 0;
+		} else {
+			$title = Yii::t('phrase', 'Publish');
+			$replace = 1;
+		}
+
+		if(Yii::app()->request->isPostRequest) {
+			// we only allow deletion via POST request
+			if(isset($id)) {
+				//change value active or publish
+				$model->publish = $replace;
+
+				if($model->update()) {
+					echo CJSON::encode(array(
+						'type' => 5,
+						'get' => Yii::app()->controller->createUrl('manage'),
+						'id' => 'partial-ommu-zone-city',
+						'msg' => '<div class="errorSummary success"><strong>OmmuZoneCity success published.</strong></div>',
+					));
+				}
+			}
+
+		} else {
+			$this->dialogDetail = true;
+			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+			$this->dialogWidth = 350;
+
+			$this->pageTitle = $title;
+			$this->pageDescription = '';
+			$this->pageMeta = '';
+			$this->render('/zone_city/admin_publish',array(
+				'title'=>$title,
+				'model'=>$model,
+			));
+		}
 	}
 
 	/**
@@ -122,7 +374,7 @@ class ZonecityController extends Controller
 	{
 		$model = OmmuZoneCity::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

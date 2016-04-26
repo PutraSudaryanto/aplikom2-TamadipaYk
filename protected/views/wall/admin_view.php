@@ -1,10 +1,13 @@
 <?php
 /**
  * Ommu Walls (ommu-walls)
- * @var $this WallController * @var $model OmmuWalls *
+ * @var $this WallController
+ * @var $model OmmuWalls
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contect (+62)856-299-4114
  *
  */
@@ -40,5 +43,5 @@ if(Yii::app()->user->hasFlash('success'))
 <div class="dialog-content">
 </div>
 <div class="dialog-submit">
-	<?php echo CHtml::button(Phrase::trans(4,0), array('id'=>'closed')); ?>
+	<?php echo CHtml::button(Yii::t('phrase', 'Close'), array('id'=>'closed')); ?>
 </div>

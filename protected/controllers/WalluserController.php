@@ -4,27 +4,19 @@
  * @var $this WalluserController
  * @var $model OmmuWallUser
  * @var $form CActiveForm
- * Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
- * version: 0.0.1
+ * version: 1.1.0
  * Reference start
  *
  * TOC :
  *	Index
- *	View
  *	Manage
- *	Add
- *	Edit
- *	RunAction
- *	Delete
- *	Publish
- *	Headline
  *
  *	LoadModel
  *	performAjaxValidation
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Core
  * @contect (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
@@ -148,7 +140,7 @@ class WalluserController extends Controller
 	{
 		$model = OmmuWallUser::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

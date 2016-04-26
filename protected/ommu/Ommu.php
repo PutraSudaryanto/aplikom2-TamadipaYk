@@ -1,15 +1,25 @@
 <?php
 /**
  * Ommu class file
- *
  * Bootstrap application
  * in this class you set default controller to be executed first time
+ *
+ * Reference start
+ *
+ * TOC :
+ *	init
+ *	getDefaultTheme
+ *	getRulePos
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @create date August 6, 2012 15:02 WIB
  * @updated date February 20, 2014 15:50 WIB
  * @version 1.0.9
  * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contect (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
  */
 
 class Ommu extends CApplicationComponent
@@ -195,8 +205,8 @@ class Ommu extends CApplicationComponent
 					'place:location:latitude'=>$point[0],
 					'place:location:longitude'=>$point[1],
 					'business:contact_data:street_address'=>$meta->office_place.', '.$meta->office_village.', '.$meta->office_district,
-					'business:contact_data:country_name'=>OmmuZoneCountry::getInfo($meta->office_country, 'country'),
-					'business:contact_data:locality'=>OmmuZoneCity::getInfo($meta->office_city, 'city'),
+					'business:contact_data:country_name'=>$meta->view_meta->country,					
+					'business:contact_data:locality'=>$meta->view_meta->city,
 					'business:contact_data:region'=>$meta->office_district,
 					'business:contact_data:postal_code'=>$meta->office_zipcode,
 					'business:contact_data:email'=>$meta->office_email,

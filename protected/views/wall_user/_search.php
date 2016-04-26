@@ -1,11 +1,14 @@
 <?php
 /**
  * Ommu Wall Users (ommu-wall-user)
- * @var $this WalluserController * @var $model OmmuWallUser * @var $form CActiveForm
+ * @var $this WalluserController
+ * @var $model OmmuWallUser
+ * @var $form CActiveForm
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contect (+62)856-299-4114
  *
  */
@@ -42,7 +45,7 @@
 		</li>
 
 		<li class="submit">
-			<?php echo CHtml::submitButton(Phrase::trans(3,0)); ?>
+			<?php echo CHtml::submitButton(Yii::t('phrase', 'Search')); ?>
 		</li>
 	</ul>
 <?php $this->endWidget(); ?>

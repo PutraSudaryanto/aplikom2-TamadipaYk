@@ -6,6 +6,10 @@
  * @link http://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
  * @license http://www.yiiframework.com/license/
+ * 
+ * @modify Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @contect (+62)856-299-4114
+ *
  */
 
 Yii::import('application.components.system.CBaseListView');
@@ -622,8 +626,12 @@ class OGridView extends CBaseListView
 		}
 
 		echo CHtml::openTag('tr', $htmlOptions)."\n";
-		foreach($this->columns as $column)
+		foreach($this->columns as $column) {
+			//echo '<pre>';
+			//print_r($column);
+			//echo '</pre>';
 			$this->renderDataCell($column, $row);
+		}	
 		echo "</tr>\n";
 	}
 

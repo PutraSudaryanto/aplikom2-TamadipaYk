@@ -6,9 +6,13 @@
  * @link http://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
  * @license http://www.yiiframework.com/license/
+ * 
+ * @modify Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @contect (+62)856-299-4114
+ *
  */
 
-Yii::import('zii.widgets.grid.CGridColumn');
+Yii::import('application.components.system.CGridColumn');
 
 /**
  * CDataColumn represents a grid view column that is associated with a data attribute or PHP expression.
@@ -97,14 +101,18 @@ class CDataColumn extends CGridColumn
 		if(is_string($this->filter))
 		{
 			//echo $this->filter;
-			echo CHtml::activeTextField($this->grid->filter, $this->name, array('id'=>$this->name, 'on_datepicker'=>''));
+			//echo '<pre>';
+			//print_r($this->grid);
+			//echo '</pre>';
+			//exit();
+			echo CHtml::activeTextField($this->grid->filter, $this->name, array('id'=>$this->name."_filter", 'on_datepicker'=>'on', 'placeholder'=>'filter'));
 		}
 		elseif($this->filter!==false && $this->grid->filter!==null && $this->name!==null && strpos($this->name,'.')===false)
 		{
 			if(is_array($this->filter))
-				return CHtml::activeDropDownList($this->grid->filter, $this->name, $this->filter, array('id'=>false,'prompt'=>''));
+				return CHtml::activeDropDownList($this->grid->filter, $this->name, $this->filter, array('id'=>false, 'prompt'=>''));
 			elseif($this->filter===null)
-				return CHtml::activeTextField($this->grid->filter, $this->name, array('id'=>false));
+				return CHtml::activeTextField($this->grid->filter, $this->name, array('id'=>false, 'placeholder'=>'filter'));
 		}
 		else
 			return parent::getFilterCellContent();

@@ -1,4 +1,14 @@
 <?php
+/**
+ * FrontBreadcrumbs
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contect (+62)856-299-4114
+ *
+ */
+ 
 class FrontBreadcrumbs extends CWidget
 {
 	/**
@@ -55,7 +65,7 @@ class FrontBreadcrumbs extends CWidget
 		$links=array();
 			
 		if($this->homeLink===null)
-			$links[]=CHtml::link(Yii::t('zii',Phrase::trans(329,0)),Yii::app()->homeUrl);
+			$links[]=CHtml::link(Yii::t('zii', Yii::t('phrase', 'Home')),Yii::app()->homeUrl);
 		elseif($this->homeLink!==false)
 			$links[]=$this->homeLink;
 

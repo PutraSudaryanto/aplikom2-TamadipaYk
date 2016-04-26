@@ -1,11 +1,14 @@
 <?php
 /**
+ * Ommu Settings (ommu-settings)
  * @var $this SettingsController
  * @var $model OmmuSettings
+ * @var $form CActiveForm
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -43,7 +46,7 @@
 		<div class="clearfix">
 			<label>
 				<?php echo $model->getAttributeLabel('analytic_id');?>
-				<span><?php echo Phrase::trans(60,0);?></span>
+				<span><?php echo Yii::t('phrase', 'Enter the Website Profile ID to use Google Analytics.');?></span>
 			</label>
 			<div class="desc">
 				<?php echo $form->textField($model,'analytic_id',array('maxlength'=>32)); ?>
@@ -55,7 +58,7 @@
 		<div class="submit clearfix">
 			<label>&nbsp;</label>
 			<div class="desc">
-				<?php echo CHtml::submitButton($model->isNewRecord ? Phrase::trans(1,0) : Phrase::trans(2,0), array('onclick' => 'setEnableSave()')); ?>
+				<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('phrase', 'Create') : Yii::t('phrase', 'Save'), array('onclick' => 'setEnableSave()')); ?>
 			</div>
 		</div>
 

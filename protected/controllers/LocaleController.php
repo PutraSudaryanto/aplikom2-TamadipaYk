@@ -1,25 +1,24 @@
 <?php
 /**
-* LocaleController
-* Handle LocaleController
-* Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
-* version: 2.0.0
-* Reference start
-*
-* TOC :
-*	Index
-*	Setting
-*
-*	LoadModel
-*	performAjaxValidation
-*
-* @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
-* @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
-* @contact (+62)856-299-4114
-*
-*----------------------------------------------------------------------------------------------------------
-*/
+ * LocaleController
+ * Handle LocaleController
+ * version: 1.1.0
+ * Reference start
+ *
+ * TOC :
+ *	Index
+ *	Setting
+ *
+ *	LoadModel
+ *	performAjaxValidation
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contact (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class LocaleController extends Controller
 {
@@ -41,7 +40,7 @@ class LocaleController extends Controller
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 			}
 		} else {
 			$this->redirect(Yii::app()->createUrl('site/login'));
@@ -117,6 +116,7 @@ class LocaleController extends Controller
 			$jsonError = CActiveForm::validate($model);
 			if(strlen($jsonError) > 2) {
 				echo $jsonError;
+				
 			} else {
 				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
 					if($model->validate()) {
@@ -129,7 +129,7 @@ class LocaleController extends Controller
 						if($locale->update() && $timezone->update() && $setting->update()) {
 							echo CJSON::encode(array(
 								'type' => 0,
-								'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(242,0).'</strong></div>',
+								'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Locale setting success updated.').'</strong></div>',
 							));
 						}
 					} else {
@@ -140,8 +140,8 @@ class LocaleController extends Controller
 			Yii::app()->end();
 
 		} else {
-			$this->pageTitle = Phrase::trans(241,0);
-			$this->pageDescription = Phrase::trans(243,0);
+			$this->pageTitle = Yii::t('phrase', 'Locale Settings');
+			$this->pageDescription = Yii::t('phrase', 'Please select a default timezone setting for your social network. This will be the default timezone applied to users\' accounts if they do not select a timezone during signup, or if they are not signed in. Select the default locale you want to use on your social network. This will affect the language of the dates that appear on your social network pages.');
 			$this->pageMeta = '';
 			$this->render('admin_setting',array(
 				'model'=>$model,
@@ -160,7 +160,7 @@ class LocaleController extends Controller
 	{
 		$model = OmmuLocale::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

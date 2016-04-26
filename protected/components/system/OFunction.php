@@ -5,7 +5,10 @@
  * @author Putra Sudaryanto <putra@sudaryanto.me>
  * @create date April 15, 2014 10:29 WIB
  * @version 1.0
- * @copyright &copy; 2012 Ommu Platform
+ * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contect (+62)856-299-4114
+ *
  *
  * Contains many function that most used
  *
@@ -24,7 +27,7 @@ class OFunction
 			$data = $dataProvider;
 		
 		$pageCount = $data->itemCount >= $data->pageSize ? ($data->itemCount % $data->pageSize === 0 ? (int)($data->itemCount/$data->pageSize) : (int)($data->itemCount/$data->pageSize)+1) : 1;
-		$currentPage = $data->itemCount != 0 ? $data->currentPage+1 : 0;
+		$currentPage = $data->itemCount != 0 ? $data->currentPage+1 : 1;
 		$nextPage = (($pageCount != $currentPage) && ($pageCount > $currentPage)) ? $currentPage+1 : 0;
 		$return = array(
 			'pageVar'=>$data->pageVar,

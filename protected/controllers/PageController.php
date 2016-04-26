@@ -1,31 +1,30 @@
 <?php
 /**
-* PageController
-* Handle PageController
-* Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
-* version: 2.0.0
-* Reference start
-*
-* TOC :
-*	Index
-*	View
-*	Manage
-*	Add
-*	Edit
-*	RunAction
-*	Delete
-*	Publish
-*
-*	LoadModel
-*	performAjaxValidation
-*
-* @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
-* @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
-* @contact (+62)856-299-4114
-*
-*----------------------------------------------------------------------------------------------------------
-*/
+ * PageController
+ * Handle PageController
+ * version: 1.1.0
+ * Reference start
+ *
+ * TOC :
+ *	Index
+ *	View
+ *	Manage
+ *	Add
+ *	Edit
+ *	RunAction
+ *	Delete
+ *	Publish
+ *
+ *	LoadModel
+ *	performAjaxValidation
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contact (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class PageController extends Controller
 {
@@ -47,7 +46,7 @@ class PageController extends Controller
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 			}
 		} else {
 			$arrThemes = Utility::getCurrentTemplate('public');
@@ -143,7 +142,7 @@ class PageController extends Controller
 			$model=$this->loadModel($id);
 			
 			$this->pageTitleShow = true;
-			if($id == 6)
+			if($id == 7)
 				$this->adsSidebar = false;
 			$this->pageTitle = Phrase::trans($model->name,2);
 			$this->pageDescription = Utility::shortText(Utility::hardDecode(Phrase::trans($model->desc,2)),300);
@@ -176,7 +175,7 @@ class PageController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Phrase::trans(188,0);
+		$this->pageTitle = Yii::t('phrase', 'Manage Pages');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -200,12 +199,12 @@ class PageController extends Controller
 		if(isset($_POST['OmmuPages'])) {
 			$model->attributes=$_POST['OmmuPages'];
 			if($model->save()) {
-				Yii::app()->user->setFlash('success', Phrase::trans(181,0));
+				Yii::app()->user->setFlash('success', Yii::t('phrase', 'Pages success created.'));
 				$this->redirect(array('manage'));
 			}
 		}
 
-		$this->pageTitle = Phrase::trans(184,0);
+		$this->pageTitle = Yii::t('phrase', 'Add Pages');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_add',array(
@@ -228,12 +227,12 @@ class PageController extends Controller
 		if(isset($_POST['OmmuPages'])) {
 			$model->attributes=$_POST['OmmuPages'];
 			if($model->save()) {
-				Yii::app()->user->setFlash('success', Phrase::trans(182,0));
+				Yii::app()->user->setFlash('success', Yii::t('phrase', 'Pages success updated.'));
 				$this->redirect(array('manage'));
 			}
 		}
 
-		$this->pageTitle = Phrase::trans(185,0);
+		$this->pageTitle = Yii::t('phrase', 'Update Pages');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_edit',array(
@@ -293,7 +292,7 @@ class PageController extends Controller
 					'type' => 5,
 					'get' => Yii::app()->controller->createUrl('manage'),
 					'id' => 'partial-pages',
-					'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(183,0).'</strong></div>',
+					'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Pages success deleted.').'</strong></div>',
 				));
 			}
 
@@ -302,7 +301,7 @@ class PageController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(186,0);
+			$this->pageTitle = Yii::t('phrase', 'Delete Pages');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -318,10 +317,10 @@ class PageController extends Controller
 	{
 		$model=$this->loadModel($id);
 		if($model->publish == 1) {
-			$title = Phrase::trans(276,0);
+			$title = Yii::t('phrase', 'Unpublish');
 			$replace = 0;
 		} else {
-			$title = Phrase::trans(275,0);
+			$title = Yii::t('phrase', 'Publish');
 			$replace = 1;
 		}
 
@@ -336,7 +335,7 @@ class PageController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-pages',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(182,0).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Pages success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -365,7 +364,7 @@ class PageController extends Controller
 	{
 		$model = OmmuPages::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

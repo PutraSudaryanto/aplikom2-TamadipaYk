@@ -1,9 +1,11 @@
 <?php
-
 /**
+ * OmmuLocale
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -88,14 +90,14 @@ class OmmuLocale extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'locale_id' => Phrase::trans(427,0),
-			'defaults' => Phrase::trans(156,0),
-			'locale' => Phrase::trans(427,0),
-			'title' => Phrase::trans(190,0),
-			'default_locale' => Phrase::trans(245,0),
-			'timezone' => Phrase::trans(244,0),
-			'dateformat' => Phrase::trans(512,0),
-			'timeformat' => Phrase::trans(513,0),
+			'locale_id' => Yii::t('attribute', 'locale_id'),
+			'defaults' => Yii::t('attribute', 'defaults'),
+			'locale' => Yii::t('attribute', 'locale'),
+			'title' => Yii::t('attribute', 'description'),
+			'default_locale' => Yii::t('attribute', 'default_locale'),
+			'timezone' => Yii::t('attribute', 'timezone'),
+			'dateformat' => Yii::t('attribute', 'dateformat'),
+			'timeformat' => Yii::t('attribute', 'timeformat'),
 		);
 	}
 	
@@ -116,7 +118,7 @@ class OmmuLocale extends CActiveRecord
 		$criteria->compare('t.title',strtolower($this->title),true);
 
 		if(!isset($_GET['OmmuLocale_sort']))
-			$criteria->order = 'locale_id DESC';
+			$criteria->order = 't.locale_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -193,7 +195,7 @@ class OmmuLocale extends CActiveRecord
 	protected function beforeValidate() {
 		if(parent::beforeValidate()) {
 			if($this->dateformat == '' || $this->timeformat == '') {
-				$this->addError('dateformat', Phrase::trans(514,0));
+				$this->addError('dateformat', Yii::t('phrase', 'Date Format cannot be blank.'));
 			}
 		}
 		return true;

@@ -1,11 +1,14 @@
 <?php
 /**
+ * Ommu Locale (ommu-locale)
  * @var $this LocaleController
  * @var $model OmmuLocale
+ * @var $form CActiveForm
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -99,7 +102,7 @@
 		<div class="submit clearfix">
 			<label>&nbsp;</label>
 			<div class="desc">
-				<?php echo CHtml::submitButton($model->isNewRecord ? Phrase::trans(2,0) : Phrase::trans(2,0), array('onclick' => 'setEnableSave()')); ?>
+				<?php echo CHtml::submitButton(Yii::t('phrase', 'Save'), array('onclick' => 'setEnableSave()')); ?>
 			</div>
 		</div>
 

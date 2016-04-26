@@ -1,31 +1,30 @@
 <?php
 /**
-* ModuleController
-* Handle ModuleController
-* Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
-* version: 2.0.0
-* Reference start
-*
-* TOC :
-*	updateModule
-*	Index
-*	Manage
-*	Add
-*	Edit
-*	Delete
-*	Active
-*	Default
-*
-*	LoadModel
-*	performAjaxValidation
-*
-* @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
-* @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
-* @contact (+62)856-299-4114
-*
-*----------------------------------------------------------------------------------------------------------
-*/
+ * ModuleController
+ * Handle ModuleController
+ * version: 1.1.0
+ * Reference start
+ *
+ * TOC :
+ *	updateModule
+ *	Index
+ *	Manage
+ *	Add
+ *	Edit
+ *	Delete
+ *	Active
+ *	Default
+ *
+ *	LoadModel
+ *	performAjaxValidation
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contact (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class ModuleController extends Controller
 {
@@ -50,7 +49,7 @@ class ModuleController extends Controller
 				
 				$this->moduleHandle = Yii::app()->moduleHandle;
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 			}
 		} else {
 			$this->redirect(Yii::app()->createUrl('site/login'));
@@ -145,8 +144,8 @@ class ModuleController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Phrase::trans(213,0);
-		$this->pageDescription = Phrase::trans(214,0);
+		$this->pageTitle = Yii::t('phrase', 'Manage Modules');
+		$this->pageDescription = Yii::t('phrase', 'Any SocialEngine plugins that you have installed will appear on this page. Note that some plugins may have user level-specific settings which are available on the User Levels page.');
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
 			'model'=>$model,
@@ -179,17 +178,17 @@ class ModuleController extends Controller
 						if($zip->extractTo(Yii::getPathOfAlias('application.modules'))) {
 							Utility::chmodr(Yii::getPathOfAlias('application.modules').'/'.$extractTo[0], 0777);
 							$this->redirect(array('manage','type'=>'all'));
-							Yii::app()->user->setFlash('success', Phrase::trans(504,0));
+							Yii::app()->user->setFlash('success', Yii::t('phrase', 'Module sukses diextract.'));
 						}
 						$zip->close();
 						Utility::recursiveDelete($runtimePath.'/'.$fileName->name);
 					}
 
 				} else {
-					Yii::app()->user->setFlash('error', Phrase::trans(503,0));				
+					Yii::app()->user->setFlash('error', Yii::t('phrase', 'Gagal mengupload file.'));				
 				}
 			} else {
-				Yii::app()->user->setFlash('error', Phrase::trans(502,0));
+				Yii::app()->user->setFlash('error', Yii::t('phrase', 'Hanya file .zip yang dibolehkan.'));
 			}
 		}
 		
@@ -197,7 +196,7 @@ class ModuleController extends Controller
 		$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 		$this->dialogWidth = 400;
 		
-		$this->pageTitle = Phrase::trans(501,0);
+		$this->pageTitle = Yii::t('phrase', 'Upload Module');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_upload');
@@ -228,7 +227,7 @@ class ModuleController extends Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('manage'),
 							'id' => 'partial-ommu-plugins',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(220,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Module success created.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -242,7 +241,7 @@ class ModuleController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 500;
 			
-			$this->pageTitle = Phrase::trans(219,0);
+			$this->pageTitle = Yii::t('phrase', 'Add Module');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_add',array(
@@ -276,7 +275,7 @@ class ModuleController extends Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('manage'),
 							'id' => 'partial-ommu-plugins',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(218,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Module success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -290,14 +289,13 @@ class ModuleController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 500;
 			
-			$this->pageTitle = Phrase::trans(217,0).': '.$model->name;
+			$this->pageTitle = Yii::t('phrase', 'Update Module: {module}', array('{module}'=>$model->name));
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_edit',array(
 				'model'=>$model,
 			));
 		}
-
 	}
 
 	/**
@@ -319,7 +317,7 @@ class ModuleController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-ommu-plugins',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(507,0).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Module success installed.').'</strong></div>',
 					));
 				}
 			}
@@ -329,7 +327,7 @@ class ModuleController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(506,0);
+			$this->pageTitle = Yii::t('phrase', 'Install Module');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_install');			
@@ -353,7 +351,7 @@ class ModuleController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-ommu-plugins',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(216,0).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Module success deleted.').'</strong></div>',
 					));					
 				}
 			}
@@ -363,7 +361,7 @@ class ModuleController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(215,0);
+			$this->pageTitle = Yii::t('phrase', 'Delete Module');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -379,10 +377,10 @@ class ModuleController extends Controller
 	{
 		$model=$this->loadModel($id);
 		if($model->actived == 1) {
-			$title = Phrase::trans(278,0);
+			$title = Yii::t('phrase', 'Deactived');
 			$replace = 0;
 		} else {
-			$title = Phrase::trans(277,0);
+			$title = Yii::t('phrase', 'Actived');
 			$replace = 1;
 		}
 
@@ -397,7 +395,7 @@ class ModuleController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-ommu-plugins',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(218,0).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Module success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -437,7 +435,7 @@ class ModuleController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-ommu-plugins',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(218,0).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Module success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -447,7 +445,7 @@ class ModuleController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(156,0);
+			$this->pageTitle = Yii::t('phrase', 'Default');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_default',array(
@@ -465,7 +463,7 @@ class ModuleController extends Controller
 	{
 		$model = OmmuPlugins::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

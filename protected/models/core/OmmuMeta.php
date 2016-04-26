@@ -1,9 +1,11 @@
 <?php
-
 /**
+ * OmmuMeta
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -59,12 +61,16 @@
  * @property string $facebook_sitename
  * @property string $facebook_see_also
  * @property string $facebook_admins
+ * @property string $modified_date
+ * @property string $modified_id
  */
 class OmmuMeta extends CActiveRecord
 {
-	public $defaultColumns = array();
-	
+	public $defaultColumns = array();	
 	public $old_meta_image;
+	
+	// Variable Search
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -104,19 +110,22 @@ class OmmuMeta extends CActiveRecord
 			array('twitter_card, twitter_site, twitter_creator', 'required', 'on'=>'twitter, twitter_photo'),
 			array('twitter_photo_width, twitter_photo_height', 'required', 'on'=>'twitter_photo'),
 			array('id, office_on, office_country, office_province, office_city, google_on, twitter_on, twitter_card, facebook_on, facebook_type', 'numerical', 'integerOnly'=>true),
-			array('meta_image, office_hour,
+			array('twitter_iphone_url, twitter_ipad_url, twitter_googleplay_url, facebook_see_also', 'length', 'max'=>256),
+			array('meta_image,
 				old_meta_image', 'length', 'max'=>64),
-			array('office_location, office_district, office_village, office_phone, office_fax, office_email, office_hotline, office_website, twitter_site, twitter_creator, twitter_iphone_id, twitter_ipad_name, twitter_googleplay_id, facebook_profile_firstname, facebook_profile_lastname, facebook_profile_username, facebook_sitename, facebook_admins', 'length', 'max'=>32),
+			array('office_location, office_district, office_village, office_phone, office_fax, office_email, office_hotline, office_website, map_icons, twitter_site, twitter_creator, twitter_iphone_id, twitter_ipad_name, twitter_googleplay_id, facebook_profile_firstname, facebook_profile_lastname, facebook_profile_username, facebook_sitename, facebook_admins', 'length', 'max'=>32),
+			array('office_city', 'length', 'max'=>11),
 			array('office_zipcode', 'length', 'max'=>6),
 			array('twitter_photo_width, twitter_photo_height', 'length', 'max'=>3),
-			array('twitter_iphone_url, twitter_ipad_url, twitter_googleplay_url, facebook_see_also', 'length', 'max'=>256),
+			array('map_icon_width, map_icon_height', 'length', 'max'=>2),
 			//array('meta_image', 'file', 'allowEmpty' => true, 'types' => 'jpg, jpeg, png, gif'),
 			array('office_email', 'email'),
-			array('meta_image, office_name, office_province, office_district, office_village, office_phone, office_fax, twitter_photo_width, twitter_photo_height, twitter_iphone_id, twitter_iphone_url, twitter_ipad_name, twitter_ipad_url, twitter_googleplay_id, twitter_googleplay_url, facebook_sitename, facebook_see_also, facebook_admins,
+			array('meta_image, office_name, office_province, office_district, office_village, office_phone, office_fax, map_icons, twitter_photo_width, twitter_photo_height, twitter_iphone_id, twitter_iphone_url, twitter_ipad_name, twitter_ipad_url, twitter_googleplay_id, twitter_googleplay_url, facebook_sitename, facebook_see_also, facebook_admins,
 				old_meta_image', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, meta_image, office_on, office_name, office_location, office_place, office_country, office_province, office_city, office_district, office_village, office_zipcode, office_hour, office_phone, office_fax, office_email, office_hotline, office_website, google_on, twitter_on, twitter_card, twitter_site, twitter_creator, twitter_photo_width, twitter_photo_height, twitter_iphone_id, twitter_iphone_url, twitter_ipad_name, twitter_ipad_url, twitter_googleplay_id, twitter_googleplay_url, facebook_on, facebook_type, facebook_profile_firstname, facebook_profile_lastname, facebook_profile_username, facebook_sitename, facebook_see_also, facebook_admins', 'safe', 'on'=>'search'),
+			array('id, meta_image, office_on, office_name, office_location, office_place, office_country, office_province, office_city, office_district, office_village, office_zipcode, office_hour, office_phone, office_fax, office_email, office_hotline, office_website, map_icons, map_icon_width, map_icon_height, google_on, twitter_on, twitter_card, twitter_site, twitter_creator, twitter_photo_width, twitter_photo_height, twitter_iphone_id, twitter_iphone_url, twitter_ipad_name, twitter_ipad_url, twitter_googleplay_id, twitter_googleplay_url, facebook_on, facebook_type, facebook_profile_firstname, facebook_profile_lastname, facebook_profile_username, facebook_sitename, facebook_see_also, facebook_admins,
+				modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -129,8 +138,10 @@ class OmmuMeta extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'country' => array(self::BELONGS_TO, 'OmmuZoneCountry', 'office_country'),			
-			'province' => array(self::BELONGS_TO, 'OmmuZoneProvince', 'office_province'),			
+			'province' => array(self::BELONGS_TO, 'OmmuZoneProvince', 'office_province'),
 			'city' => array(self::BELONGS_TO, 'OmmuZoneCity', 'office_city'),
+			'view_meta' => array(self::BELONGS_TO, 'ViewMeta', 'id'),
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -140,46 +151,51 @@ class OmmuMeta extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'meta_image' => Phrase::trans(515,0),
-			'office_on' => Phrase::trans(516,0),
-			'office_name' => Phrase::trans(595,0),
-			'office_location' => Phrase::trans(517,0),
-			'office_place' => Phrase::trans(518,0),
-			'office_country' => Phrase::trans(519,0),
-			'office_province' => Phrase::trans(520,0),
-			'office_city' => Phrase::trans(521,0),
-			'office_district' => Phrase::trans(522,0),
-			'office_village' => Phrase::trans(523,0),
-			'office_zipcode' => Phrase::trans(524,0),
-			'office_hour' => Phrase::trans(525,0),
-			'office_phone' => Phrase::trans(526,0),
-			'office_fax' => Phrase::trans(527,0),
-			'office_email' => Phrase::trans(528,0),
-			'office_hotline' => Phrase::trans(529,0),
-			'office_website' => Phrase::trans(530,0),
-			'google_on' => Phrase::trans(531,0),
-			'twitter_on' => Phrase::trans(532,0),
-			'twitter_card' => Phrase::trans(533,0),
-			'twitter_site' => Phrase::trans(534,0),
-			'twitter_creator' => Phrase::trans(535,0),
-			'twitter_photo_width' => Phrase::trans(536,0),
-			'twitter_photo_height' => Phrase::trans(537,0),
-			'twitter_iphone_id' => Phrase::trans(538,0),
-			'twitter_iphone_url' => Phrase::trans(539,0),
-			'twitter_ipad_name' => Phrase::trans(540,0),
-			'twitter_ipad_url' => Phrase::trans(541,0),
-			'twitter_googleplay_id' => Phrase::trans(542,0),
-			'twitter_googleplay_url' => Phrase::trans(543,0),
-			'facebook_on' => Phrase::trans(544,0),
-			'facebook_type' => Phrase::trans(533,0),
-			'facebook_profile_firstname' => Phrase::trans(545,0),
-			'facebook_profile_lastname' => Phrase::trans(546,0),
-			'facebook_profile_username' => Phrase::trans(547,0),
-			'facebook_sitename' => Phrase::trans(548,0),
-			'facebook_see_also' => Phrase::trans(549,0),
-			'facebook_admins' => Phrase::trans(550,0),
-			'old_meta_image' => Phrase::trans(587,0),
+			'id' => Yii::t('attribute', 'id'),
+			'meta_image' => Yii::t('attribute', 'meta_image'),
+			'office_on' => Yii::t('attribute', 'office_on'),
+			'office_name' => Yii::t('attribute', 'office_name'),
+			'office_location' => Yii::t('attribute', 'office_location'),
+			'office_place' => Yii::t('attribute', 'office_place'),
+			'office_country' => Yii::t('attribute', 'office_country'),
+			'office_province' => Yii::t('attribute', 'office_province'),
+			'office_city' => Yii::t('attribute', 'office_city'),
+			'office_district' => Yii::t('attribute', 'office_district'),
+			'office_village' => Yii::t('attribute', 'office_village'),
+			'office_zipcode' => Yii::t('attribute', 'office_zipcode'),
+			'office_hour' => Yii::t('attribute', 'office_hour'),
+			'office_phone' => Yii::t('attribute', 'office_phone'),
+			'office_fax' => Yii::t('attribute', 'office_fax'),
+			'office_email' => Yii::t('attribute', 'office_email'),
+			'office_hotline' => Yii::t('attribute', 'office_hotline'),
+			'office_website' => Yii::t('attribute', 'office_website'),
+			'map_icon_height' => Yii::t('attribute', 'map_icon_height'),
+			'map_icon_width' => Yii::t('attribute', 'map_icon_width'),
+			'map_icons' => Yii::t('attribute', 'map_icons'),
+			'google_on' => Yii::t('attribute', 'google_on'),
+			'twitter_on' => Yii::t('attribute', 'twitter_on'),
+			'twitter_card' => Yii::t('attribute', 'twitter_card'),
+			'twitter_site' => Yii::t('attribute', 'twitter_site'),
+			'twitter_creator' => Yii::t('attribute', 'twitter_creator'),
+			'twitter_photo_width' => Yii::t('attribute', 'twitter_photo_width'),
+			'twitter_photo_height' => Yii::t('attribute', 'twitter_photo_height'),
+			'twitter_iphone_id' => Yii::t('attribute', 'twitter_iphone_id'),
+			'twitter_iphone_url' => Yii::t('attribute', 'twitter_iphone_url'),
+			'twitter_ipad_name' => Yii::t('attribute', 'twitter_ipad_name'),
+			'twitter_ipad_url' => Yii::t('attribute', 'twitter_ipad_url'),
+			'twitter_googleplay_id' => Yii::t('attribute', 'twitter_googleplay_id'),
+			'twitter_googleplay_url' => Yii::t('attribute', 'twitter_googleplay_url'),
+			'facebook_on' => Yii::t('attribute', 'facebook_on'),
+			'facebook_type' => Yii::t('attribute', 'facebook_type'),
+			'facebook_profile_firstname' => Yii::t('attribute', 'facebook_profile_firstname'),
+			'facebook_profile_lastname' => Yii::t('attribute', 'facebook_profile_lastname'),
+			'facebook_profile_username' => Yii::t('attribute', 'facebook_profile_username'),
+			'facebook_sitename' => Yii::t('attribute', 'facebook_sitename'),
+			'facebook_see_also' => Yii::t('attribute', 'facebook_see_also'),
+			'facebook_admins' => Yii::t('attribute', 'facebook_admins'),
+			'modified_date' => Yii::t('attribute', 'modified_date'),
+			'modified_id' => Yii::t('attribute', 'modified_id'),
+			'old_meta_image' => Yii::t('attribute', 'old_meta_image'),
 		);
 	}
 	
@@ -233,9 +249,21 @@ class OmmuMeta extends CActiveRecord
 		$criteria->compare('t.facebook_sitename',$this->facebook_sitename,true);
 		$criteria->compare('t.facebook_see_also',$this->facebook_see_also,true);
 		$criteria->compare('t.facebook_admins',$this->facebook_admins,true);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->modified_id);
+		
+		// Custom Search
+		$criteria->with = array(
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
+			),
+		);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['OmmuMeta_sort']))
-			$criteria->order = 'id DESC';
+			$criteria->order = 't.id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -299,6 +327,8 @@ class OmmuMeta extends CActiveRecord
 			$this->defaultColumns[] = 'facebook_sitename';
 			$this->defaultColumns[] = 'facebook_see_also';
 			$this->defaultColumns[] = 'facebook_admins';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -348,6 +378,11 @@ class OmmuMeta extends CActiveRecord
 			$this->defaultColumns[] = 'facebook_sitename';
 			$this->defaultColumns[] = 'facebook_see_also';
 			$this->defaultColumns[] = 'facebook_admins';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = array(
+				'name' => 'modified_search',
+				'value' => '$data->modified_relation->displayname',
+			);
 		}
 		parent::afterConstruct();
 	}
@@ -358,7 +393,7 @@ class OmmuMeta extends CActiveRecord
 	protected function beforeValidate() {
 		if(parent::beforeValidate()) {
 			if($this->office_place == '' && $this->office_district == '' && $this->office_village == '') {
-				$this->addError('office_place', Phrase::trans(594,0));
+				$this->addError('office_place', Yii::t('phrase', 'Office Address cannot be blank.'));
 			}
 			
 			$meta_image = CUploadedFile::getInstance($this, 'meta_image');	
@@ -367,6 +402,8 @@ class OmmuMeta extends CActiveRecord
 				if(!in_array($extension, array('bmp','gif','jpg','png')))
 					$this->addError('meta_image', 'The file "'.$meta_image->name.'" cannot be uploaded. Only files with these extensions are allowed: bmp, gif, jpg, png.');
 			}
+			
+			$this->modified_id = Yii::app()->user->id;	
 		}
 		return true;
 	}

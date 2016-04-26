@@ -1,12 +1,14 @@
 <?php
 /**
+ * Ommu Plugins (ommu-plugins)
  * @var $this ModuleController
  * @var $model OmmuPlugins
  * @var $form CActiveForm
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -38,11 +40,6 @@
 		</li>
 
 		<li>
-			<?php echo $model->getAttributeLabel('code'); ?><br/>
-			<?php echo $form->textField($model,'code'); ?>
-		</li>
-
-		<li>
 			<?php echo $model->getAttributeLabel('name'); ?><br/>
 			<?php echo $form->textField($model,'name',array('size'=>60,'maxlength'=>128)); ?>
 		</li>
@@ -53,22 +50,12 @@
 		</li>
 
 		<li>
-			<?php echo $model->getAttributeLabel('version'); ?><br/>
-			<?php echo $form->textField($model,'version',array('size'=>16,'maxlength'=>16)); ?>
-		</li>
-
-		<li>
-			<?php echo $model->getAttributeLabel('icon'); ?><br/>
-			<?php echo $form->textField($model,'icon',array('size'=>16,'maxlength'=>16)); ?>
-		</li>
-
-		<li>
 			<?php echo $model->getAttributeLabel('creation_date'); ?><br/>
 			<?php echo $form->textField($model,'creation_date'); ?>
 		</li>
 
 		<li class="submit">
-			<?php echo CHtml::submitButton(Phrase::trans(3,0)); ?>
+			<?php echo CHtml::submitButton(Yii::t('phrase', 'Search')); ?>
 		</li>
 	</ul>
 	<div class="clear"></div>

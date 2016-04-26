@@ -1,30 +1,29 @@
 <?php
 /**
-* LanguageController
-* Handle LanguageController
-* Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
-* version: 2.0.0
-* Reference start
-*
-* TOC :
-*	Index
-*	Manage
-*	Add
-*	Edit
-*	Delete
-*	Actived
-*	Settings
-*
-*	LoadModel
-*	performAjaxValidation
-*
-* @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
-* @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
-* @contact (+62)856-299-4114
-*
-*----------------------------------------------------------------------------------------------------------
-*/
+ * LanguageController
+ * Handle LanguageController
+ * version: 1.1.0
+ * Reference start
+ *
+ * TOC :
+ *	Index
+ *	Manage
+ *	Add
+ *	Edit
+ *	Delete
+ *	Actived
+ *	Settings
+ *
+ *	LoadModel
+ *	performAjaxValidation
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contact (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class LanguageController extends /*SBaseController*/ Controller
 {
@@ -46,7 +45,7 @@ class LanguageController extends /*SBaseController*/ Controller
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 			}
 		} else {
 			$this->redirect(Yii::app()->createUrl('site/login'));
@@ -127,8 +126,8 @@ class LanguageController extends /*SBaseController*/ Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Phrase::trans(137,0);
-		$this->pageDescription = Phrase::trans(162,0);
+		$this->pageTitle = Yii::t('phrase', 'Language Settings');
+		$this->pageDescription = Yii::t('phrase', 'The layout of your social network includes hundreds of phrases of text which are stored in a language pack. SocialEngine comes with an English pack which is the default when you first install the platform. If you want to change any of these phrases on your social network, you can edit the pack below. If you want to allow users to pick from multiple languages, you can also create additional packs below. If you have multiple language packs, the pack you\'ve selected as your "default" will be the language that displays if a user has not selected any other language. Note: You can not delete the default language. To edit a language\'s details, click its name.');
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
 			'model'=>$model,
@@ -161,7 +160,7 @@ class LanguageController extends /*SBaseController*/ Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('manage'),
 							'id' => 'partial-language',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(168,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Language success created.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -175,7 +174,7 @@ class LanguageController extends /*SBaseController*/ Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 500;
 			
-			$this->pageTitle = Phrase::trans(149,0);
+			$this->pageTitle = Yii::t('phrase', 'Create New Language Pack');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_add',array(
@@ -209,7 +208,7 @@ class LanguageController extends /*SBaseController*/ Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('manage'),
 							'id' => 'partial-language',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(169,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Language success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -223,7 +222,7 @@ class LanguageController extends /*SBaseController*/ Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 500;
 			
-			$this->pageTitle = Phrase::trans(150,0).': '.$model->name;
+			$this->pageTitle = Yii::t('phrase', 'Update Language Pack').': '.$model->name;
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_edit',array(
@@ -248,7 +247,7 @@ class LanguageController extends /*SBaseController*/ Controller
 					'type' => 5,
 					'get' => Yii::app()->controller->createUrl('manage'),
 					'id' => 'partial-language',
-					'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(170,0).'</strong></div>',
+					'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Language success deleted.').'</strong></div>',
 				));
 			}
 
@@ -257,7 +256,7 @@ class LanguageController extends /*SBaseController*/ Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(171,0);
+			$this->pageTitle = Yii::t('phrase', 'Delete Language');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -273,10 +272,10 @@ class LanguageController extends /*SBaseController*/ Controller
 	{
 		$model=$this->loadModel($id);
 		if($model->actived == 1) {
-			$title = Phrase::trans(278,0);
+			$title = Yii::t('phrase', 'Deactived');
 			$replace = 0;
 		} else {
-			$title = Phrase::trans(277,0);
+			$title = Yii::t('phrase', 'Actived');
 			$replace = 1;
 		}
 
@@ -291,7 +290,7 @@ class LanguageController extends /*SBaseController*/ Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-language',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(169,0).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Language success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -332,7 +331,7 @@ class LanguageController extends /*SBaseController*/ Controller
 					if($setting->save()) {
 						echo CJSON::encode(array(
 							'type' => 0,
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(206,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Language setting success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($setting->getErrors());
@@ -352,7 +351,7 @@ class LanguageController extends /*SBaseController*/ Controller
 	{
 		$model = OmmuLanguages::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

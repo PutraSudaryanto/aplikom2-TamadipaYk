@@ -1,9 +1,12 @@
 <?php
-
 /**
+ * OmmuMenu
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
+ * @created date 24 March 2016, 09:46 WIB
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -22,27 +25,34 @@
  * The followings are the available columns in table 'ommu_core_menu':
  * @property string $id
  * @property integer $publish
+ * @property integer $cat_id
  * @property integer $dependency
- * @property string $module
- * @property string $controller
- * @property string $action
- * @property integer $site_type
- * @property integer $site_admin
  * @property integer $orders
  * @property string $name
- * @property string $class
  * @property string $url
- * @property integer $dialog
  * @property string $attr
+ * @property string $sitetype_access
+ * @property string $userlevel_access
  * @property string $creation_date
+ * @property string $creation_id
+ * @property string $modified_date
+ * @property string $modified_id
+ *
+ * The followings are the available model relations:
+ * @property OmmuCoreMenuCategory $cat
  */
 class OmmuMenu extends CActiveRecord
 {
 	public $defaultColumns = array();
 	public $title;
+	
+	// Variable Search
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
+	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
 	 * @return OmmuMenu the static model class
 	 */
@@ -67,20 +77,18 @@ class OmmuMenu extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('module, controller, orders, name, url,
+			array('publish, cat_id, url,
 				title', 'required'),
-			array('publish, dependency, site_type, site_admin, orders, dialog', 'numerical', 'integerOnly'=>true),
-			array('module, controller, action,
+			array('publish, cat_id, dependency, orders, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
+			array('name, creation_id, modified_id', 'length', 'max'=>11),
+			array('sitetype_access, userlevel_access,
 				title', 'length', 'max'=>32),
-			array('name', 'length', 'max'=>10),
-			array('class', 'length', 'max'=>16),
 			array('url, attr', 'length', 'max'=>128),
-			array('creation_date,
-				title', 'safe'),
+			array('', 'safe'),
 			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('id, publish, dependency, module, controller, action, site_type, site_admin, orders, name, class, url, dialog, attr, creation_date,
-				title', 'safe', 'on'=>'search'),
+			// @todo Please remove those attributes that should not be searched.
+			array('id, publish, cat_id, dependency, orders, name, url, attr, sitetype_access, userlevel_access, creation_date, creation_id, modified_date, modified_id,
+				title, creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -92,7 +100,10 @@ class OmmuMenu extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'title' => array(self::BELONGS_TO, 'OmmuSystemPhrase', 'name'),
+			'view' => array(self::BELONGS_TO, 'ViewMenu', 'id'),
+			'cat_relation' => array(self::BELONGS_TO, 'OmmuMenuCategory', 'cat_id'),
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -102,76 +113,105 @@ class OmmuMenu extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'publish' => 'Publish',
-			'dependency' => 'Dependency',
-			'module' => Phrase::trans(199,0),
-			'controller' => Phrase::trans(200,0),
-			'action' => Phrase::trans(201,0),
-			'site_type' => 'Site Type',
-			'site_admin' => 'Site Admin',
-			'orders' => Phrase::trans(202,0),
-			'name' => Phrase::trans(194,0),
-			'class' => Phrase::trans(196,0),
-			'url' => Phrase::trans(197,0),
-			'dialog' => Phrase::trans(198,0),
-			'attr' => Phrase::trans(203,0),
-			'creation_date' => Phrase::trans(365,0),
-			'title' => Phrase::trans(194,0),
+			'id' => Yii::t('attribute', 'ID'),
+			'publish' => Yii::t('attribute', 'Publish'),
+			'cat_id' => Yii::t('attribute', 'Category'),
+			'dependency' => Yii::t('attribute', 'Parent Menu'),
+			'orders' => Yii::t('attribute', 'Orders'),
+			'name' => Yii::t('attribute', 'Title Menu'),
+			'url' => Yii::t('attribute', 'Url'),
+			'attr' => Yii::t('attribute', 'Attr'),
+			'sitetype_access' => Yii::t('attribute', 'Sitetype Access'),
+			'userlevel_access' => Yii::t('attribute', 'Userlevel Access'),
+			'creation_date' => Yii::t('attribute', 'Creation Date'),
+			'creation_id' => Yii::t('attribute', 'Creation'),
+			'modified_date' => Yii::t('attribute', 'Modified Date'),
+			'modified_id' => Yii::t('attribute', 'Modified'),
+			'title' => Yii::t('attribute', 'Title Menu'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 	}
-	
+
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 *
+	 * Typical usecase:
+	 * - Initialize the model fields with values from filter form.
+	 * - Execute this method to get CActiveDataProvider instance which will filter
+	 * models according to data in model fields.
+	 * - Pass data provider to CGridView, CListView or any similar widget.
+	 *
+	 * @return CActiveDataProvider the data provider that can return the models
+	 * based on the search/filter conditions.
 	 */
 	public function search()
 	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
+		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('t.id',$this->id,true);
-		if(isset($_GET['type']) && $_GET['type'] == 'publish') {
+		$criteria->compare('t.id',strtolower($this->id),true);
+		if(isset($_GET['type']) && $_GET['type'] == 'publish')
 			$criteria->compare('t.publish',1);
-		} elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish') {
+		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
 			$criteria->compare('t.publish',0);
-		} elseif(isset($_GET['type']) && $_GET['type'] == 'trash') {
+		elseif(isset($_GET['type']) && $_GET['type'] == 'trash')
 			$criteria->compare('t.publish',2);
-		} else {
+		else {
 			$criteria->addInCondition('t.publish',array(0,1));
 			$criteria->compare('t.publish',$this->publish);
 		}
+		if(isset($_GET['category']))
+			$criteria->compare('t.cat_id',$_GET['category']);
+		else
+			$criteria->compare('t.cat_id',$this->cat_id);
 		$criteria->compare('t.dependency',$this->dependency);
-		$criteria->compare('t.module',$this->module,true);
-		$criteria->compare('t.controller',$this->controller,true);
-		$criteria->compare('t.action',$this->action,true);
-		$criteria->compare('t.site_type',$this->site_type);
-		$criteria->compare('t.site_admin',$this->site_admin);
 		$criteria->compare('t.orders',$this->orders);
-		$criteria->compare('t.name',$this->name,true);
-		$criteria->compare('t.class',$this->class,true);
-		$criteria->compare('t.url',$this->url,true);
-		$criteria->compare('t.dialog',$this->dialog);
-		$criteria->compare('t.attr',$this->attr,true);
+		$criteria->compare('t.name',strtolower($this->name),true);
+		$criteria->compare('t.url',strtolower($this->url),true);
+		$criteria->compare('t.attr',strtolower($this->attr),true);
+		$criteria->compare('t.sitetype_access',strtolower($this->sitetype_access),true);
+		$criteria->compare('t.userlevel_access',strtolower($this->userlevel_access),true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		if(isset($_GET['creation']))
+			$criteria->compare('t.creation_id',$_GET['creation']);
+		else
+			$criteria->compare('t.creation_id',$this->creation_id);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		if(isset($_GET['modified']))
+			$criteria->compare('t.modified_id',$_GET['modified']);
+		else
+			$criteria->compare('t.modified_id',$this->modified_id);
 		
 		// Custom Search
 		$criteria->with = array(
-			'title' => array(
-				'alias'=>'title',
-				'select'=>'en'
+			'view' => array(
+				'alias'=>'view',
+			),
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname'
+			),
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
 			),
 		);
-		$criteria->compare('title.en',strtolower($this->title), true);
+		$criteria->compare('view.title',strtolower($this->title), true);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['OmmuMenu_sort']))
-			$criteria->order = 'id DESC';
+			$criteria->order = 't.id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'pagination'=>array(
+				'pageSize'=>30,
+			),
 		));
 	}
 
@@ -192,22 +232,21 @@ class OmmuMenu extends CActiveRecord
 				*/
 				$this->defaultColumns[] = $val;
 			}
-		}else {
+		} else {
 			//$this->defaultColumns[] = 'id';
 			$this->defaultColumns[] = 'publish';
+			$this->defaultColumns[] = 'cat_id';
 			$this->defaultColumns[] = 'dependency';
-			$this->defaultColumns[] = 'module';
-			$this->defaultColumns[] = 'controller';
-			$this->defaultColumns[] = 'action';
-			$this->defaultColumns[] = 'site_type';
-			$this->defaultColumns[] = 'site_admin';
 			$this->defaultColumns[] = 'orders';
 			$this->defaultColumns[] = 'name';
-			$this->defaultColumns[] = 'class';
 			$this->defaultColumns[] = 'url';
-			$this->defaultColumns[] = 'dialog';
 			$this->defaultColumns[] = 'attr';
+			$this->defaultColumns[] = 'sitetype_access';
+			$this->defaultColumns[] = 'userlevel_access';
 			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -230,19 +269,52 @@ class OmmuMenu extends CActiveRecord
 				'header' => 'No',
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
-			$this->defaultColumns[] = 'dependency';
-			$this->defaultColumns[] = 'module';
-			$this->defaultColumns[] = 'controller';
-			$this->defaultColumns[] = 'action';
-			$this->defaultColumns[] = 'site_type';
-			$this->defaultColumns[] = 'site_admin';
-			$this->defaultColumns[] = 'orders';
-			$this->defaultColumns[] = 'name';
-			$this->defaultColumns[] = 'class';
-			$this->defaultColumns[] = 'url';
-			$this->defaultColumns[] = 'dialog';
-			$this->defaultColumns[] = 'attr';
-			$this->defaultColumns[] = 'creation_date';
+			if(!isset($_GET['category'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'cat_id',
+					'value' => 'Phrase::trans($data->cat_relation->name, 2)',
+					'filter'=> OmmuMenuCategory::getCategory(),
+					'type' => 'raw',
+				);
+			}
+			$this->defaultColumns[] = array(
+				'name' => 'title',
+				'value' => 'Phrase::trans($data->name, 2)',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'dependency',
+				'value' => '$data->dependency != 0 ? $data->dependency : "-"',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation_relation->displayname',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_date',
+				'value' => 'Utility::dateFormat($data->creation_date)',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
+					'model'=>$this,
+					'attribute'=>'creation_date',
+					'language' => 'ja',
+					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
+					//'mode'=>'datetime',
+					'htmlOptions' => array(
+						'id' => 'creation_date_filter',
+					),
+					'options'=>array(
+						'showOn' => 'focus',
+						'dateFormat' => 'dd-mm-yy',
+						'showOtherMonths' => true,
+						'selectOtherMonths' => true,
+						'changeMonth' => true,
+						'changeYear' => true,
+						'showButtonPanel' => true,
+					),
+				), true),
+			);
 			if(!isset($_GET['type'])) {
 				$this->defaultColumns[] = array(
 					'name' => 'publish',
@@ -257,9 +329,67 @@ class OmmuMenu extends CActiveRecord
 					'type' => 'raw',
 				);
 			}
-
 		}
 		parent::afterConstruct();
+	}
+
+	/**
+	 * User get information
+	 */
+	public static function getInfo($id, $column=null)
+	{
+		if($column != null) {
+			$model = self::model()->findByPk($id,array(
+				'select' => $column
+			));
+			return $model->$column;
+			
+		} else {
+			$model = self::model()->findByPk($id);
+			return $model;			
+		}
+	}
+
+	/**
+	 * Get category
+	 * 0 = unpublish
+	 * 1 = publish
+	 */
+	public static function getParentMenu($publish=null, $dependency=null, $type=null) 
+	{		
+		$criteria=new CDbCriteria;
+		if($publish != null)
+			$criteria->compare('t.publish',$publish);
+		if($dependency != null)
+			$criteria->compare('t.dependency',$dependency);
+		
+		$model = self::model()->findAll($criteria);
+
+		if($type == null) {
+			$items = array();
+			if($model != null) {
+				foreach($model as $key => $val) {
+					$items[$val->cat_id] = Phrase::trans($val->name, 2);
+				}
+				return $items;
+			} else {
+				return false;
+			}
+		} else
+			return $model;
+	}
+
+	/**
+	 * before validate attributes
+	 */
+	protected function beforeValidate() {
+		if(parent::beforeValidate()) {
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;	
+			else
+				$this->modified_id = Yii::app()->user->id;				
+		}
+		return true;
 	}
 	
 	/**
@@ -268,15 +398,14 @@ class OmmuMenu extends CActiveRecord
 	protected function beforeSave() {
 		if(parent::beforeSave()) {			
 			if($this->isNewRecord) {
-				$current = strtolower(Yii::app()->controller->id);
+				$location = strtolower(Yii::app()->controller->id);
 				$title=new OmmuSystemPhrase;
-				$title->phrase_id = count(OmmuSystemPhrase::getAdminPhrase('phrase_id')) + 1;
-				$title->location = $current;
+				$title->location = $location.'_title';
 				$title->en = $this->title;
-				if($title->save()) {
+				if($title->save())
 					$this->name = $title->phrase_id;
-				}
-			}else {
+				
+			} else {
 				$title = OmmuSystemPhrase::model()->findByPk($this->name);
 				$title->en = $this->title;
 				$title->save();
@@ -284,4 +413,5 @@ class OmmuMenu extends CActiveRecord
 		}
 		return true;
 	}
+
 }

@@ -1,9 +1,11 @@
 <?php
-
 /**
+ * OmmuThemes
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -27,10 +29,18 @@
  * @property string $layout
  * @property string $name
  * @property string $thumbnail
+ * @property string $creation_date
+ * @property string $creation_id
+ * @property string $modified_date
+ * @property string $modified_id
  */
 class OmmuThemes extends CActiveRecord
 {
 	public $defaultColumns = array();
+	
+	// Variable Search
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -64,7 +74,8 @@ class OmmuThemes extends CActiveRecord
 			array('folder, layout, name, thumbnail', 'length', 'max'=>32),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('theme_id, group_page, default_theme, folder, layout, name, thumbnail', 'safe', 'on'=>'search'),
+			array('theme_id, group_page, default_theme, folder, layout, name, thumbnail, creation_date, creation_id, modified_date, modified_id,
+				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -76,6 +87,8 @@ class OmmuThemes extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -85,13 +98,19 @@ class OmmuThemes extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'theme_id' => Phrase::trans(428,0),
-			'group_page' => Phrase::trans(234,0),
-			'default_theme' => Phrase::trans(156,0),
-			'folder' => Phrase::trans(429,0),
-			'layout' => Phrase::trans(430,0),
-			'name' => Phrase::trans(232,0),
-			'thumbnail' => Phrase::trans(233,0),
+			'theme_id' => Yii::t('attribute', 'theme_id'),
+			'group_page' => Yii::t('attribute', 'group_page'),
+			'default_theme' => Yii::t('attribute', 'default_theme'),
+			'folder' => Yii::t('attribute', 'folder'),
+			'layout' => Yii::t('attribute', 'layout'),
+			'name' => Yii::t('attribute', 'theme_name'),
+			'thumbnail' => Yii::t('attribute', 'thumbnail'),
+			'creation_date' => Yii::t('attribute', 'creation_date'),
+			'creation_id' => Yii::t('attribute', 'creation_id'),
+			'modified_date' => Yii::t('attribute', 'modified_date'),
+			'modified_id' => Yii::t('attribute', 'modified_id'),
+			'creation_search' => Yii::t('attribute', 'creation_id'),
+			'modified_search' => Yii::t('attribute', 'modified_id'),
 		);
 	}
 	
@@ -113,9 +132,29 @@ class OmmuThemes extends CActiveRecord
 		$criteria->compare('t.layout',strtolower($this->layout),true);
 		$criteria->compare('t.name',strtolower($this->name),true);
 		$criteria->compare('t.thumbnail',$this->thumbnail,true);
+		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		$criteria->compare('t.creation_id',$this->creation_id);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->modified_id);
+		
+		// Custom Search
+		$criteria->with = array(
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname'
+			),
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
+			),
+		);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 		
 		if(!isset($_GET['OmmuThemes_sort']))
-			$criteria->order = 'theme_id DESC';
+			$criteria->order = 't.theme_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -150,6 +189,10 @@ class OmmuThemes extends CActiveRecord
 			$this->defaultColumns[] = 'layout';
 			$this->defaultColumns[] = 'name';
 			$this->defaultColumns[] = 'thumbnail';
+			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -173,12 +216,42 @@ class OmmuThemes extends CActiveRecord
 					//'class' => 'center',
 				),
 				'filter'=>array(
-					'admin'=>Phrase::trans(590,0),
-					'public'=>Phrase::trans(229,0),
-					'underconstruction'=>Phrase::trans(591,0),
-					'maintenance'=>Phrase::trans(592,0),
+					'admin'=>Yii::t('phrase', 'Admin'),
+					'public'=>Yii::t('phrase', 'Public'),
+					'underconstruction'=>Yii::t('phrase', 'Underconstruction'),
+					'maintenance'=>Yii::t('phrase', 'Maintenance'),
 				),
 				'type' => 'raw',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation_relation->displayname',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_date',
+				'value' => 'Utility::dateFormat($data->creation_date)',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
+					'model'=>$this,
+					'attribute'=>'creation_date',
+					'language' => 'ja',
+					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
+					//'mode'=>'datetime',
+					'htmlOptions' => array(
+						'id' => 'creation_date_filter',
+					),
+					'options'=>array(
+						'showOn' => 'focus',
+						'dateFormat' => 'dd-mm-yy',
+						'showOtherMonths' => true,
+						'selectOtherMonths' => true,
+						'changeMonth' => true,
+						'changeYear' => true,
+						'showButtonPanel' => true,
+					),
+				), true),
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'default_theme',
@@ -187,13 +260,26 @@ class OmmuThemes extends CActiveRecord
 					'class' => 'center',
 				),
 				'filter'=>array(
-					1=>Phrase::trans(588,0),
-					0=>Phrase::trans(589,0),
+					1=>Yii::t('phrase', 'Yes'),
+					0=>Yii::t('phrase', 'No'),
 				),
 				'type' => 'raw',
 			);
 		}
 		parent::afterConstruct();
+	}
+
+	/**
+	 * before validate attributes
+	 */
+	protected function beforeValidate() {
+		if(parent::beforeValidate()) {	
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;
+			else
+				$this->modified_id = Yii::app()->user->id;
+		}
+		return true;
 	}
 	
 	/**

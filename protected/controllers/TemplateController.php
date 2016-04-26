@@ -4,8 +4,7 @@
  * @var $this TemplateController
  * @var $model OmmuTemplate
  * @var $form CActiveForm
- * Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
- * version: 0.0.1
+ * version: 1.1.0
  * Reference start
  *
  * TOC :
@@ -20,9 +19,9 @@
  *	performAjaxValidation
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
- * @contect (+62)856-299-4114
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
+ * @contact (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
  */
@@ -47,7 +46,7 @@ class TemplateController extends Controller
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
 			} else {
-				throw new CHttpException(404, Phrase::trans(193,0));
+				throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 			}
 		} else {
 			$this->redirect(Yii::app()->createUrl('site/login'));
@@ -115,26 +114,6 @@ class TemplateController extends Controller
 	{
 		$this->redirect(array('manage'));
 	}
-	
-	/**
-	 * Displays a particular model.
-	 * @param integer $id the ID of the model to be displayed
-	 */
-	public function actionView($id) 
-	{
-		$model=$this->loadModel($id);
-		
-		$this->dialogDetail = true;
-		$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-		$this->dialogWidth = 500;
-
-		$this->pageTitle = 'View Ommu Templates';
-		$this->pageDescription = '';
-		$this->pageMeta = '';
-		$this->render('admin_view',array(
-			'model'=>$model,
-		));
-	}	
 
 	/**
 	 * Manages all models.
@@ -157,7 +136,7 @@ class TemplateController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Phrase::trans(603,0);
+		$this->pageTitle = Yii::t('phrase', 'Template Manage');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -191,7 +170,7 @@ class TemplateController extends Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('manage'),
 							'id' => 'partial-ommu-template',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(605,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Template success created.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -205,7 +184,7 @@ class TemplateController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 600;
 			
-			$this->pageTitle = Phrase::trans(604,0);
+			$this->pageTitle = Yii::t('phrase', 'Create Template');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_add',array(
@@ -240,7 +219,7 @@ class TemplateController extends Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('manage'),
 							'id' => 'partial-ommu-template',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(607,0).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Template success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -254,7 +233,7 @@ class TemplateController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 600;
 			
-			$this->pageTitle = Phrase::trans(606,0);
+			$this->pageTitle = Yii::t('phrase', 'Update Template');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_edit',array(
@@ -262,6 +241,26 @@ class TemplateController extends Controller
 			));		
 		}
 	}
+	
+	/**
+	 * Displays a particular model.
+	 * @param integer $id the ID of the model to be displayed
+	 */
+	public function actionView($id) 
+	{
+		$model=$this->loadModel($id);
+		
+		$this->dialogDetail = true;
+		$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+		$this->dialogWidth = 500;
+
+		$this->pageTitle = Yii::t('phrase', 'View Template');
+		$this->pageDescription = '';
+		$this->pageMeta = '';
+		$this->render('admin_view',array(
+			'model'=>$model,
+		));
+	}	
 
 	/**
 	 * Deletes a particular model.
@@ -280,7 +279,7 @@ class TemplateController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-ommu-template',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(609,0).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Template success deleted').'</strong></div>',
 					));
 				}
 			}
@@ -290,7 +289,7 @@ class TemplateController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(608,0);
+			$this->pageTitle = Yii::t('phrase', 'Delete Template');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -306,7 +305,7 @@ class TemplateController extends Controller
 	{
 		$model = OmmuTemplate::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

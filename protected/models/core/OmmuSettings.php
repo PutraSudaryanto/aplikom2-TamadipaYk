@@ -1,9 +1,11 @@
 <?php
-
 /**
+ * OmmuSettings
+ * version: 1.1.0
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -34,7 +36,9 @@
  * @property string $site_timeformat
  * @property string $construction_date
  * @property string $construction_text
- * @property string $construction_twitter
+ * @property string $event_startdate
+ * @property string $event_finishdate
+ * @property string $event_tag
  * @property integer $signup_username
  * @property integer $signup_approve
  * @property integer $signup_verifyemail
@@ -67,10 +71,16 @@
  * @property string $license_email
  * @property string $license_key
  * @property string $ommu_version
+ * @property string $modified_date
+ * @property string $modified_id
  */
 class OmmuSettings extends CActiveRecord
 {
 	public $defaultColumns = array();
+	public $event;
+	
+	// Variable Search
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -98,7 +108,8 @@ class OmmuSettings extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('site_url, site_title, site_keywords, site_description, site_dateformat, site_timeformat', 'required', 'on'=>'general'),
+			array('site_url, site_title, site_keywords, site_description, site_dateformat, site_timeformat,
+				event', 'required', 'on'=>'general'),
 			array('general_commenthtml, spam_failedcount', 'required', 'on'=>'banned'),
 			array('signup_numgiven', 'required', 'on'=>'signup'),
 			//array('analytic_id', 'required', 'on'=>'analytic'),
@@ -108,10 +119,12 @@ class OmmuSettings extends CActiveRecord
 			array('site_url, analytic_id, license_email, license_key', 'length', 'max'=>32),
 			array('site_title, site_keywords, site_description, general_commenthtml', 'length', 'max'=>256),
 			array('license_email', 'email'),
-			array('site_creation, construction_date, construction_text, construction_twitter, general_include, banned_ips, banned_emails, banned_usernames, banned_words', 'safe'),
+			array('site_creation, construction_date, construction_text, event_startdate, event_finishdate, event_tag, general_include, banned_ips, banned_emails, banned_usernames, banned_words,
+				event', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, online, site_type, site_admin, site_email, site_url, site_title, site_keywords, site_description, construction_date, construction_text, construction_twitter, site_creation, site_dateformat, site_timeformat, signup_username, signup_approve, signup_verifyemail, signup_photo, signup_welcome, signup_random, signup_terms, signup_invitepage, signup_inviteonly, signup_checkemail, signup_adminemail, general_profile, general_invite, general_search, general_portal, general_include, general_commenthtml, banned_ips, banned_emails, banned_usernames, banned_words, spam_comment, spam_contact, spam_invite, spam_login, spam_failedcount, spam_signup, analytic, analytic_id, license_email, license_key, ommu_version', 'safe', 'on'=>'search'),
+			array('id, online, site_type, site_admin, site_email, site_url, site_title, site_keywords, site_description, construction_date, construction_text, construction_twitter, site_creation, site_dateformat, site_timeformat, signup_username, signup_approve, signup_verifyemail, signup_photo, signup_welcome, signup_random, signup_terms, signup_invitepage, signup_inviteonly, signup_checkemail, signup_adminemail, general_profile, general_invite, general_search, general_portal, general_include, general_commenthtml, banned_ips, banned_emails, banned_usernames, banned_words, spam_comment, spam_contact, spam_invite, spam_login, spam_failedcount, spam_signup, analytic, analytic_id, license_email, license_key, ommu_version, modified_date, modified_id, 
+				modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -123,6 +136,7 @@ class OmmuSettings extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -132,57 +146,64 @@ class OmmuSettings extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => Phrase::trans(133,0),
-			'online' => Phrase::trans(101,0),
-			'site_type' => Phrase::trans(439,0),
-			'site_admin' => Phrase::trans(440,0),
-			'site_email' => Phrase::trans(441,0),
-			'site_url' => Phrase::trans(107,0),
-			'site_title' => Phrase::trans(105,0),
-			'site_keywords' => Phrase::trans(110,0),
-			'site_description' => Phrase::trans(108,0),
-			'site_creation' => Phrase::trans(438,0),
-			'site_dateformat' => Phrase::trans(512,0),
-			'site_timeformat' => Phrase::trans(513,0),
-			'construction_date' => Phrase::trans(315,0),
-			'construction_text' => Phrase::trans(316,0),
-			'construction_twitter' => Phrase::trans(319,0),
-			'signup_username' => Phrase::trans(46,0),
-			'signup_approve' => Phrase::trans(11,0),
-			'signup_verifyemail' => Phrase::trans(34,0),
-			'signup_photo' => Phrase::trans(7,0),
-			'signup_welcome' => Phrase::trans(15,0),
-			'signup_random' => Phrase::trans(38,0),
-			'signup_terms' => Phrase::trans(42,0),
-			'signup_invitepage' => Phrase::trans(30,0),
-			'signup_inviteonly' => Phrase::trans(19,0),
-			'signup_checkemail' => Phrase::trans(437,0),
-			'signup_numgiven' => Phrase::trans(29,0),
-			'signup_adminemail' => Phrase::trans(50,0),
-			'general_profile' => Phrase::trans(95,0),
-			'general_invite' => Phrase::trans(99,0),
-			'general_search' => Phrase::trans(97,0),
-			'general_portal' => Phrase::trans(98,0),
-			'general_include' => Phrase::trans(126,0),
-			'general_commenthtml' => Phrase::trans(92,0),
-			'lang_allow' => Phrase::trans(434,0),
-			'lang_autodetect' => Phrase::trans(435,0),
-			'lang_anonymous' => Phrase::trans(92,0),
-			'banned_ips' => Phrase::trans(65,0),
-			'banned_emails' => Phrase::trans(67,0),
-			'banned_usernames' => Phrase::trans(69,0),
-			'banned_words' => Phrase::trans(71,0),
-			'spam_comment' => Phrase::trans(88,0),
-			'spam_contact' => Phrase::trans(84,0),
-			'spam_invite' => Phrase::trans(73,0),
-			'spam_login' => Phrase::trans(77,0),
-			'spam_failedcount' => Phrase::trans(83,0),
-			'spam_signup' => Phrase::trans(54,0),
-			'analytic' => Phrase::trans(61,0),
-			'analytic_id' => Phrase::trans(62,0),
-			'license_email' => Phrase::trans(433,0),
-			'license_key' => Phrase::trans(432,0),
-			'ommu_version' => Phrase::trans(431,0),
+			'id' => Yii::t('attribute', 'setting'),
+			'online' => Yii::t('attribute', 'online'),
+			'site_type' => Yii::t('attribute', 'site_type'),
+			'site_admin' => Yii::t('attribute', 'site_admin'),
+			'site_email' => Yii::t('attribute', 'site_email'),
+			'site_headline' => Yii::t('attribute', 'site_headline'),
+			'site_url' => Yii::t('attribute', 'site_url'),
+			'site_title' => Yii::t('attribute', 'site_title'),
+			'site_keywords' => Yii::t('attribute', 'site_keywords'),
+			'site_description' => Yii::t('attribute', 'site_description'),
+			'site_creation' => Yii::t('attribute', 'site_creation'),
+			'site_dateformat' => Yii::t('attribute', 'site_dateformat'),
+			'site_timeformat' => Yii::t('attribute', 'site_timeformat'),
+			'construction_date' => Yii::t('attribute', 'construction_date'),
+			'construction_text' => Yii::t('attribute', 'construction_text'),
+			'event_startdate' => Yii::t('attribute', 'event_startdate'),
+			'event_finishdate' => Yii::t('attribute', 'event_finishdate'),
+			'event_tag' => Yii::t('attribute', 'event_tag'),
+			'signup_username' => Yii::t('attribute', 'signup_username'),
+			'signup_approve' => Yii::t('attribute', 'signup_approve'),
+			'signup_verifyemail' => Yii::t('attribute', 'signup_verifyemail'),
+			'signup_photo' => Yii::t('attribute', 'signup_photo'),
+			'signup_welcome' => Yii::t('attribute', 'signup_welcome'),
+			'signup_random' => Yii::t('attribute', 'signup_random'),
+			'signup_terms' => Yii::t('attribute', 'signup_terms'),
+			'signup_invitepage' => Yii::t('attribute', 'signup_invitepage'),
+			'signup_inviteonly' => Yii::t('attribute', 'signup_inviteonly'),
+			'signup_checkemail' => Yii::t('attribute', 'signup_checkemail'),
+			'signup_numgiven' => Yii::t('attribute', 'signup_numgiven'),
+			'signup_adminemail' => Yii::t('attribute', 'signup_adminemail'),
+			'general_profile' => Yii::t('attribute', 'general_profile'),
+			'general_invite' => Yii::t('attribute', 'general_invite'),
+			'general_search' => Yii::t('attribute', 'general_search'),
+			'general_portal' => Yii::t('attribute', 'general_portal'),
+			'general_include' => Yii::t('attribute', 'general_include'),
+			'general_commenthtml' => Yii::t('attribute', 'general_commenthtml'),
+			'lang_allow' => Yii::t('attribute', 'lang_allow'),
+			'lang_autodetect' => Yii::t('attribute', 'lang_autodetect'),
+			'lang_anonymous' => Yii::t('attribute', 'lang_anonymous'),
+			'banned_ips' => Yii::t('attribute', 'banned_ips'),
+			'banned_emails' => Yii::t('attribute', 'banned_emails'),
+			'banned_usernames' => Yii::t('attribute', 'banned_usernames'),
+			'banned_words' => Yii::t('attribute', 'banned_words'),
+			'spam_comment' => Yii::t('attribute', 'spam_comment'),
+			'spam_contact' => Yii::t('attribute', 'spam_contact'),
+			'spam_invite' => Yii::t('attribute', 'spam_invite'),
+			'spam_login' => Yii::t('attribute', 'spam_login'),
+			'spam_failedcount' => Yii::t('attribute', 'spam_failedcount'),
+			'spam_signup' => Yii::t('attribute', 'spam_signup'),
+			'analytic' => Yii::t('attribute', 'analytic'),
+			'analytic_id' => Yii::t('attribute', 'analytic_id'),
+			'license_email' => Yii::t('attribute', 'license_email'),
+			'license_key' => Yii::t('attribute', 'license_key'),
+			'ommu_version' => Yii::t('attribute', 'ommu_version'),
+			'modified_date' => Yii::t('attribute', 'modified_date'),
+			'modified_id' => Yii::t('attribute', 'modified_id'),
+			'event' => Yii::t('attribute', 'event'),
+			'modified_search' => Yii::t('attribute', 'modified_id'),
 		);
 	}
 	
@@ -211,7 +232,11 @@ class OmmuSettings extends CActiveRecord
 		$criteria->compare('t.site_timeformat',$this->site_timeformat,true);
 		$criteria->compare('t.construction_date',$this->construction_date);
 		$criteria->compare('t.construction_text',$this->construction_text,true);
-		$criteria->compare('t.construction_twitter',$this->construction_twitter,true);
+		if($this->event_startdate != null && !in_array($this->event_startdate, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.event_startdate)',date('Y-m-d', strtotime($this->event_startdate)));
+		if($this->event_finishdate != null && !in_array($this->event_finishdate, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.event_finishdate)',date('Y-m-d', strtotime($this->event_finishdate)));
+		$criteria->compare('t.event_tag',$this->event_tag);
 		$criteria->compare('t.signup_username',$this->signup_username);
 		$criteria->compare('t.signup_approve',$this->signup_approve);
 		$criteria->compare('t.signup_verifyemail',$this->signup_verifyemail);
@@ -244,6 +269,21 @@ class OmmuSettings extends CActiveRecord
 		$criteria->compare('t.license_email',$this->license_email,true);
 		$criteria->compare('t.license_key',$this->license_key,true);
 		$criteria->compare('t.ommu_version',$this->ommu_version,true);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->modified_id);
+		
+		if(!isset($_GET['OmmuSettings_sort']))
+			$criteria->order = 't.id DESC';
+		
+		// Custom Search
+		$criteria->with = array(
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
+			),
+		);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -282,7 +322,9 @@ class OmmuSettings extends CActiveRecord
 			$this->defaultColumns[] = 'site_timeformat';
 			$this->defaultColumns[] = 'construction_date';
 			$this->defaultColumns[] = 'construction_text';
-			$this->defaultColumns[] = 'construction_twitter';
+			$this->defaultColumns[] = 'event_startdate';
+			$this->defaultColumns[] = 'event_finishdate';
+			$this->defaultColumns[] = 'event_tag';
 			$this->defaultColumns[] = 'signup_username';
 			$this->defaultColumns[] = 'signup_approve';
 			$this->defaultColumns[] = 'signup_verifyemail';
@@ -315,6 +357,8 @@ class OmmuSettings extends CActiveRecord
 			$this->defaultColumns[] = 'license_email';
 			$this->defaultColumns[] = 'license_key';
 			$this->defaultColumns[] = 'ommu_version';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -339,7 +383,9 @@ class OmmuSettings extends CActiveRecord
 			$this->defaultColumns[] = 'site_timeformat';
 			$this->defaultColumns[] = 'construction_date';
 			$this->defaultColumns[] = 'construction_text';
-			$this->defaultColumns[] = 'construction_twitter';
+			$this->defaultColumns[] = 'event_startdate';
+			$this->defaultColumns[] = 'event_finishdate';
+			$this->defaultColumns[] = 'event_tag';
 			$this->defaultColumns[] = 'signup_username';
 			$this->defaultColumns[] = 'signup_approve';
 			$this->defaultColumns[] = 'signup_verifyemail';
@@ -372,6 +418,11 @@ class OmmuSettings extends CActiveRecord
 			$this->defaultColumns[] = 'license_email';
 			$this->defaultColumns[] = 'license_key';
 			$this->defaultColumns[] = 'ommu_version';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = array(
+				'name' => 'modified_search',
+				'value' => '$data->modified_relation->displayname',
+			);
 		}
 		parent::afterConstruct();
 	}
@@ -392,17 +443,31 @@ class OmmuSettings extends CActiveRecord
 	 */
 	protected function beforeValidate() {
 		if(parent::beforeValidate()) {		
+			$action = strtolower(Yii::app()->controller->action->id);
+			$currentAction = strtolower(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
 			if($this->online == 0) {
 				if($this->construction_date == '') {
-					$this->addError('construction_date', Phrase::trans(317,0));
+					$this->addError('construction_date', Yii::t('phrase', 'Maintenance date cannot be blank.'));
 				}
 				if($this->construction_text == '') {
-					$this->addError('construction_text', Phrase::trans(318,0));
-				}
-				if($this->construction_twitter == '') {
-					$this->addError('construction_twitter', Phrase::trans(320,0));
+					$this->addError('construction_text', Yii::t('phrase', 'Maintenance text cannot be blank.'));
 				}
 			}
+			
+			if($currentAction == 'settings/general') {			
+				if(in_array(date('Y-m-d', strtotime($this->event_startdate)), array('0000-00-00','1970-01-01')) && in_array(date('Y-m-d', strtotime($this->event_finishdate)), array('0000-00-00','1970-01-01')))
+					$this->event = 0;
+			
+				if($this->event == 0) {
+					$this->event_startdate = '00-00-0000';	
+					$this->event_finishdate = '00-00-0000';	
+				}
+			
+				if($this->event != 0 && ($this->event_startdate != '' && $this->event_finishdate != '') && (date('Y-m-d', strtotime($this->event_startdate)) >= date('Y-m-d', strtotime($this->event_finishdate))))
+					$this->addError('event_finishdate', Yii::t('phrase', 'Event Finishdate tidak boleh lebih kecil'));
+			}
+			
+			$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}
@@ -413,6 +478,8 @@ class OmmuSettings extends CActiveRecord
 	protected function beforeSave() {
 		if(parent::beforeSave()) {
 			$this->construction_date = date('Y-m-d', strtotime($this->construction_date));
+			$this->event_startdate = date('Y-m-d', strtotime($this->event_startdate));
+			$this->event_finishdate = date('Y-m-d', strtotime($this->event_finishdate));
 		}
 		return true;
 	}

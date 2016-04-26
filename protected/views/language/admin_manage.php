@@ -1,11 +1,13 @@
 <?php
 /**
+ * Ommu Languages (ommu-languages)
  * @var $this LanguageController
  * @var $model OmmuLanguages
+ * version: 1.1.0
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contact (+62)856-299-4114
  *
  */
@@ -33,15 +35,9 @@
 		<?php 
 			$columnData   = $columns;
 			array_push($columnData, array(
-				'header' => Phrase::trans(151,0),
+				'header' => Yii::t('phrase', 'Options'),
 				'class'=>'CButtonColumn',
 				'buttons' => array(
-					'phrase' => array(
-						'label' => 'phrase',
-						'options' => array(
-							'class' => 'view'
-						),
-						'url' => 'Yii::app()->createUrl("phrase/manage",array("id"=>$data->primaryKey))'),
 					'view' => array(
 						'label' => 'view',
 						'options' => array(
@@ -61,7 +57,7 @@
 						),
 						'url' => 'Yii::app()->controller->createUrl("delete",array("id"=>$data->primaryKey))')
 				),
-				'template' => '{phrase}|{update}|{delete}',
+				'template' => '{update}|{delete}',
 			));
 
 			$this->widget('application.components.system.OGridView', array(
@@ -93,36 +89,36 @@
 	<?php //begin.Messages ?>
 
 	<fieldset>
-		<h3><?php echo Phrase::trans(139,0);?></h3>
+		<h3><?php echo Yii::t('phrase', 'Language Selection Settings');?></h3>
 
 		<div class="clearfix">
-			<label><span><?php echo Phrase::trans(140,0);?></span></label>
+			<label><span><?php echo Yii::t('phrase', 'If you have more than one language pack, do you want to allow your registered users to select which one will be used while they are logged in? If you select "Yes", users will be able to choose their language on the signup page and the account settings page. Note that this will only apply if you have more than one language pack.');?></span></label>
 			<div class="desc">
 				<?php echo $form->radioButtonList($setting, 'lang_allow', array(
-					1 => Phrase::trans(141,0),
-					0 => Phrase::trans(142,0),
+					1 => Yii::t('phrase', 'Yes, allow registered users to choose their own language.'),
+					0 => Yii::t('phrase', 'No, do not allow registered users to save their language preference.'),
 				)); ?>
 				<?php echo $form->error($setting,'lang_allow'); ?>
 			</div>
 		</div>
 
 		<div class="clearfix">
-			<label><span><?php echo Phrase::trans(143,0);?></span></label>
+			<label><span><?php echo Yii::t('phrase', 'If you have more than one language pack, do you want to display a select box on your homepage so that unregistered users can change the language in which they view the social network? Note that this will only apply if you have more than one language pack.');?></span></label>
 			<div class="desc">
 				<?php echo $form->radioButtonList($setting, 'lang_anonymous', array(
-					1 => Phrase::trans(144,0),
-					0 => Phrase::trans(145,0),
+					1 => Yii::t('phrase', 'Yes, display a select box that will allow unregistered users to change their language.'),
+					0 => Yii::t('phrase', 'No, do not allow unregistered users to change the site language.'),
 				)); ?>
 				<?php echo $form->error($setting,'lang_anonymous'); ?>
 			</div>
 		</div>
 
 		<div class="clearfix">
-			<label><span><?php echo Phrase::trans(146,0);?></span></label>
+			<label><span><?php echo Yii::t('phrase', 'If you have more than one language pack, do you want the system to autodetect the language settings from your visitors\' browsers? If you select "Yes", the system will attempt to detect what language the user has set in their browser settings. If you have a matching language, your site will display in that language, otherwise it will display in the default language.');?></span></label>
 			<div class="desc">
 				<?php echo $form->radioButtonList($setting, 'lang_autodetect', array(
-					1 => Phrase::trans(147,0),
-					0 => Phrase::trans(148,0),
+					1 => Yii::t('phrase', 'Yes, attempt to detect the visitor\'s language based on their browser settings.'),
+					0 => Yii::t('phrase', 'No, do not autodetect the visitor\'s language.'),
 				)); ?>
 				<?php echo $form->error($setting,'lang_autodetect'); ?>
 			</div>
@@ -131,7 +127,7 @@
 		<div class="submit clearfix">
 			<label>&nbsp;</label>
 			<div class="desc">
-				<?php echo CHtml::submitButton($setting->isNewRecord ? Phrase::trans(1,0) : Phrase::trans(2,0), array('onclick' => 'setEnableSave()')); ?>
+				<?php echo CHtml::submitButton($setting->isNewRecord ? Yii::t('phrase', 'Create') : Yii::t('phrase', 'Save'), array('onclick' => 'setEnableSave()')); ?>
 			</div>
 		</div>
 

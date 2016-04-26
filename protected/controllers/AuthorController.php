@@ -2,9 +2,9 @@
 /**
  * AuthorController
  * @var $this AuthorController
- * @var $model OmmuAuthors * @var $form CActiveForm
- * Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
- * version: 0.0.1
+ * @var $model OmmuAuthors
+ * @var $form CActiveForm
+ * version: 1.1.0
  * Reference start
  *
  * TOC :
@@ -21,8 +21,8 @@
  *	performAjaxValidation
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Core
  * @contect (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ class AuthorController extends Controller
 	public function init() 
 	{
 		if(!Yii::app()->user->isGuest) {
-			if(Yii::app()->user->level == 1) {
+			if(in_array(Yii::app()->user->level, array(1,2))) {
 				$arrThemes = Utility::getCurrentTemplate('admin');
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
@@ -87,7 +87,7 @@ class AuthorController extends Controller
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
 				'actions'=>array('manage','add','edit','view','runaction','delete','publish'),
 				'users'=>array('@'),
-				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 1)',
+				'expression'=>'isset(Yii::app()->user->level) && in_array(Yii::app()->user->level, array(1,2))',
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
 				'actions'=>array(),
@@ -334,10 +334,10 @@ class AuthorController extends Controller
 		$model=$this->loadModel($id);
 		
 		if($model->publish == 1) {
-			$title = Phrase::trans(276,0);
+			$title = Yii::t('phrase', 'Unpublish');
 			$replace = 0;
 		} else {
-			$title = Phrase::trans(275,0);
+			$title = Yii::t('phrase', 'Publish');
 			$replace = 1;
 		}
 
@@ -381,7 +381,7 @@ class AuthorController extends Controller
 	{
 		$model = OmmuAuthors::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 
