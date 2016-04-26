@@ -1,12 +1,42 @@
-code			: 
-name			: 
-description		: 
-folder_name		: 
-global_model	: 
+code			: 25000
+name			: Video Feeder
+description		: Video Feeder
+folder_name		: video
 version			: 0.1.0
 created_date	: 
-author			: Putra Sudaryanto [putra@sudaryanto.me]
+author			: Putra Sudaryanto [putra@sudaryanto.id]
 
 db_table_name	: 
  
 db_sql_filename	: 
+
+plugin_menu		:
+	- urlTitle: View Videos
+		urlRules: {siteType: 0,1, userLevel: 1,2}
+		urlPath: {url: o/admin/manage, attr: -, icon: -}
+		
+	- urlTitle: Video Settings
+		urlRules: {siteType: 0,1, userLevel: 1}
+		urlPath: {url: o/setting/index, attr: -, icon: -}
+		submenu :
+			- urlTitle: Likes
+				urlRules: {siteType: 0,1, userLevel: 1,2}
+				urlPath: {url: o/likes/manage, attr: -, icon: -}
+
+content_menu	:
+# controller o/admin
+	- urlTitle: Add Video
+		urlRules: {video, o/admin, manage, siteType: 0,1, userLevel: 1,2}
+		urlPath: {url: add, attr: -, icon: -}
+		
+# controller o/category
+
+	- urlTitle: Add Category
+		urlRules: {video, o/category, manage, siteType: 0,1, userLevel: 1,2}
+		urlPath: {url: add, attr: -, icon: -}
+		
+# controller o/setting
+
+	- urlTitle: Add Category
+		urlRules: {video, o/setting, index, siteType: 0,1, userLevel: 1,2}
+		urlPath: {url: o/category/add, attr: -, icon: -}

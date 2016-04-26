@@ -1,8 +1,18 @@
+<?php
+/**
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Video-Albums
+ * @contect (+62)856-299-4114
+ *
+ */
+?>
+
 <?php if($model != null) {?>
 <div class="box recent-news-video">
 	<h3>Video Terbaru</h3>
 	<ul>
-		<?php 
+		<?php
 		$i=0;
 		foreach($model as $key => $val) {
 		$i++;

@@ -1,3 +1,13 @@
+<?php
+/**
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Video-Albums
+ * @contect (+62)856-299-4114
+ *
+ */
+?>
+
 <?php if($model != null) {?>
 <div class="boxed">
 	<h3><?php echo Phrase::trans(25040,1);?></h3>
