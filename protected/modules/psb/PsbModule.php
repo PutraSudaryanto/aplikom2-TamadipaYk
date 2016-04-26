@@ -25,7 +25,8 @@ class PsbModule extends CWebModule
 			//list public controller in this module
 			$publicControllers = array(
 				'site',
-				'member',
+				'course',
+				'school',
 			);
 			
 			// pake ini untuk set theme per action di controller..

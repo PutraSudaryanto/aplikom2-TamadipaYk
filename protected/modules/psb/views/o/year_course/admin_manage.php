@@ -32,7 +32,7 @@
 
 <?php //begin.Search ?>
 <div class="search-form">
-<?php $this->renderPartial('/year_course/_search',array(
+<?php $this->renderPartial('/o/year_course/_search',array(
 	'model'=>$model,
 )); ?>
 </div>
@@ -40,7 +40,7 @@
 
 <?php //begin.Grid Option ?>
 <div class="grid-form">
-<?php $this->renderPartial('/year_course/_option_form',array(
+<?php $this->renderPartial('/o/year_course/_option_form',array(
 	'model'=>$model,
 )); ?>
 </div>

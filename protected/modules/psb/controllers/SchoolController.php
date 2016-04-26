@@ -9,10 +9,8 @@
  *
  * TOC :
  *	Index
- *	Manage
- *	Add
- *	Edit
- *	Delete
+ *	Suggest
+ *	AjaxGet
  *
  *	LoadModel
  *	performAjaxValidation
@@ -39,17 +37,9 @@ class SchoolController extends Controller
 	 */
 	public function init() 
 	{
-		if(!Yii::app()->user->isGuest) {
-			if(Yii::app()->user->level == 1) {
-				$arrThemes = Utility::getCurrentTemplate('admin');
-				Yii::app()->theme = $arrThemes['folder'];
-				$this->layout = $arrThemes['layout'];
-			} else {
-				$this->redirect(Yii::app()->createUrl('site/login'));
-			}
-		} else {
-			$this->redirect(Yii::app()->createUrl('site/login'));
-		}
+		$arrThemes = Utility::getCurrentTemplate('public');
+		Yii::app()->theme = $arrThemes['folder'];
+		$this->layout = $arrThemes['layout'];
 	}
 
 	/**
@@ -81,11 +71,6 @@ class SchoolController extends Controller
 				'expression'=>'isset(Yii::app()->user->level)',
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
 			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('manage','add','edit','delete'),
-				'users'=>array('@'),
-				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 1)',
-			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
 				'actions'=>array(),
 				'users'=>array('admin'),
@@ -101,7 +86,7 @@ class SchoolController extends Controller
 	 */
 	public function actionIndex() 
 	{
-		$this->redirect(array('manage'));
+		$this->redirect(Yii::app()->createUrl('site/index'));
 	}
 	
 	/**
@@ -144,169 +129,6 @@ class SchoolController extends Controller
 				'publisher_id' => $model->publisher_id,
 				'publisher_id' => $model->publisher_id,
 			));
-		}
-	}
-
-	/**
-	 * Manages all models.
-	 */
-	public function actionManage() 
-	{
-		$model=new PsbSchools('search');
-		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['PsbSchools'])) {
-			$model->attributes=$_GET['PsbSchools'];
-		}
-
-		$columnTemp = array();
-		if(isset($_GET['GridColumn'])) {
-			foreach($_GET['GridColumn'] as $key => $val) {
-				if($_GET['GridColumn'][$key] == 1) {
-					$columnTemp[] = $key;
-				}
-			}
-		}
-		$columns = $model->getGridColumn($columnTemp);
-
-		$this->pageTitle = 'Psb Schools Manage';
-		$this->pageDescription = '';
-		$this->pageMeta = '';
-		$this->render('admin_manage',array(
-			'model'=>$model,
-			'columns' => $columns,
-		));
-	}	
-	
-	/**
-	 * Creates a new model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
-	 */
-	public function actionAdd() 
-	{
-		$model=new PsbSchools;
-
-		// Uncomment the following line if AJAX validation is needed
-		$this->performAjaxValidation($model);
-
-		if(isset($_POST['PsbSchools'])) {
-			$model->attributes=$_POST['PsbSchools'];
-			$model->scenario='schoolmaster';
-			
-			$jsonError = CActiveForm::validate($model);
-			if(strlen($jsonError) > 2) {
-				echo $jsonError;
-
-			} else {
-				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
-					if($model->save()) {
-						echo CJSON::encode(array(
-							'type' => 5,
-							'get' => Yii::app()->controller->createUrl('manage'),
-							'id' => 'partial-psb-schools',
-							'msg' => '<div class="errorSummary success"><strong>PsbSchools success created.</strong></div>',
-						));
-					} else {
-						print_r($model->getErrors());
-					}
-				}
-			}
-			Yii::app()->end();
-			
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-			$this->dialogWidth = 600;
-			
-			$this->pageTitle = 'Create Psb Schools';
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_add',array(
-				'model'=>$model,
-			));			
-		}
-	}
-
-	/**
-	 * Updates a particular model.
-	 * If update is successful, the browser will be redirected to the 'view' page.
-	 * @param integer $id the ID of the model to be updated
-	 */
-	public function actionEdit($id) 
-	{
-		$model=$this->loadModel($id);
-
-		// Uncomment the following line if AJAX validation is needed
-		$this->performAjaxValidation($model);
-
-		if(isset($_POST['PsbSchools'])) {
-			$model->attributes=$_POST['PsbSchools'];
-			$model->scenario='schoolmasterEdit';
-			
-			$jsonError = CActiveForm::validate($model);
-			if(strlen($jsonError) > 2) {
-				echo $jsonError;
-
-			} else {
-				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
-					if($model->save()) {
-						echo CJSON::encode(array(
-							'type' => 5,
-							'get' => Yii::app()->controller->createUrl('manage'),
-							'id' => 'partial-psb-schools',
-							'msg' => '<div class="errorSummary success"><strong>PsbSchools success updated.</strong></div>',
-						));
-					} else {
-						print_r($model->getErrors());
-					}
-				}
-			}
-			Yii::app()->end();
-			
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-			$this->dialogWidth = 600;
-			
-			$this->pageTitle = 'Update Psb Schools';
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_edit',array(
-				'model'=>$model,
-			));			
-		}
-	}
-
-	/**
-	 * Deletes a particular model.
-	 * If deletion is successful, the browser will be redirected to the 'admin' page.
-	 * @param integer $id the ID of the model to be deleted
-	 */
-	public function actionDelete($id) 
-	{
-		$model=$this->loadModel($id);
-		
-		if(Yii::app()->request->isPostRequest) {
-			// we only allow deletion via POST request
-			if(isset($id)) {
-				if($model->delete()) {
-					echo CJSON::encode(array(
-						'type' => 5,
-						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-psb-schools',
-						'msg' => '<div class="errorSummary success"><strong>PsbSchools success deleted.</strong></div>',
-					));
-				}
-			}
-
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-			$this->dialogWidth = 350;
-
-			$this->pageTitle = 'PsbSchools Delete.';
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_delete');
 		}
 	}
 

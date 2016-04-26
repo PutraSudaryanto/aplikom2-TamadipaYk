@@ -44,7 +44,7 @@
 				<div class="desc">
 					<?php 
 					//echo $form->textField($model,'course_input',array('maxlength'=>32,'class'=>'span-7'));					
-					$url = Yii::app()->controller->createUrl('yearcourse/add', array('type'=>'year'));
+					$url = Yii::app()->controller->createUrl('o/yearcourse/add', array('type'=>'year'));
 					$year = $model->year_id;
 					$courseId = 'PsbYears_course_input';
 					$this->widget('zii.widgets.jui.CJuiAutoComplete', array(
@@ -98,7 +98,7 @@
 
 <div class="contentmenu clearfix">
 <ul class="left clearfix">
-	<li><a href="<?php echo Yii::app()->controller->createUrl('batch/add',array('id'=>$model->year_id,'type'=>'year'));?>" title="Tambah Gelombang"><span class="icons">C</span>Tambah Gelombang</a></li>
+	<li><a href="<?php echo Yii::app()->controller->createUrl('o/batch/add',array('id'=>$model->year_id,'type'=>'year'));?>" title="Tambah Gelombang"><span class="icons">C</span>Tambah Gelombang</a></li>
 </ul>
 </div>
 
@@ -127,19 +127,19 @@
 						'options' => array(							
 							'class' => 'view',
 						),
-						'url' => 'Yii::app()->controller->createUrl("batch/view",array("id"=>$data->primaryKey, "type"=>"year"))'),
+						'url' => 'Yii::app()->controller->createUrl("o/batch/view",array("id"=>$data->primaryKey, "type"=>"year"))'),
 					'update' => array(
 						'label' => 'update',
 						'options' => array(
 							'class' => 'update'
 						),
-						'url' => 'Yii::app()->controller->createUrl("batch/edit",array("id"=>$data->primaryKey, "type"=>"year"))'),
+						'url' => 'Yii::app()->controller->createUrl("o/batch/edit",array("id"=>$data->primaryKey, "type"=>"year"))'),
 					'delete' => array(
 						'label' => 'delete',
 						'options' => array(
 							'class' => 'delete'
 						),
-						'url' => 'Yii::app()->controller->createUrl("batch/delete",array("id"=>$data->primaryKey, "type"=>"year"))')
+						'url' => 'Yii::app()->controller->createUrl("o/batch/delete",array("id"=>$data->primaryKey, "type"=>"year"))')
 				),
 				'template' => '{update}|{delete}',
 			));
