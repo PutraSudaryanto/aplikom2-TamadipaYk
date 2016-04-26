@@ -372,7 +372,7 @@ class OmmuMenuCategory extends CActiveRecord
 					$this->name = $title->phrase_id;
 
 				$desc=new OmmuSystemPhrase;
-				$desc->location = $location.'description';
+				$desc->location = $location.'_description';
 				$desc->en_us = $this->description;
 				if($desc->save())
 					$this->desc = $desc->phrase_id;
