@@ -57,8 +57,6 @@ themes
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\themes\ommu" "D:\htdocs\_project_ommu_bootstrap\themes\backend-end\ommu"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\themes\tamadipayk\css\content.css" "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\content.css"
 
-
-
 -------
 protected\modules
 =======
