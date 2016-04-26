@@ -1,9 +1,9 @@
 <?php
-
 /**
+ * ArticleCategory
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Articles
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -27,6 +27,9 @@
  * @property string $name
  * @property string $desc
  * @property string $creation_date
+ * @property string $creation_id
+ * @property string $modified_date
+ * @property string $modified_id
  *
  * The followings are the available model relations:
  * @property OmmuArticles[] $ommuArticles
@@ -36,7 +39,10 @@ class ArticleCategory extends CActiveRecord
 	public $defaultColumns = array();
 	public $title;
 	public $description;
-	public $count_article;
+	
+	// Variable Search
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -66,17 +72,16 @@ class ArticleCategory extends CActiveRecord
 		return array(
 			array('
 				title, description', 'required'),
-			array('publish, dependency, orders', 'numerical', 'integerOnly'=>true),
-			array('name, desc,
-				count_article', 'length', 'max'=>11),
+			array('publish, dependency, orders, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
+			array('name, desc', 'length', 'max'=>11),
 			array('
 				title', 'length', 'max'=>32),
 			array('
 				description', 'length', 'max'=>128),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('cat_id, publish, dependency, orders, name, desc, creation_date, 
-				title, description, count_article', 'safe', 'on'=>'search'),
+			array('cat_id, publish, dependency, orders, name, desc, creation_date, creation_id, modified_date, modified_id,
+				title, description, creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -88,8 +93,9 @@ class ArticleCategory extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'title' => array(self::BELONGS_TO, 'OmmuSystemPhrase', 'name'),
-			'description' => array(self::BELONGS_TO, 'OmmuSystemPhrase', 'desc'),
+			'view_cat' => array(self::BELONGS_TO, 'ViewArticleCategory', 'cat_id'),
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -108,7 +114,11 @@ class ArticleCategory extends CActiveRecord
 			'title' => Phrase::trans(26016,1),
 			'description' => Phrase::trans(26017,1),
 			'creation_date' => Phrase::trans(26069,1),
-			'count_article' => Phrase::trans(26000,1),
+			'creation_id' => 'Creation',
+			'modified_date' => 'Modified Date',
+			'modified_id' => 'Modified',
+			'creation_search' => 'Creation',
+			'modified_search' => 'Modified',
 		);
 	}
 	
@@ -140,24 +150,33 @@ class ArticleCategory extends CActiveRecord
 		$criteria->compare('t.desc',$this->desc,true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
-		$criteria->compare('t.count_article',$this->count_article);
+		$criteria->compare('t.creation_id',$this->creation_id);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->modified_id);
 		
 		// Custom Search
 		$criteria->with = array(
-			'title' => array(
-				'alias'=>'title',
-				'select'=>'en'
+			'view_cat' => array(
+				'alias'=>'view_cat',
+				'select'=>'category_name, category_desc, articles'
 			),
-			'description' => array(
-				'alias'=>'description',
-				'select'=>'en'
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname'
+			),
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
 			),
 		);
-		$criteria->compare('title.en',strtolower($this->title), true);
-		$criteria->compare('description.en',strtolower($this->description), true);
+		$criteria->compare('view_cat.category_name',strtolower($this->title), true);
+		$criteria->compare('view_cat.category_desc',strtolower($this->description), true);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['ArticleCategory_sort']))
-			$criteria->order = 'cat_id DESC';
+			$criteria->order = 't.cat_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -189,7 +208,9 @@ class ArticleCategory extends CActiveRecord
 			$this->defaultColumns[] = 'name';
 			$this->defaultColumns[] = 'desc';
 			$this->defaultColumns[] = 'creation_date';
-			$this->defaultColumns[] = 'count_article';
+			$this->defaultColumns[] = 'creation_id';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -225,9 +246,16 @@ class ArticleCategory extends CActiveRecord
 				'value' => '$data->dependency != 0 ? Phrase::trans(ArticleCategory::model()->findByPk($data->dependency)->name, 2) : "-"',
 			);
 			$this->defaultColumns[] = array(
-				'header' => 'count_article',
-				'value' => 'CHtml::link($data->count_article." ".Phrase::trans(26000,1), Yii::app()->controller->createUrl("admin/manage",array("category"=>$data->cat_id)))',
+				'header' => 'Count',
+				'value' => 'CHtml::link($data->view_cat->articles." ".Phrase::trans(26000,1), Yii::app()->controller->createUrl("o/admin/manage",array("category"=>$data->cat_id)))',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
 				'type' => 'raw',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation_relation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
@@ -258,13 +286,13 @@ class ArticleCategory extends CActiveRecord
 			if(!isset($_GET['type'])) {
 				$this->defaultColumns[] = array(
 					'name' => 'publish',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("category/publish",array("id"=>$data->cat_id)), $data->publish, 1)',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("o/category/publish",array("id"=>$data->cat_id)), $data->publish, 1)',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
 					'filter'=>array(
-						1=>Phrase::trans(588,0),
-						0=>Phrase::trans(589,0),
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
 					),
 					'type' => 'raw',
 				);
@@ -309,16 +337,10 @@ class ArticleCategory extends CActiveRecord
 		if($type == null) {
 			//$criteria->select = '';
 			$model = Articles::model()->findAll($criteria);
-		} else {
+		} else
 			$model = Articles::model()->count($criteria);
-		}
 		
 		return $model;
-	}
-	
-	protected function afterFind() {
-		$this->count_article = self::getArticle($this->cat_id, 'count');
-		parent::afterFind();
 	}
 
 	/**
@@ -328,7 +350,9 @@ class ArticleCategory extends CActiveRecord
 		if(parent::beforeValidate()) {		
 			if($this->isNewRecord) {
 				$this->orders = 0;
-			}		
+				$this->creation_id = Yii::app()->user->id;	
+			} else
+				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}
@@ -338,32 +362,28 @@ class ArticleCategory extends CActiveRecord
 	 */
 	protected function beforeSave() {
 		if(parent::beforeSave()) {
-			$action = strtolower(Yii::app()->controller->action->id);
 			if($this->isNewRecord) {
-				$currentAction = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id);
+				$location = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id);
 				$title=new OmmuSystemPhrase;
-				$title->location = $currentAction;
+				$title->location = $location.'_title';
 				$title->en = $this->title;
-				if($title->save()) {
+				if($title->save())
 					$this->name = $title->phrase_id;
-				}
 
 				$desc=new OmmuSystemPhrase;
-				$desc->location = $currentAction;
+				$desc->location = $location.'_description';
 				$desc->en = $this->description;
-				if($desc->save()) {
+				if($desc->save())
 					$this->desc = $desc->phrase_id;
-				}
+				
 			} else {
-				if($action == 'edit') {
-					$title = OmmuSystemPhrase::model()->findByPk($this->name);
-					$title->en = $this->title;
-					$title->save();
+				$title = OmmuSystemPhrase::model()->findByPk($this->name);
+				$title->en = $this->title;
+				$title->save();
 
-					$desc = OmmuSystemPhrase::model()->findByPk($this->desc);
-					$desc->en = $this->description;
-					$desc->save();
-				}
+				$desc = OmmuSystemPhrase::model()->findByPk($this->desc);
+				$desc->en = $this->description;
+				$desc->save();
 			}
 		}
 		return true;

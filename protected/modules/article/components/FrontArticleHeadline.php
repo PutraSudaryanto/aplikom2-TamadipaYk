@@ -11,7 +11,10 @@ class FrontArticleHeadline extends CWidget
 	}
 
 	protected function renderContent() {
+		$module = strtolower(Yii::app()->controller->module->id);
 		$controller = strtolower(Yii::app()->controller->id);
+		$action = strtolower(Yii::app()->controller->action->id);
+		$currentAction = strtolower(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
 		
 		//import model
 		Yii::import('application.modules.article.models.Articles');
@@ -33,6 +36,6 @@ class FrontArticleHeadline extends CWidget
 
 		$this->render('front_article_headline',array(
 			'model' => $model,
-		));	
+		));
 	}
 }

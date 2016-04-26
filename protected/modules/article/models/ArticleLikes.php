@@ -1,9 +1,9 @@
 <?php
-
 /**
+ * ArticleLikes
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Articles
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -145,7 +145,7 @@ class ArticleLikes extends CActiveRecord
 		$criteria->compare('user.displayname',strtolower($this->user_search), true);
 
 		if(!isset($_GET['ArticleLikes_sort']))
-			$criteria->order = 'like_id DESC';
+			$criteria->order = 't.like_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

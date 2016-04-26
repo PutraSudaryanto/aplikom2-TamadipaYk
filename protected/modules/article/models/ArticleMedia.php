@@ -1,9 +1,9 @@
 <?php
-
 /**
+ * ArticleMedia
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Articles
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -26,6 +26,7 @@
  * @property integer $cover
  * @property string $media
  * @property string $creation_date
+ * @property string $creation_id
  *
  * The followings are the available model relations:
  * @property OmmuArticles $article
@@ -37,8 +38,9 @@ class ArticleMedia extends CActiveRecord
 	public $video;
 	
 	// Variable Search
-	public $article_search;
 	public $type_search;
+	public $article_search;
+	public $creation_search;
 	
 	/**
 	 * Returns the static model of the specified AR class.
@@ -67,19 +69,16 @@ class ArticleMedia extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('article_id', 'required'),
-			array('orders, cover', 'numerical', 'integerOnly'=>true),
+			array('orders, cover, creation_id', 'numerical', 'integerOnly'=>true),
 			array('article_id', 'length', 'max'=>11),
 			array('
 				video', 'length', 'max'=>32),
-			array('media,
-				old_media', 'length', 'max'=>64),
-			//array('media', 'file', 'types' => 'jpg, jpeg, png, gif', 'allowEmpty' => true),
 			array('cover, media, caption, creation_date,
 				old_media, video', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('media_id, article_id, orders, cover, media, creation_date,
-				article_search, type_search', 'safe', 'on'=>'search'),
+			array('media_id, article_id, orders, cover, media, creation_date, creation_id,
+				article_search, creation_search, type_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -92,6 +91,7 @@ class ArticleMedia extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'article' => array(self::BELONGS_TO, 'Articles', 'article_id'),
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 		);
 	}
 
@@ -107,10 +107,12 @@ class ArticleMedia extends CActiveRecord
 			'cover' => Phrase::trans(26073,1),
 			'media' => Phrase::trans(26039,1),
 			'creation_date' => Phrase::trans(26069,1),
+			'creation_id' => 'Creation',
 			'old_media' => Phrase::trans(26071,1),
 			'video' => Phrase::trans(26044,1),
-			'article_search' => Phrase::trans(26000,1),
 			'type_search' => Phrase::trans(26067,1),
+			'article_search' => Phrase::trans(26000,1),
+			'creation_search' => 'Creation',
 		);
 	}
 	
@@ -136,6 +138,7 @@ class ArticleMedia extends CActiveRecord
 		$criteria->compare('t.media',strtolower($this->media),true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		$criteria->compare('t.creation_id',$this->creation_id);
 		
 		// Custom Search
 		$criteria->with = array(
@@ -143,12 +146,17 @@ class ArticleMedia extends CActiveRecord
 				'alias'=>'article',
 				'select'=>'article_type, title'
 			),
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname'
+			),
 		);
-		$criteria->compare('article.title',strtolower($this->article_search), true);
 		$criteria->compare('article.article_type',strtolower($this->type_search), true);
+		$criteria->compare('article.title',strtolower($this->article_search), true);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
 
 		if(!isset($_GET['ArticleMedia_sort']))
-			//$criteria->order = 'media_id DESC';
+			$criteria->order = 't.media_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -182,6 +190,7 @@ class ArticleMedia extends CActiveRecord
 			$this->defaultColumns[] = 'cover';
 			$this->defaultColumns[] = 'media';
 			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
 		}
 
 		return $this->defaultColumns;
@@ -224,14 +233,18 @@ class ArticleMedia extends CActiveRecord
 				'type' => 'raw',
 			);
 			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation_relation->displayname',
+			);
+			$this->defaultColumns[] = array(
 				'name' => 'cover',
 				'value' => '$data->cover == 1 ? Chtml::image(Yii::app()->theme->baseUrl.\'/images/icons/publish.png\') : Chtml::image(Yii::app()->theme->baseUrl.\'/images/icons/unpublish.png\')',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
 				'filter'=>array(
-					1=>Phrase::trans(588,0),
-					0=>Phrase::trans(589,0),
+					1=>Yii::t('phrase', 'Yes'),
+					0=>Yii::t('phrase', 'No'),
 				),
 				'type' => 'raw',
 			);
@@ -263,6 +276,23 @@ class ArticleMedia extends CActiveRecord
 			);
 		}
 		parent::afterConstruct();
+	}
+
+	/**
+	 * ArticleMedia get information
+	 */
+	public static function getInfo($id, $column=null)
+	{
+		if($column != null) {
+			$model = self::model()->findByPk($id,array(
+				'select' => $column
+			));
+			return $model->$column;
+			
+		} else {
+			$model = self::model()->findByPk($id);
+			return $model;			
+		}
 	}
 
 	/**
@@ -304,12 +334,13 @@ class ArticleMedia extends CActiveRecord
 				if($this->article->article_type == 2 && $this->media == '') {
 					$this->addError('video', Phrase::trans(26048,1));
 				}
-			}
+			} else
+				$this->creation_id = Yii::app()->user->id;
 			
 			$media = CUploadedFile::getInstance($this, 'media');
 			if($currentAction != 'media/ajaxadd' && $this->article->article_type == 1 && $media->name != '') {
 				$extension = pathinfo($media->name, PATHINFO_EXTENSION);
-				if(!in_array($extension, array('bmp','gif','jpg','png')))
+				if(!in_array(strtolower($extension), array('bmp','gif','jpg','png')))
 					$this->addError('media', 'The file "'.$media->name.'" cannot be uploaded. Only files with these extensions are allowed: bmp, gif, jpg, png.');
 			}
 		}
@@ -331,9 +362,9 @@ class ArticleMedia extends CActiveRecord
 					if($this->article->article_type == 1) {
 						$this->media = CUploadedFile::getInstance($this, 'media');
 						if($this->media instanceOf CUploadedFile) {
-							$fileName = time().'_'.$this->article_id.'.'.strtolower($this->media->extensionName);
+							$fileName = time().'_'.$this->article_id.'_'.Utility::getUrlTitle($this->article->title).'.'.strtolower($this->media->extensionName);
 							if($this->media->saveAs($article_path.'/'.$fileName)) {
-								if($this->old_media != '')
+								if($this->old_media != '' && file_exists($article_path.'/'.$this->old_media))
 									rename($article_path.'/'.$this->old_media, 'public/article/verwijderen/'.$this->article_id.'_'.$this->old_media);
 								$this->media = $fileName;
 							}
@@ -376,8 +407,7 @@ class ArticleMedia extends CActiveRecord
 				if($resizeSize[1] == 0)
 					$articleImg->resize($resizeSize[0]);
 				else
-					$articleImg->adaptiveResize($resizeSize[0], $resizeSize[1]);
-					
+					$articleImg->adaptiveResize($resizeSize[0], $resizeSize[1]);					
 				$articleImg->save($article_path.'/'.$this->media);
 			}
 			
@@ -401,7 +431,7 @@ class ArticleMedia extends CActiveRecord
 		parent::afterDelete();
 		//delete article image
 		$article_path = "public/article/".$this->article_id;
-		if(in_array($this->article->article_type, array(1,3)) && $this->media != '')
+		if(in_array($this->article->article_type, array(1,3)) && $this->media != '' && file_exists($article_path.'/'.$this->media))
 			rename($article_path.'/'.$this->media, 'public/article/verwijderen/'.$this->article_id.'_'.$this->media);
 
 		//reset cover in article

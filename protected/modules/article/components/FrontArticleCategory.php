@@ -2,6 +2,7 @@
 
 class FrontArticleCategory extends CWidget
 {
+	public $publish = null;
 
 	public function init() {
 	}
@@ -14,12 +15,14 @@ class FrontArticleCategory extends CWidget
 		//import model
 		Yii::import('application.modules.article.models.ArticleCategory');
 
-		$model = ArticleCategory::model()->findAll(array(
-			'condition' => 'publish = :publish',
-			'params' => array(
-				':publish' => 1,
-			),
-		));
+		$criteria=new CDbCriteria;
+		if($this->publish != null) {
+			$criteria->condition = 'publish = :publish';
+			$criteria->params = array(
+				':publish'=>$this->publish,
+			);			
+		}
+		$model = ArticleCategory::model()->findAll($criteria);
 
 		$this->render('front_article_category',array(
 			'model' => $model,

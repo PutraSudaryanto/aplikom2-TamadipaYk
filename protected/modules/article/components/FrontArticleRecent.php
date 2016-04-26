@@ -29,6 +29,7 @@ class FrontArticleRecent extends CWidget
 		$criteria->order = 'published_date DESC';
 		//$criteria->addInCondition('cat_id',array(18));
 		//$criteria->compare('cat_id',18);
+		//$criteria->limit = 3;
 		$criteria->limit = ($module == null && $currentAction == 'site/index') ? 4 : 5;
 			
 		$model = Articles::model()->findAll($criteria);
