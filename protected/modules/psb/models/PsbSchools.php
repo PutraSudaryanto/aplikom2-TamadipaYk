@@ -194,7 +194,7 @@ class PsbSchools extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'header' => 'registers',
-				'value' => 'CHtml::link($data->registers, Yii::app()->controller->createUrl("admin/manage",array("school"=>$data->school_id)))',
+				'value' => 'CHtml::link($data->registers, Yii::app()->controller->createUrl("o/admin/manage",array("school"=>$data->school_id)))',
 				'type' => 'raw',
 			);
 		}

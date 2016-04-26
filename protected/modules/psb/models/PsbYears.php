@@ -219,7 +219,7 @@ class PsbYears extends CActiveRecord
 			/*
 			$this->defaultColumns[] = array(
 				'header' => 'batchs',
-				'value' => 'CHtml::link($data->batchs, Yii::app()->controller->createUrl("batch/manage",array("year"=>$data->year_id)))',
+				'value' => 'CHtml::link($data->batchs, Yii::app()->controller->createUrl("o/batch/manage",array("year"=>$data->year_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
@@ -227,7 +227,7 @@ class PsbYears extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'header' => 'courses',
-				'value' => 'CHtml::link($data->courses, Yii::app()->controller->createUrl("yearcourse/manage",array("year"=>$data->year_id)))',
+				'value' => 'CHtml::link($data->courses, Yii::app()->controller->createUrl("o/yearcourse/manage",array("year"=>$data->year_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
@@ -235,7 +235,7 @@ class PsbYears extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'header' => 'registers',
-				'value' => 'CHtml::link($data->registers, Yii::app()->controller->createUrl("admin/manage",array("year"=>$data->year_id)))',
+				'value' => 'CHtml::link($data->registers, Yii::app()->controller->createUrl("o/admin/manage",array("year"=>$data->year_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),

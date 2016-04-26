@@ -190,7 +190,7 @@ class YearcourseController extends Controller
 
 		} else {
 			$this->dialogDetail = true;
-			$this->dialogGroundUrl = (isset($_GET['type']) && $_GET['type'] == 'year') ? Yii::app()->controller->createUrl('year/edit', array('id'=>$model->year_id)) : Yii::app()->controller->createUrl('manage');
+			$this->dialogGroundUrl = (isset($_GET['type']) && $_GET['type'] == 'year') ? Yii::app()->controller->createUrl('o/year/edit', array('id'=>$model->year_id)) : Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
 			$this->pageTitle = 'PsbYearCourse Delete.';
