@@ -1,10 +1,12 @@
 <?php
 /**
  * Banner Categories (banner-category)
- * @var $this CategoryController * @var $model BannerCategory *
+ * @var $this CategoryController
+ * @var $model BannerCategory
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Banner
  * @contect (+62)856-299-4114
  *
  */
@@ -15,16 +17,16 @@
 	);
 	$this->menu=array(
 		array(
-			'label' => Phrase::trans(307,0), 
+			'label' => Yii::t('phrase', 'Filter'), 
 			'url' => array('javascript:void(0);'),
 			'itemOptions' => array('class' => 'search-button'),
-			'linkOptions' => array('title' => Phrase::trans(307,0)),
+			'linkOptions' => array('title' => Yii::t('phrase', 'Filter')),
 		),
 		array(
-			'label' => Phrase::trans(308,0), 
+			'label' => Yii::t('phrase', 'Grid Options'), 
 			'url' => array('javascript:void(0);'),
 			'itemOptions' => array('class' => 'grid-button'),
-			'linkOptions' => array('title' => Phrase::trans(308,0)),
+			'linkOptions' => array('title' => Yii::t('phrase', 'Grid Options')),
 		),
 	);
 
@@ -63,7 +65,7 @@
 		<?php 
 			$columnData   = $columns;
 			array_push($columnData, array(
-				'header' => Phrase::trans(151,0),
+				'header' => Yii::t('phrase', 'Options'),
 				'class'=>'CButtonColumn',
 				'buttons' => array(
 					'view' => array(
@@ -85,7 +87,7 @@
 						),
 						'url' => 'Yii::app()->controller->createUrl("delete",array("id"=>$data->primaryKey))')
 				),
-				'template' => '{view}|{update}|{delete}',
+				'template' => '{update}|{delete}',
 			));
 
 			$this->widget('application.components.system.OGridView', array(

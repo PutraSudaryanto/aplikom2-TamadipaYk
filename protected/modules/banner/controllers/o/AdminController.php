@@ -1,9 +1,9 @@
 <?php
 /**
- * CategoryController
- * @var $this CategoryController
- * @var $model BannerCategory * @var $form CActiveForm
- * Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
+ * AdminController
+ * @var $this AdminController
+ * @var $model Banners
+ * @var $form CActiveForm
  * version: 0.0.1
  * Reference start
  *
@@ -22,13 +22,13 @@
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Banner
  * @contect (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
  */
 
-class CategoryController extends Controller
+class AdminController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -43,7 +43,7 @@ class CategoryController extends Controller
 	public function init() 
 	{
 		if(!Yii::app()->user->isGuest) {
-			if(Yii::app()->user->level == 1) {
+			if(in_array(Yii::app()->user->level, array(1,2))) {
 				$arrThemes = Utility::getCurrentTemplate('admin');
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
@@ -87,7 +87,7 @@ class CategoryController extends Controller
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
 				'actions'=>array('manage','add','edit','view','runaction','delete','publish'),
 				'users'=>array('@'),
-				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 1)',
+				'expression'=>'isset(Yii::app()->user->level) && in_array(Yii::app()->user->level, array(1,2))',
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
 				'actions'=>array(),
@@ -112,10 +112,10 @@ class CategoryController extends Controller
 	 */
 	public function actionManage() 
 	{
-		$model=new BannerCategory('search');
+		$model=new Banners('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['BannerCategory'])) {
-			$model->attributes=$_GET['BannerCategory'];
+		if(isset($_GET['Banners'])) {
+			$model->attributes=$_GET['Banners'];
 		}
 
 		$columnTemp = array();
@@ -128,7 +128,7 @@ class CategoryController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Phrase::trans(28012,1);
+		$this->pageTitle = Phrase::trans(28036,1);
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -143,46 +143,26 @@ class CategoryController extends Controller
 	 */
 	public function actionAdd() 
 	{
-		$model=new BannerCategory;
+		$model=new Banners;
 
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['BannerCategory'])) {
-			$model->attributes=$_POST['BannerCategory'];
+		if(isset($_POST['Banners'])) {
+			$model->attributes=$_POST['Banners'];
 			
-			$jsonError = CActiveForm::validate($model);
-			if(strlen($jsonError) > 2) {
-				echo $jsonError;
-
-			} else {
-				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
-					if($model->save()) {
-						echo CJSON::encode(array(
-							'type' => 5,
-							'get' => Yii::app()->controller->createUrl('setting/index'),
-							'id' => 'partial-banner-category',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28014,1).'</strong></div>',
-						));
-					} else {
-						print_r($model->getErrors());
-					}
-				}
+			if($model->save()) {
+				Yii::app()->user->setFlash('success', Phrase::trans(28038,1));
+				$this->redirect(array('manage'));
 			}
-			Yii::app()->end();
-			
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('setting/index');
-			$this->dialogWidth = 600;
-			
-			$this->pageTitle = Phrase::trans(28013,1);
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_add',array(
-				'model'=>$model,
-			));			
 		}
+
+		$this->pageTitle = Phrase::trans(28037,1);
+		$this->pageDescription = '';
+		$this->pageMeta = '';
+		$this->render('admin_add',array(
+			'model'=>$model,
+		));
 	}
 
 	/**
@@ -197,41 +177,21 @@ class CategoryController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['BannerCategory'])) {
-			$model->attributes=$_POST['BannerCategory'];
+		if(isset($_POST['Banners'])) {
+			$model->attributes=$_POST['Banners'];
 			
-			$jsonError = CActiveForm::validate($model);
-			if(strlen($jsonError) > 2) {
-				echo $jsonError;
-
-			} else {
-				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
-					if($model->save()) {
-						echo CJSON::encode(array(
-							'type' => 5,
-							'get' => Yii::app()->controller->createUrl('setting/index'),
-							'id' => 'partial-banner-category',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28016,1).'</strong></div>',
-						));
-					} else {
-						print_r($model->getErrors());
-					}
-				}
+			if($model->save()) {
+				Yii::app()->user->setFlash('success', Phrase::trans(28040,1));
+				$this->redirect(array('manage'));
 			}
-			Yii::app()->end();
-			
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('setting/index');
-			$this->dialogWidth = 600;
-			
-			$this->pageTitle = Phrase::trans(28015,1);
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_edit',array(
-				'model'=>$model,
-			));			
 		}
+
+		$this->pageTitle = Phrase::trans(28039,1).': '.$model->title;
+		$this->pageDescription = '';
+		$this->pageMeta = '';
+		$this->render('admin_edit',array(
+			'model'=>$model,
+		));
 	}
 	
 	/**
@@ -241,12 +201,8 @@ class CategoryController extends Controller
 	public function actionView($id) 
 	{
 		$model=$this->loadModel($id);
-		
-		$this->dialogDetail = true;
-		$this->dialogGroundUrl = Yii::app()->controller->createUrl('setting/index');
-		$this->dialogWidth = 500;
 
-		$this->pageTitle = 'View Banner Categories';
+		$this->pageTitle = 'View Banners: '.$model->title;
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_view',array(
@@ -268,19 +224,19 @@ class CategoryController extends Controller
 			$criteria->addInCondition('id', $id);
 
 			if($actions == 'publish') {
-				BannerCategory::model()->updateAll(array(
+				Banners::model()->updateAll(array(
 					'publish' => 1,
 				),$criteria);
 			} elseif($actions == 'unpublish') {
-				BannerCategory::model()->updateAll(array(
+				Banners::model()->updateAll(array(
 					'publish' => 0,
 				),$criteria);
 			} elseif($actions == 'trash') {
-				BannerCategory::model()->updateAll(array(
+				Banners::model()->updateAll(array(
 					'publish' => 2,
 				),$criteria);
 			} elseif($actions == 'delete') {
-				BannerCategory::model()->deleteAll($criteria);
+				Banners::model()->deleteAll($criteria);
 			}
 		}
 
@@ -305,19 +261,19 @@ class CategoryController extends Controller
 				if($model->delete()) {
 					echo CJSON::encode(array(
 						'type' => 5,
-						'get' => Yii::app()->controller->createUrl('setting/index'),
-						'id' => 'partial-banner-category',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28018,1).'</strong></div>',
+						'get' => Yii::app()->controller->createUrl('manage'),
+						'id' => 'partial-banners',
+						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28042,1).'</strong></div>',
 					));
 				}
 			}
 
 		} else {
 			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('setting/index');
+			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(28017,1);
+			$this->pageTitle = Phrase::trans(28041,1).': '.$model->title;
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -334,10 +290,10 @@ class CategoryController extends Controller
 		$model=$this->loadModel($id);
 		
 		if($model->publish == 1) {
-			$title = Phrase::trans(276,0);
+			$title = Yii::t('phrase', 'Unpublish');
 			$replace = 0;
 		} else {
-			$title = Phrase::trans(275,0);
+			$title = Yii::t('phrase', 'Publish');
 			$replace = 1;
 		}
 
@@ -350,16 +306,16 @@ class CategoryController extends Controller
 				if($model->update()) {
 					echo CJSON::encode(array(
 						'type' => 5,
-						'get' => Yii::app()->controller->createUrl('setting/index'),
-						'id' => 'partial-banner-category',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28016,1).'</strong></div>',
+						'get' => Yii::app()->controller->createUrl('manage'),
+						'id' => 'partial-banners',
+						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28040,1).'</strong></div>',
 					));
 				}
 			}
 
 		} else {
 			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('setting/index');
+			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
 			$this->pageTitle = $title;
@@ -379,9 +335,9 @@ class CategoryController extends Controller
 	 */
 	public function loadModel($id) 
 	{
-		$model = BannerCategory::model()->findByPk($id);
+		$model = Banners::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 
@@ -391,7 +347,7 @@ class CategoryController extends Controller
 	 */
 	protected function performAjaxValidation($model) 
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='banner-category-form') {
+		if(isset($_POST['ajax']) && $_POST['ajax']==='banners-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}

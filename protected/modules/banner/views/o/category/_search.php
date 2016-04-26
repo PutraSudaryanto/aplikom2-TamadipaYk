@@ -1,11 +1,13 @@
 <?php
 /**
  * Banner Categories (banner-category)
- * @var $this CategoryController * @var $model BannerCategory * @var $form CActiveForm
+ * @var $this CategoryController
+ * @var $model BannerCategory
+ * @var $form CActiveForm
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Banner
  * @contect (+62)856-299-4114
  *
  */
@@ -72,7 +74,7 @@
 		</li>
 
 		<li class="submit">
-			<?php echo CHtml::submitButton(Phrase::trans(3,0)); ?>
+			<?php echo CHtml::submitButton(Yii::t('phrase', 'Search')); ?>
 		</li>
 	</ul>
 <?php $this->endWidget(); ?>

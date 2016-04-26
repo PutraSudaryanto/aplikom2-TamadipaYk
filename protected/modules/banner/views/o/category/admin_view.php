@@ -1,10 +1,12 @@
 <?php
 /**
  * Banner Categories (banner-category)
- * @var $this CategoryController * @var $model BannerCategory *
+ * @var $this CategoryController
+ * @var $model BannerCategory
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Banner
  * @contect (+62)856-299-4114
  *
  */
@@ -42,5 +44,5 @@ if(Yii::app()->user->hasFlash('success'))
 <div class="dialog-content">
 </div>
 <div class="dialog-submit">
-	<?php echo CHtml::button(Phrase::trans(4,0), array('id'=>'closed')); ?>
+	<?php echo CHtml::button(Yii::t('phrase', 'Close'), array('id'=>'closed')); ?>
 </div>

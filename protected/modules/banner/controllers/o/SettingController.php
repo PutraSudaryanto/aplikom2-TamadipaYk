@@ -2,8 +2,8 @@
 /**
  * SettingController
  * @var $this SettingController
- * @var $model BannerSetting * @var $form CActiveForm
- * Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
+ * @var $model BannerSetting
+ * @var $form CActiveForm
  * version: 0.0.1
  * Reference start
  *
@@ -16,7 +16,7 @@
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Banner
  * @contect (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ class SettingController extends Controller
 			$jsonError = CActiveForm::validate($model);
 			if(strlen($jsonError) > 2) {
 				$errors = $model->getErrors();
-				$summary['msg'] = "<div class='errorSummary'><strong>".Phrase::trans(163,0)."</strong>";
+				$summary['msg'] = "<div class='errorSummary'><strong>".Yii::t('phrase', 'Please fix the following input errors:')."</strong>";
 				$summary['msg'] .= "<ul>";
 				foreach($errors as $key => $value) {
 					$summary['msg'] .= "<li>{$value[0]}</li>";
@@ -179,7 +179,7 @@ class SettingController extends Controller
 	{
 		$model = BannerSetting::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 

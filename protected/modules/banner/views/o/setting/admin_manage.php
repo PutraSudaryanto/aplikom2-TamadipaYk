@@ -1,10 +1,12 @@
 <?php
 /**
  * Banner Settings (banner-setting)
- * @var $this SettingController * @var $model BannerSetting *
+ * @var $this SettingController
+ * @var $model BannerSetting
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Banner
  * @contect (+62)856-299-4114
  *
  */
@@ -33,7 +35,7 @@
 		<?php 
 			$columnData = $columns;
 			array_push($columnData, array(
-				'header' => Phrase::trans(151,0),
+				'header' => Yii::t('phrase', 'Options'),
 				'class'=>'CButtonColumn',
 				'buttons' => array(
 					'view' => array(
@@ -41,21 +43,21 @@
 						'options' => array(							
 							'class' => 'view',
 						),
-						'url' => 'Yii::app()->controller->createUrl("category/view",array("id"=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl("o/category/view",array("id"=>$data->primaryKey))'),
 					'update' => array(
 						'label' => 'update',
 						'options' => array(
 							'class' => 'update'
 						),
-						'url' => 'Yii::app()->controller->createUrl("category/edit",array("id"=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl("o/category/edit",array("id"=>$data->primaryKey))'),
 					'delete' => array(
 						'label' => 'delete',
 						'options' => array(
 							'class' => 'delete'
 						),
-						'url' => 'Yii::app()->controller->createUrl("category/delete",array("id"=>$data->primaryKey))')
+						'url' => 'Yii::app()->controller->createUrl("o/category/delete",array("id"=>$data->primaryKey))')
 				),
-				'template' => '{view}|{update}|{delete}',
+				'template' => '{update}|{delete}',
 			));
 
 			$this->widget('application.components.system.OGridView', array(

@@ -1,11 +1,13 @@
 <?php
 /**
  * Banner Categories (banner-category)
- * @var $this CategoryController * @var $model BannerCategory * @var $form CActiveForm
+ * @var $this CategoryController
+ * @var $model BannerCategory
+ * @var $form CActiveForm
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Banner
  * @contect (+62)856-299-4114
  *
  */
@@ -23,10 +25,10 @@
 )); ?>
 
 	<div class="dialog-content">
-		<?php echo Phrase::trans(172,0);?>	</div>
+		<?php echo Yii::t('phrase', 'Are you sure you want to delete this item?');?>	</div>
 	<div class="dialog-submit">
-		<?php echo CHtml::submitButton(Phrase::trans(173,0), array('onclick' => 'setEnableSave()')); ?>
-		<?php echo CHtml::button(Phrase::trans(174,0), array('id'=>'closed')); ?>
+		<?php echo CHtml::submitButton(Yii::t('phrase', 'Delete'), array('onclick' => 'setEnableSave()')); ?>
+		<?php echo CHtml::button(Yii::t('phrase', 'Cancel'), array('id'=>'closed')); ?>
 	</div>
 	
 <?php $this->endWidget(); ?>

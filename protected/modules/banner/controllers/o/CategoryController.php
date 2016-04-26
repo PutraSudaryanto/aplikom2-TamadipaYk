@@ -1,9 +1,9 @@
 <?php
 /**
- * AdminController
- * @var $this AdminController
- * @var $model Banners * @var $form CActiveForm
- * Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
+ * CategoryController
+ * @var $this CategoryController
+ * @var $model BannerCategory
+ * @var $form CActiveForm
  * version: 0.0.1
  * Reference start
  *
@@ -22,13 +22,13 @@
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Banner
  * @contect (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
  */
 
-class AdminController extends Controller
+class CategoryController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -112,10 +112,10 @@ class AdminController extends Controller
 	 */
 	public function actionManage() 
 	{
-		$model=new Banners('search');
+		$model=new BannerCategory('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Banners'])) {
-			$model->attributes=$_GET['Banners'];
+		if(isset($_GET['BannerCategory'])) {
+			$model->attributes=$_GET['BannerCategory'];
 		}
 
 		$columnTemp = array();
@@ -128,7 +128,7 @@ class AdminController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Phrase::trans(28036,1);
+		$this->pageTitle = Phrase::trans(28012,1);
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -143,26 +143,46 @@ class AdminController extends Controller
 	 */
 	public function actionAdd() 
 	{
-		$model=new Banners;
+		$model=new BannerCategory;
 
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['Banners'])) {
-			$model->attributes=$_POST['Banners'];
+		if(isset($_POST['BannerCategory'])) {
+			$model->attributes=$_POST['BannerCategory'];
 			
-			if($model->save()) {
-				Yii::app()->user->setFlash('success', Phrase::trans(28038,1));
-				$this->redirect(array('manage'));
-			}
-		}
+			$jsonError = CActiveForm::validate($model);
+			if(strlen($jsonError) > 2) {
+				echo $jsonError;
 
-		$this->pageTitle = Phrase::trans(28037,1);
-		$this->pageDescription = '';
-		$this->pageMeta = '';
-		$this->render('admin_add',array(
-			'model'=>$model,
-		));
+			} else {
+				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
+					if($model->save()) {
+						echo CJSON::encode(array(
+							'type' => 5,
+							'get' => Yii::app()->controller->createUrl('o/setting/index'),
+							'id' => 'partial-banner-category',
+							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28014,1).'</strong></div>',
+						));
+					} else {
+						print_r($model->getErrors());
+					}
+				}
+			}
+			Yii::app()->end();
+			
+		} else {
+			$this->dialogDetail = true;
+			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+			$this->dialogWidth = 600;
+			
+			$this->pageTitle = Phrase::trans(28013,1);
+			$this->pageDescription = '';
+			$this->pageMeta = '';
+			$this->render('admin_add',array(
+				'model'=>$model,
+			));			
+		}
 	}
 
 	/**
@@ -177,21 +197,41 @@ class AdminController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['Banners'])) {
-			$model->attributes=$_POST['Banners'];
+		if(isset($_POST['BannerCategory'])) {
+			$model->attributes=$_POST['BannerCategory'];
 			
-			if($model->save()) {
-				Yii::app()->user->setFlash('success', Phrase::trans(28040,1));
-				$this->redirect(array('manage'));
-			}
-		}
+			$jsonError = CActiveForm::validate($model);
+			if(strlen($jsonError) > 2) {
+				echo $jsonError;
 
-		$this->pageTitle = Phrase::trans(28039,1).': '.$model->title;
-		$this->pageDescription = '';
-		$this->pageMeta = '';
-		$this->render('admin_edit',array(
-			'model'=>$model,
-		));
+			} else {
+				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
+					if($model->save()) {
+						echo CJSON::encode(array(
+							'type' => 5,
+							'get' => Yii::app()->controller->createUrl('o/setting/index'),
+							'id' => 'partial-banner-category',
+							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28016,1).'</strong></div>',
+						));
+					} else {
+						print_r($model->getErrors());
+					}
+				}
+			}
+			Yii::app()->end();
+			
+		} else {
+			$this->dialogDetail = true;
+			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+			$this->dialogWidth = 600;
+			
+			$this->pageTitle = Phrase::trans(28015,1);
+			$this->pageDescription = '';
+			$this->pageMeta = '';
+			$this->render('admin_edit',array(
+				'model'=>$model,
+			));			
+		}
 	}
 	
 	/**
@@ -201,8 +241,12 @@ class AdminController extends Controller
 	public function actionView($id) 
 	{
 		$model=$this->loadModel($id);
+		
+		$this->dialogDetail = true;
+		$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+		$this->dialogWidth = 500;
 
-		$this->pageTitle = 'View Banners: '.$model->title;
+		$this->pageTitle = 'View Banner Categories';
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_view',array(
@@ -224,19 +268,19 @@ class AdminController extends Controller
 			$criteria->addInCondition('id', $id);
 
 			if($actions == 'publish') {
-				Banners::model()->updateAll(array(
+				BannerCategory::model()->updateAll(array(
 					'publish' => 1,
 				),$criteria);
 			} elseif($actions == 'unpublish') {
-				Banners::model()->updateAll(array(
+				BannerCategory::model()->updateAll(array(
 					'publish' => 0,
 				),$criteria);
 			} elseif($actions == 'trash') {
-				Banners::model()->updateAll(array(
+				BannerCategory::model()->updateAll(array(
 					'publish' => 2,
 				),$criteria);
 			} elseif($actions == 'delete') {
-				Banners::model()->deleteAll($criteria);
+				BannerCategory::model()->deleteAll($criteria);
 			}
 		}
 
@@ -261,9 +305,9 @@ class AdminController extends Controller
 				if($model->delete()) {
 					echo CJSON::encode(array(
 						'type' => 5,
-						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-banners',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28042,1).'</strong></div>',
+						'get' => Yii::app()->controller->createUrl('o/setting/index'),
+						'id' => 'partial-banner-category',
+						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28018,1).'</strong></div>',
 					));
 				}
 			}
@@ -273,7 +317,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(28041,1).': '.$model->title;
+			$this->pageTitle = Phrase::trans(28017,1);
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -290,10 +334,10 @@ class AdminController extends Controller
 		$model=$this->loadModel($id);
 		
 		if($model->publish == 1) {
-			$title = Phrase::trans(276,0);
+			$title = Yii::t('phrase', 'Unpublish');
 			$replace = 0;
 		} else {
-			$title = Phrase::trans(275,0);
+			$title = Yii::t('phrase', 'Publish');
 			$replace = 1;
 		}
 
@@ -306,9 +350,9 @@ class AdminController extends Controller
 				if($model->update()) {
 					echo CJSON::encode(array(
 						'type' => 5,
-						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-banners',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28040,1).'</strong></div>',
+						'get' => Yii::app()->controller->createUrl('o/setting/index'),
+						'id' => 'partial-banner-category',
+						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(28016,1).'</strong></div>',
 					));
 				}
 			}
@@ -335,9 +379,9 @@ class AdminController extends Controller
 	 */
 	public function loadModel($id) 
 	{
-		$model = Banners::model()->findByPk($id);
+		$model = BannerCategory::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
 	}
 
@@ -347,7 +391,7 @@ class AdminController extends Controller
 	 */
 	protected function performAjaxValidation($model) 
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='banners-form') {
+		if(isset($_POST['ajax']) && $_POST['ajax']==='banner-category-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}

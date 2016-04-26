@@ -1,8 +1,8 @@
 <?php
 /**
- * BannerSetting
+ * ViewBannerCategory
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @copyright Copyright (c) 2015 Ommu Platform (ommu.co)
  * @link https://github.com/oMMu/Ommu-Banner
  * @contact (+62)856-299-4114
  *
@@ -17,31 +17,27 @@
  *
  * --------------------------------------------------------------------------------------
  *
- * This is the model class for table "ommu_banner_setting".
+ * This is the model class for table "_view_banner_category".
  *
- * The followings are the available columns in table 'ommu_banner_setting':
- * @property integer $id
- * @property string $license
- * @property integer $permission
- * @property string $media_validation
- * @property string $media_resize
- * @property string $meta_keyword
- * @property string $meta_description
- * @property string $modified_date
- * @property string $modified_id
+ * The followings are the available columns in table '_view_banner_category':
+ * @property integer $cat_id
+ * @property string $category_name
+ * @property string $category_desc
+ * @property string $banner_publish
+ * @property string $banner_pending
+ * @property string $banner_expired
+ * @property string $banner_unpublish
+ * @property string $banners
  */
-class BannerSetting extends CActiveRecord
+class ViewBannerCategory extends CActiveRecord
 {
 	public $defaultColumns = array();
-	
-	// Variable Search
-	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return BannerSetting the static model class
+	 * @return ViewBannerCategory the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -53,7 +49,15 @@ class BannerSetting extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'ommu_banner_setting';
+		return '_view_banner_category';
+	}
+
+	/**
+	 * @return string the primarykey column
+	 */
+	public function primaryKey()
+	{
+		return 'cat_id';
 	}
 
 	/**
@@ -64,13 +68,12 @@ class BannerSetting extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('license, permission, media_validation, media_resize, meta_keyword, meta_description', 'required'),
-			array('permission', 'numerical', 'integerOnly'=>true),
-			array('license', 'length', 'max'=>32),
+			array('cat_id', 'numerical', 'integerOnly'=>true),
+			array('banner_publish, banner_pending, banner_expired, banner_unpublish, banners', 'length', 'max'=>21),
+			array('category_name, category_desc', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, license, permission, media_validation, media_resize, meta_keyword, meta_description, modified_date, modified_id,
-				modified_search', 'safe', 'on'=>'search'),
+			array('cat_id, category_name, category_desc, banner_publish, banner_pending, banner_expired, banner_unpublish, banners', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -82,7 +85,6 @@ class BannerSetting extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -92,16 +94,14 @@ class BannerSetting extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => Phrase::trans(28000,1),
-			'license' => Phrase::trans(28002,1),
-			'permission' => Phrase::trans(28005,1),
-			'media_validation' => 'Media Validation',
-			'media_resize' => 'Media Resize',
-			'meta_keyword' => Phrase::trans(28009,1),
-			'meta_description' => Phrase::trans(28010,1),
-			'modified_date' => 'Modified Date',
-			'modified_id' => 'Modified',
-			'modified_search' => 'Modified',
+			'cat_id' => 'Cat',
+			'category_name' => 'Category Name',
+			'category_desc' => 'Category Desc',
+			'banner_publish' => 'Banner Publish',
+			'banner_pending' => 'Banner Pending',
+			'banner_expired' => 'Banner Expired',
+			'banner_unpublish' => 'Banner Unpublish',
+			'banners' => 'Banners',
 		);
 	}
 
@@ -123,28 +123,17 @@ class BannerSetting extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('t.id',$this->id);
-		$criteria->compare('t.license',$this->license,true);
-		$criteria->compare('t.permission',$this->permission);
-		$criteria->compare('t.media_validation',$this->media_validation);
-		$criteria->compare('t.media_resize',$this->media_resize);
-		$criteria->compare('t.meta_keyword',$this->meta_keyword,true);
-		$criteria->compare('t.meta_description',$this->meta_description,true);
-		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
-			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
-		$criteria->compare('t.modified_id',$this->modified_id);
-		
-		// Custom Search
-		$criteria->with = array(
-			'modified_relation' => array(
-				'alias'=>'modified_relation',
-				'select'=>'displayname',
-			),
-		);
-		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
+		$criteria->compare('t.cat_id',$this->cat_id);
+		$criteria->compare('t.category_name',strtolower($this->category_name),true);
+		$criteria->compare('t.category_desc',strtolower($this->category_desc),true);
+		$criteria->compare('t.banner_publish',strtolower($this->banner_publish),true);
+		$criteria->compare('t.banner_pending',strtolower($this->banner_pending),true);
+		$criteria->compare('t.banner_expired',strtolower($this->banner_expired),true);
+		$criteria->compare('t.banner_unpublish',strtolower($this->banner_unpublish),true);
+		$criteria->compare('t.banners',strtolower($this->banners),true);
 
-		if(!isset($_GET['BannerSetting_sort']))
-			$criteria->order = 't.id DESC';
+		if(!isset($_GET['ViewBannerCategory_sort']))
+			$criteria->order = 't.cat_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -172,13 +161,14 @@ class BannerSetting extends CActiveRecord
 				$this->defaultColumns[] = $val;
 			}
 		} else {
-			//$this->defaultColumns[] = 'id';
-			$this->defaultColumns[] = 'license';
-			$this->defaultColumns[] = 'permission';
-			$this->defaultColumns[] = 'media_validation';
-			$this->defaultColumns[] = 'media_resize';
-			$this->defaultColumns[] = 'meta_keyword';
-			$this->defaultColumns[] = 'meta_description';
+			$this->defaultColumns[] = 'cat_id';
+			$this->defaultColumns[] = 'category_name';
+			$this->defaultColumns[] = 'category_desc';
+			$this->defaultColumns[] = 'banner_publish';
+			$this->defaultColumns[] = 'banner_pending';
+			$this->defaultColumns[] = 'banner_expired';
+			$this->defaultColumns[] = 'banner_unpublish';
+			$this->defaultColumns[] = 'banners';
 		}
 
 		return $this->defaultColumns;
@@ -189,18 +179,18 @@ class BannerSetting extends CActiveRecord
 	 */
 	protected function afterConstruct() {
 		if(count($this->defaultColumns) == 0) {
-			$this->defaultColumns[] = 'license';
-			$this->defaultColumns[] = 'permission';
-			$this->defaultColumns[] = 'media_validation';
-			$this->defaultColumns[] = 'media_resize';
-			$this->defaultColumns[] = 'meta_keyword';
-			$this->defaultColumns[] = 'meta_description';
-			$this->defaultColumns[] = 'modified_date';
-			$this->defaultColumns[] = 'modified_id';
 			$this->defaultColumns[] = array(
-				'name' => 'modified_search',
-				'value' => '$data->modified_relation->displayname',
+				'header' => 'No',
+				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
+			$this->defaultColumns[] = 'cat_id';
+			$this->defaultColumns[] = 'category_name';
+			$this->defaultColumns[] = 'category_desc';
+			$this->defaultColumns[] = 'banner_publish';
+			$this->defaultColumns[] = 'banner_pending';
+			$this->defaultColumns[] = 'banner_expired';
+			$this->defaultColumns[] = 'banner_unpublish';
+			$this->defaultColumns[] = 'banners';
 		}
 		parent::afterConstruct();
 	}
@@ -220,16 +210,6 @@ class BannerSetting extends CActiveRecord
 			$model = self::model()->findByPk($id);
 			return $model;			
 		}
-	}
-
-	/**
-	 * before validate attributes
-	 */
-	protected function beforeValidate() {
-		if(parent::beforeValidate()) {			
-			$this->modified_id = Yii::app()->user->id;
-		}
-		return true;
 	}
 
 }
