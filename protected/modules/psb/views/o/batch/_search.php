@@ -37,11 +37,6 @@
 		</li>
 
 		<li>
-			<?php echo $model->getAttributeLabel('registers'); ?><br/>
-			<?php echo $form->textField($model,'registers'); ?>
-		</li>
-
-		<li>
 			<?php echo $model->getAttributeLabel('creation_date'); ?><br/>
 			<?php echo $form->textField($model,'creation_date'); ?>
 		</li>
