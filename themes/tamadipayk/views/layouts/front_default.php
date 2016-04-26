@@ -1,5 +1,6 @@
 <?php $this->beginContent('//layouts/default');
 	Yii::import('webroot.themes.'.Yii::app()->theme->name.'.components.*');
+	Yii::import('webroot.themes.'.Yii::app()->theme->name.'.components.public.*');
 	$module = strtolower(Yii::app()->controller->module->id);
 	$controller = strtolower(Yii::app()->controller->id);
 	$action = strtolower(Yii::app()->controller->action->id);
@@ -50,11 +51,11 @@
 			<div class="boxed clearfix">
 				<?php
 				if($module != 'article') 
-					$this->widget('application.modules.article.components.FrontArticleRecent');
+					$this->widget('ArticleRecent');
 				if($module != 'album')
-					$this->widget('application.modules.album.components.FrontAlbumRecents');
+					$this->widget('AlbumRecents');
 				if($module != 'video')
-					$this->widget('application.modules.video.components.FrontVideoRecents');
+					$this->widget('VideoRecents');
 				?>
 			</div>
 		</div>
@@ -100,10 +101,10 @@
 
 <?php if($this->adsSidebar == false) {?>
 <div class="main article clearfix">
-	<?php $this->widget('application.modules.article.components.FrontArticleRecent');
-	$this->widget('application.modules.album.components.FrontAlbumRecents');
+	<?php $this->widget('ArticleRecent');
+	$this->widget('AlbumRecents');
 	echo '<div class="clear"></div>';
-	$this->widget('application.modules.video.components.FrontVideoRecents');
+	$this->widget('VideoRecents');
 	?>
 </div>
 <?php }?>

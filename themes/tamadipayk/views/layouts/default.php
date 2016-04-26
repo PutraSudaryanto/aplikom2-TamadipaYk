@@ -4,6 +4,7 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
 	
 } else {
 	Yii::import('webroot.themes.'.Yii::app()->theme->name.'.components.*');
+	Yii::import('webroot.themes.'.Yii::app()->theme->name.'.components.public.*');
 	$module = strtolower(Yii::app()->controller->module->id);
 	$controller = strtolower(Yii::app()->controller->id);
 	$action = strtolower(Yii::app()->controller->action->id);
@@ -202,7 +203,7 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
 	<div class="body">		
 		<div class="container">
 			<?php if($module == null && $currentAction == 'site/index') {
-				$this->widget('application.modules.banner.components.FrontBannerRecent', array(
+				$this->widget('BannerRecent', array(
 					'category'=>1,
 				));
 			}?>
@@ -240,7 +241,7 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
 				<div class="clear"></div>
 				<div class="box address">
 					<h2>SMA Taman Madya Ibu Payiwatan<span>Terakreditasi "A"</span></h2>
-					<?php $this->widget('application.modules.support.components.FrontContactDetails'); ?>
+					<?php $this->widget('SupportContactDetails'); ?>
 				</div>
 			</div>
 		</div>
