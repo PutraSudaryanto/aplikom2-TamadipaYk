@@ -151,3 +151,7 @@ mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\video\models"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\video\controllers\o" "D:\htdocs\_project_ommu_module_video\modules\video\controllers\o"
 --
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\video\views\o" "D:\htdocs\_project_ommu_module_video\modules\video\views\o"
+
+///psb\\\
+mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\psb" "D:\htdocs\_project_ommu_module_psb\externals\psb"
+mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\psb" "D:\htdocs\_project_ommu_module_psb\modules\psb"
