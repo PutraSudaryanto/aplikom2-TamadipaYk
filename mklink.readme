@@ -55,6 +55,8 @@ mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\views" "D:\htdocs\_pr
 themes
 =======
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\themes\ommu" "D:\htdocs\_project_ommu_bootstrap\themes\backend-end\ommu"
+mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\themes\tamadipayk\css\content.css" "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\content.css"
+
 
 
 -------
@@ -111,8 +113,10 @@ mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\compon
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\models" "D:\htdocs\_project_ommu_module_banner\modules\banner\models"
 --
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\controllers\o" "D:\htdocs\_project_ommu_module_banner\modules\banner\controllers\o"
+mklink /h "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\controllers\SiteController.php" "D:\htdocs\_project_ommu_module_banner\modules\banner\controllers\SiteController.php"
 --
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\views\o" "D:\htdocs\_project_ommu_module_banner\modules\banner\views\o"
+mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\views\site" "D:\htdocs\_project_ommu_module_banner\modules\banner\views\site"
 
 ///article\\\
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\article" "D:\htdocs\_project_ommu_module_articles\externals\article"
