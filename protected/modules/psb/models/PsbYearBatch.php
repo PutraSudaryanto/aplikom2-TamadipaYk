@@ -93,6 +93,7 @@ class PsbYearBatch extends CActiveRecord
 			'year' => array(self::BELONGS_TO, 'PsbYears', 'year_id'),
 			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
+			'view' => array(self::BELONGS_TO, 'ViewPsbYearBatch', 'batch_id'),
 		);
 	}
 
@@ -308,13 +309,14 @@ class PsbYearBatch extends CActiveRecord
 					),
 				), true),
 			);
-			/*
 			$this->defaultColumns[] = array(
 				'header' => 'registers',
-				'value' => 'CHtml::link($data->registers, Yii::app()->controller->createUrl("o/admin/manage",array("batch"=>$data->batch_id)))',
+				'value' => 'CHtml::link($data->view->registers, Yii::app()->controller->createUrl("o/admin/manage",array("batch"=>$data->batch_id)))',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
 				'type' => 'raw',
 			);
-			*/
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
 				'value' => '$data->creation->displayname',

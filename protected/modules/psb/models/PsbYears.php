@@ -92,6 +92,7 @@ class PsbYears extends CActiveRecord
 		return array(
 			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
+			'view' => array(self::BELONGS_TO, 'ViewPsbYears', 'year_id'),
 		);
 	}
 
@@ -216,10 +217,9 @@ class PsbYears extends CActiveRecord
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
 			$this->defaultColumns[] = 'years';
-			/*
 			$this->defaultColumns[] = array(
 				'header' => 'batchs',
-				'value' => 'CHtml::link($data->batchs, Yii::app()->controller->createUrl("o/batch/manage",array("year"=>$data->year_id)))',
+				'value' => 'CHtml::link($data->view->batchs, Yii::app()->controller->createUrl("o/batch/manage",array("year"=>$data->year_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
@@ -227,7 +227,7 @@ class PsbYears extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'header' => 'courses',
-				'value' => 'CHtml::link($data->courses, Yii::app()->controller->createUrl("o/yearcourse/manage",array("year"=>$data->year_id)))',
+				'value' => 'CHtml::link($data->view->courses, Yii::app()->controller->createUrl("o/yearcourse/manage",array("year"=>$data->year_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
@@ -235,13 +235,12 @@ class PsbYears extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'header' => 'registers',
-				'value' => 'CHtml::link($data->registers, Yii::app()->controller->createUrl("o/admin/manage",array("year"=>$data->year_id)))',
+				'value' => 'CHtml::link($data->view->registers, Yii::app()->controller->createUrl("o/admin/manage",array("year"=>$data->year_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
 				'type' => 'raw',
 			);
-			*/
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
 				'value' => '$data->creation->displayname',
