@@ -1,30 +1,26 @@
 <?php
 /**
-* AdminController
-* Handle AdminController
-* Copyright (c) 2013, Ommu Platform (ommu.co). All rights reserved.
-* version: 2.0.0
-* Reference start
-*
-* TOC :
-*	Index
-*	Password
-*	Manage
-*	Add
-*	Edit
-*	Delete
-*	Enabled
-*
-*	LoadModel
-*	performAjaxValidation
-*
-* @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
-* @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
-* @link http://company.ommu.co
-* @contact (+62)856-299-4114
-*
-*----------------------------------------------------------------------------------------------------------
-*/
+ * AdminController
+ * @var $this AdminController
+ * @var $model Users
+ * @var $form CActiveForm
+ * version: 0.0.1
+ * Reference start
+ *
+ * TOC :
+ *	Index
+ *	Login
+ *
+ *	LoadModel
+ *	performAjaxValidation
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Users
+ * @contect (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class AdminController extends /*SBaseController*/ Controller
 {
@@ -40,17 +36,9 @@ class AdminController extends /*SBaseController*/ Controller
 	 */
 	public function init() 
 	{
-		if(!Yii::app()->user->isGuest) {
-			if(in_array(Yii::app()->user->level, array(1,2))) {
-				$arrThemes = Utility::getCurrentTemplate('admin');
-				Yii::app()->theme = $arrThemes['folder'];
-				$this->layout = $arrThemes['layout'];
-			} else {
-				$this->redirect(Yii::app()->createUrl('site/login'));
-			}
-		} else {
-			$this->redirect(Yii::app()->createUrl('site/login'));
-		}
+		$arrThemes = Utility::getCurrentTemplate('admin');
+		Yii::app()->theme = $arrThemes['folder'];
+		$this->layout = $arrThemes['layout'];
 	}	
 
 	/**
@@ -73,24 +61,13 @@ class AdminController extends /*SBaseController*/ Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index'),
+				'actions'=>array('index','login'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array(''),
+				'actions'=>array(),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level)',
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('manage','add','edit','delete','enabled',
-					'password'),
-				'users'=>array('@'),
-				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 1)',
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('edit','password'),
-				'users'=>array('@'),
-				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 2)',
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
 				'actions'=>array(),
@@ -107,262 +84,78 @@ class AdminController extends /*SBaseController*/ Controller
 	 */
 	public function actionIndex() 
 	{
-		$this->redirect(array('manage'));
+		$this->redirect(Yii::app()->controller->createUrl('login'));
 	}
 
 	/**
-	 * Creates a new model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 * Displays the login page
 	 */
-	public function actionPassword() 
+	public function actionLogin()
 	{
-		$model=$this->loadModel(Yii::app()->user->id);
+		if(!Yii::app()->user->isGuest) {
+			$this->redirect(Yii::app()->createUrl('admin/index'));
 
-		// Uncomment the following line if AJAX validation is needed
-		$this->performAjaxValidation($model);
-
-		if(isset($_POST['Users'])) {
-			$model->attributes=$_POST['Users'];
-			$model->scenario = 'adminpassword';
-
-			$jsonError = CActiveForm::validate($model);
-			if(strlen($jsonError) > 2) {
-				echo $jsonError;
+		} else {				
+			if(isset($_GET['oauth'])) {
+				$model=new LoginFormOauth;
+				$modelForm = 'LoginFormOauth';
 			} else {
-				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
-					if($model->save()) {
-						echo CJSON::encode(array(
-							'type' => 5,
-							'get' => Yii::app()->controller->createUrl('password',array('type'=>'success')),
-						));
-					} else {
-						print_r($model->getErrors());
+				$model=new LoginFormAdmin;
+				$modelForm = 'LoginFormAdmin';
+			}
+			
+			// if it is ajax validation request
+			if(isset($_POST['ajax']) && $_POST['ajax']==='login-form') {
+				echo CActiveForm::validate($model);
+				Yii::app()->end();
+			}
+
+			// collect user input data
+			if(isset($_POST[$modelForm]))
+			{
+				$model->attributes=$_POST[$modelForm];
+
+				$jsonError = CActiveForm::validate($model);
+				if(strlen($jsonError) > 2) {
+					echo $jsonError;
+
+				} else {
+					if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
+						// validate user input and redirect to the previous page if valid
+						if($model->validate() && $model->login()) {
+							Users::model()->updateByPk(Yii::app()->user->id, array(
+								'lastlogin_date'=>date('Y-m-d H:i:s'), 
+								'lastlogin_ip'=>$_SERVER['REMOTE_ADDR'],
+							));
+							if(isset($_GET['type'])) {
+								echo CJSON::encode(array(
+									'type' => 6,
+								));
+							} else {
+								echo CJSON::encode(array(
+									'redirect' => in_array(Yii::app()->user->level, array(1,2)) ? Yii::app()->createUrl('admin/index') : Yii::app()->user->returnUrl,
+								));
+							}
+							//$this->redirect(Yii::app()->user->returnUrl);
+						} else {
+							print_r($model->getErrors());
+						}
 					}
 				}
+				Yii::app()->end();
+				
 			}
-			Yii::app()->end();
-
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->createUrl('admin/dashboard');
-			$this->dialogWidth = 500;
 			
-			$this->pageTitle = 'Change Password';
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_password',array(
-				'model'=>$model,
-			));
-		}
-	}
-
-	/**
-	 * Manages all models.
-	 */
-	public function actionManage() 
-	{
-		$model=new Users('search');
-		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Users'])) {
-			$model->attributes=$_GET['Users'];
-		}
-
-		$columnTemp = array();
-		if(isset($_GET['GridColumn'])) {
-			foreach($_GET['GridColumn'] as $key => $val) {
-				if($_GET['GridColumn'][$key] == 1) {
-					$columnTemp[] = $key;
-				}
-			}
-		}
-		$columns = $model->getGridColumn($columnTemp);
-
-		$this->pageTitle = Phrase::trans(16096,1);
-		$this->pageDescription = Phrase::trans(16097,1);
-		$this->pageMeta = '';
-		$this->render('admin_manage',array(
-			'model'=>$model,
-			'columns' => $columns,
-		));
-	}	
-	
-	/**
-	 * Creates a new model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
-	 */
-	public function actionAdd() 
-	{
-		$model=new Users;
-
-		// Uncomment the following line if AJAX validation is needed
-		$this->performAjaxValidation($model);
-
-		if(isset($_POST['Users'])) {
-			$model->attributes=$_POST['Users'];
-			$model->scenario = 'adminadd';
-
-			$jsonError = CActiveForm::validate($model);
-			if(strlen($jsonError) > 2) {
-				echo $jsonError;
-			} else {
-				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
-					if($model->save()) {
-						echo CJSON::encode(array(
-							'type' => 5,
-							'get' => Yii::app()->controller->createUrl('manage'),
-							'id' => 'partial-users',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(16099,1).'</strong></div>',
-						));
-					} else {
-						print_r($model->getErrors());
-					}
-				}
-			}
-			Yii::app()->end();
-
-		} else {
+			// display the login form
 			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-			$this->dialogWidth = 500;
+			$this->dialogWidth = 600;
 			
-			$this->pageTitle = Phrase::trans(16098,1);
+			$this->pageTitle = Yii::t('phrase', 'Login');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
-			$this->render('admin_add',array(
+			$this->render('admin_login',array(
 				'model'=>$model,
-			));
-		}
-	}
-
-	/**
-	 * Updates a particular model.
-	 * If update is successful, the browser will be redirected to the 'view' page.
-	 * @param integer $id the ID of the model to be updated
-	 */
-	public function actionEdit() 
-	{
-		if(isset($_GET['id']))
-			$id = $_GET['id'];
-		else 
-			$id = Yii::app()->user->id;
-			
-		$model=$this->loadModel($id);
-
-		// Uncomment the following line if AJAX validation is needed
-		$this->performAjaxValidation($model);
-
-		if(isset($_POST['Users'])) {
-			$model->attributes=$_POST['Users'];
-			$model->scenario = 'adminedit';
-
-			$jsonError = CActiveForm::validate($model);
-			if(strlen($jsonError) > 2) {
-				echo $jsonError;
-			} else {
-				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
-					if($model->save()) {
-						echo CJSON::encode(array(
-							'type' => 5,
-							'get' => isset($_GET['id']) ? Yii::app()->controller->createUrl('manage') : Yii::app()->createUrl('admin/dashboard'),
-							'id' => 'partial-users',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(16101,1).'</strong></div>',
-						));
-					} else {
-						print_r($model->getErrors());
-					}
-				}
-			}
-			Yii::app()->end();
-
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = isset($_GET['id']) ? Yii::app()->controller->createUrl('manage') : Yii::app()->createUrl('admin/dashboard');
-			$this->dialogWidth = 500;
-			
-			$this->pageTitle = Phrase::trans(16100,1).': '.$model->displayname;
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_edit',array(
-				'model'=>$model,
-			));
-		}
-	}
-	
-	/**
-	 * Deletes a particular model.
-	 * If deletion is successful, the browser will be redirected to the 'admin' page.
-	 * @param integer $id the ID of the model to be deleted
-	 */
-	public function actionDelete($id) 
-	{
-		if(Yii::app()->request->isPostRequest) {
-			// we only allow deletion via POST request
-			if(isset($id)) {
-				$this->loadModel($id)->delete();
-
-				echo CJSON::encode(array(
-					'type' => 5,
-					'get' => Yii::app()->controller->createUrl('manage'),
-					'id' => 'partial-users',
-					'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(16103,1).'</strong></div>',
-				));
-			}
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-			$this->dialogWidth = 350;
-
-			$this->pageTitle = Phrase::trans(16102,1);
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_delete');
-		}
-	}
-
-	/**
-	 * Deletes a particular model.
-	 * If deletion is successful, the browser will be redirected to the 'admin' page.
-	 * @param integer $id the ID of the model to be deleted
-	 */
-	public function actionEnabled($id) 
-	{
-		$model=$this->loadModel($id);
-		if($model->enabled == 1) {
-			$title = Phrase::trans(284,0);
-			$replace = 0;
-		} else {
-			$title = Phrase::trans(283,0);
-			$replace = 1;
-		}
-
-		if(Yii::app()->request->isPostRequest) {
-			// we only allow deletion via POST request
-			if(isset($id)) {
-				//change value active or publish
-				$model->enabled = $replace;
-
-				if($model->update()) {
-					echo CJSON::encode(array(
-						'type' => 5,
-						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-users',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(16101,1).'</strong></div>',
-					));
-				}
-			}
-
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-			$this->dialogWidth = 350;
-
-			$this->pageTitle = $title;
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_enabled',array(
-				'title'=>$title,
-				'model'=>$model,
-			));
+			));			
 		}
 	}
 
@@ -375,7 +168,7 @@ class AdminController extends /*SBaseController*/ Controller
 	{
 		$model = Users::model()->findByPk($id);
 		if($model===null)
-			throw new CHttpException(404, Phrase::trans(193,0));
+			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
 	}
 

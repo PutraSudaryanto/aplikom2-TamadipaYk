@@ -1,9 +1,9 @@
 <?php
-
 /**
+ * UserForgot
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Users
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -124,7 +124,7 @@ class UserForgot extends CActiveRecord
 		$criteria->compare('t.forgot_from',$this->forgot_from,true);
 
 		if(!isset($_GET['UserForgot_sort']))
-			$criteria->order = 'forgot_id DESC';
+			$criteria->order = 't.forgot_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

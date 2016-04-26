@@ -22,10 +22,13 @@ class UsersModule extends CWebModule
 			// you may place customized code here
 			//list public controller in this module
 			$publicControllers = array(
-				'account',
-				'forgot',
+				'admin',
+				'invite',
 				'newsletter',
 				'verify',
+				'api/device',
+				'api/member',
+				'api/site',
 			);
 			
 			// pake ini untuk set theme per action di controller..

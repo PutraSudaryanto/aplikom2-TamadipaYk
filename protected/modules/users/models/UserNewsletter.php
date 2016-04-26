@@ -1,9 +1,9 @@
 <?php
-
 /**
+ * UserNewsletter
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @copyright Copyright (c) 2012 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Users
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -137,9 +137,8 @@ class UserNewsletter extends CActiveRecord
 		);
 		$criteria->compare('user.displayname',strtolower($this->user_search), true);
 		
-		if(!isset($_GET['UserNewsletter_sort'])) {
-			$criteria->order = 'id DESC';
-		}
+		if(!isset($_GET['UserNewsletter_sort']))
+			$criteria->order = 't.id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -256,15 +255,15 @@ class UserNewsletter extends CActiveRecord
 				),
 			);
 			$this->defaultColumns[] = array(
-				'header' => Phrase::trans(313,0),
+				'header' => Yii::t('phrase', 'Status'),
 				'name' => 'subscribe',
 				'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("unsubscribe",array("id"=>$data->id, "type"=>"admin")), $data->subscribe, 8)',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
 				'filter'=>array(
-					1=>Phrase::trans(588,0),
-					0=>Phrase::trans(589,0),
+					1=>Yii::t('phrase', 'Yes'),
+					0=>Yii::t('phrase', 'No'),
 				),
 				'type' => 'raw',
 			);
@@ -327,6 +326,7 @@ class UserNewsletter extends CActiveRecord
 	 */
 	protected function beforeSave() {
 		if(parent::beforeSave()) {
+			$this->email = strtolower($this->email);
 			if(!$this->isNewRecord && $this->subscribe == 0) {
 				$this->unsubscribe_ip = $_SERVER['REMOTE_ADDR'];
 			}
