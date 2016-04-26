@@ -38,12 +38,12 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
 	$urlAddress = Utility::getProtocol().'://'.Yii::app()->request->serverName.Yii::app()->request->requestUri;
 
 	if(Yii::app()->request->isAjaxRequest && !isset($_GET['ajax'])) {
-		/* if((Yii::app()->session['theme_active'] != Yii::app()->theme->name) && ($action != 'manage')) {
+		if((Yii::app()->session['theme_active'] != Yii::app()->theme->name) && ($action != 'manage')) {
 			$return = array(
 				'redirect' => $urlAddress,		
 			);
 
-		} else { */
+		} else {
 			$page = $this->contentOther == true ? 1 : 0;
 			$dialog = $this->dialogDetail == true ? (empty($this->dialogWidth) ? 1 : 2) : 0;		// 0 = static, 1 = dialog, 2 = notifier
 			$header = $this->widget('AdminMenu', array(), true);
@@ -68,7 +68,7 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
 			$return['header'] = $this->dialogDetail != true ? $header : '';
 			$return['render'] = $render;
 			$return['script'] = $cs=Yii::app()->getClientScript()->getOmmuScript();
-		//}
+		}
 		echo CJSON::encode($return);
 
 	} else {
@@ -106,7 +106,7 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
  <body <?php echo $this->dialogDetail == true ? 'style="overflow-y: hidden;"' : '';?>>
 
 <?php 
-if ($currentAction == 'site/login') {
+if ($module == 'users' && $currentAction == 'admin/login') {
 //if(Yii::app()->user->isGuest) {?>
 	<?php //begin.Notifier ?>
 	<div class="login notifier" <?php echo ($this->dialogDetail == true && !empty($this->dialogWidth)) ? 'name="'.$dialogWidth.'" '.$display : '';?>>
@@ -125,28 +125,7 @@ if ($currentAction == 'site/login') {
 
 	<?php //begin.Header ?>
 	<header class="clearfix">
-		<?php //begin.Flag and Language ?>
-		<div class="flag learfix">
-			<?php
-			if(!empty($_GET)) {
-				$attrEn = array_merge($_GET, array('lang'=>'en'));
-				$attrId = array_merge($_GET, array('lang'=>'id'));
-			} else {
-				$attrEn = array('lang'=>'en');
-				$attrId = array('lang'=>'id');
-			}
-			if($module == 'null') {
-				$urlEn = Yii::app()->createUrl($controller.'/'.$action, $attrEn);
-				$urlId = Yii::app()->createUrl($controller.'/'.$action, $attrId);
-			} else {
-				$urlEn = Yii::app()->createUrl($module.'/'.$controller.'/'.$action, $attrEn);
-				$urlId = Yii::app()->createUrl($module.'/'.$controller.'/'.$action, $attrId);
-			}
-			?>
-			<a off_address="" href="<?php echo $urlEn;?>" title="English"><img src="<?php echo Yii::app()->theme->baseUrl;?>/images/icons/flag_en.png" /></a>
-			<a off_address="" href="<?php echo $urlId;?>" title="Indonesia"><img src="<?php echo Yii::app()->theme->baseUrl;?>/images/icons/flag_id.png" /></a>
-		</div>
-		<?php //end.Flag and Language ?>
+		<?php $this->widget('LanguageFlag'); ?>
 		
 		<?php //begin.Loading ?>
 		<div class="loading"><img src="<?php echo Yii::app()->theme->baseUrl;?>/images/icons/ajax_loader.gif" /><span>Loading...</span></div>

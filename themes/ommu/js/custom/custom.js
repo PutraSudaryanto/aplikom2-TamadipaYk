@@ -591,6 +591,6 @@ utilityFunction();
  **/
 function reinstallDatePicker() {
 	$('input[on_datepicker]').focus(function(){
-		$(this).datepicker(jQuery.extend({showMonthAfterYear:false},jQuery.datepicker.regional['ja'],[]));
+		$(this).datepicker(jQuery.extend({showMonthAfterYear:false},jQuery.datepicker.regional['ja'],{'showOn':'focus','dateFormat':'dd-mm-yy','showOtherMonths':true,'selectOtherMonths':true,'changeMonth':true,'changeYear':true,'showButtonPanel':true}));
 	});
 }

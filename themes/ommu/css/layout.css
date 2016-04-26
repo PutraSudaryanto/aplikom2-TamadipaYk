@@ -48,7 +48,7 @@ div[class^="open-dialog"] {
 	cursor: -webkit-zoom-out;
 }
 .dialog {
-	z-index: 980;
+	z-index: 800;
 	background: rgba(0,0,0,0.6);
 	-webkit-overflow-scrolling: touch;
 	overflow-y: scroll;
@@ -134,7 +134,7 @@ div[class^="open-dialog"] {
 
 /* Notifier */
 .notifier {
-	z-index: 990;
+	z-index: 900;
 	background: rgba(0,0,0,0.6);
 	-webkit-overflow-scrolling: touch;
 	overflow-y: scroll;
@@ -650,8 +650,9 @@ div.body .content div[id^="partial"]:last-child {
 	float: right;
 }
 .body div.content .contentmenu ul li {
+	position: relative;
 	float: left;
-	margin: 0 0 15px 0;
+	padding: 0 0 15px 0;
 }
 .body div.content .contentmenu ul li a {
 	display: block;
@@ -671,6 +672,37 @@ div.body .content div[id^="partial"]:last-child {
 .body div.content .contentmenu ul li a span {
 	display: inline-block;
 	padding: 0 6px 0 0;
+}
+.body div.content .contentmenu ul ul {
+	-webkit-box-shadow: 0px 0px 2px 0px #acaeaf;
+	-moz-box-shadow: 0px 0px 2px 0px #acaeaf;
+	box-shadow: 0px 0px 2px 0px #acaeaf;
+	position: absolute;
+	top: 80%;
+	left: 0;
+	display: none;
+	width: 200px;
+	background: #f9f9f9;
+}
+.body div.content .contentmenu ul li:hover ul {
+	display: block;
+}
+.body div.content .contentmenu ul ul li {
+	float: none;
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
+}
+.body div.content .contentmenu ul ul li a,
+.body div.content .contentmenu ul ul li:first-child a,
+.body div.content .contentmenu ul.left ul li:first-child a {
+	padding: 8px 12px;
+	border-left: none;
+}
+.body div.content .contentmenu ul ul li a {
+	border-bottom: 1px dotted #ccc;
+}
+.body div.content .contentmenu ul ul li:last-child a {
+	border-bottom: none;
 }
 
 /* Search and Grid Options Form */
@@ -1057,6 +1089,9 @@ div.body .content div[id^="partial"]:last-child {
 
 /* =Detail-View
 -------------------------------------------------------------- */
+.detail-view {
+	background: #fff;
+}
 .detail-view th,
 .detail-view td {
 	padding: 8px 15px;
@@ -1345,9 +1380,14 @@ footer .powered {
 	background: #aaa;	
 }
 
-
 /* =Responsive
 -------------------------------------------------------------- */
+ul.ui-autocomplete,
+div.ui-datepicker,
+div.ui-datepicker * {
+	z-index: 999 !important;
+}
+
 /* Resolution 1280 */
 @media only screen and (max-width:1280px) {
 

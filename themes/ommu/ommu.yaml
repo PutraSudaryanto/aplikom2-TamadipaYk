@@ -2,5 +2,5 @@ group_page		: admin
 name			: Ommu Default
 folder			: ommu
 layout			: admin_default
-thumbnail		: 
+thumbnail		: ommu_platform.png
 author			: Putra Sudaryanto

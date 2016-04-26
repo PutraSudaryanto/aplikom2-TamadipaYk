@@ -6,18 +6,16 @@
 	$currentAction = strtolower(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
 	$currentModule = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id);
 	$currentModuleAction = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
-	if($module == null) {
-		if($currentAction == 'site/login') {
-			$class = 'login';
-		} else {
-			$class = $controller;
-		}
-	} else {
-		if($controller == 'admin') {
+	if($module == null)
+		$class = $controller;
+		
+	else {
+		if($controller == 'admin')
 			$class = $module;
-		} else {
+		else
 			$class = $module.'-'.$controller;
-		}
+		if($module == 'users' && $currentAction == 'admin/login')
+			$class = 'login';
 	}
 ?>
 	
@@ -31,7 +29,7 @@
 
 			<?php //begin.Content Menu ?>
 			<div class="contentmenu clearfix">
-				<?php $this->widget('AdminContentMenu'); ?>
+				<?php $this->widget('AdminContentMenu');?>
 				<?php $this->widget('application.components.system.CMenu', array(
 					'items'=>$this->menu,
 					'htmlOptions'=>array('class'=>'gridmenu clearfix'),
