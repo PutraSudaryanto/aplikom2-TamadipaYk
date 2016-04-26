@@ -14,7 +14,7 @@ db_sql_filename	:
 plugin_menu		:
 	- urlTitle: View Register
 		urlRules: {siteType: 0,1, userLevel: 1,2}
-		urlPath: {url: admin/manage, attr: -, icon: -}
+		urlPath: {url: o/admin/manage, attr: -, icon: -}
 		
 	- urlTitle: Settings
 		urlRules: {siteType: 0,1, userLevel: 1}
@@ -22,16 +22,16 @@ plugin_menu		:
 		submenu :
 			- urlTitle: Years
 				urlRules: {siteType: 0,1, userLevel: 1,2}
-				urlPath: {url: year/manage, attr: -, icon: -}
+				urlPath: {url: o/year/manage, attr: -, icon: -}
 			- urlTitle: Batchs
 				urlRules: {siteType: 0,1, userLevel: 1,2}
-				urlPath: {url: batch/manage, attr: -, icon: -}
+				urlPath: {url: o/batch/manage, attr: -, icon: -}
 			- urlTitle: Schools
 				urlRules: {siteType: 0,1, userLevel: 1,2}
-				urlPath: {url: school/manage, attr: -, icon: -}
+				urlPath: {url: o/school/manage, attr: -, icon: -}
 			- urlTitle: Courses
 				urlRules: {siteType: 0,1, userLevel: 1,2}
-				urlPath: {url: course/manage, attr: -, icon: -}
+				urlPath: {url: o/course/manage, attr: -, icon: -}
 
 content_menu	:
 # controller o/year

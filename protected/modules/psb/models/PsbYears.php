@@ -20,12 +20,12 @@
  *
  * The followings are the available columns in table 'ommu_psb_years':
  * @property string $year_id
+ * @property integer $publish
  * @property string $years
- * @property integer $batchs
- * @property integer $courses
- * @property integer $registers
  * @property string $creation_date
  * @property string $creation_id
+ * @property string $modified_date
+ * @property string $modified_id
  *
  * The followings are the available model relations:
  * @property OmmuPsbRegisters[] $ommuPsbRegisters
@@ -39,6 +39,7 @@ class PsbYears extends CActiveRecord
 	
 	// Variable Search
 	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -68,17 +69,16 @@ class PsbYears extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('years', 'required'),
-			array('years', 'required'),
-			array('batchs, courses, registers', 'numerical', 'integerOnly'=>true),
+			array('publish', 'numerical', 'integerOnly'=>true),
 			array('years', 'length', 'max'=>9),
 			array('creation_id', 'length', 'max'=>11),
 			array('
 				course_input', 'length', 'max'=>32),
-			array('creation_id', 'safe'),
+			array('', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('year_id, years, batchs, courses, registers, creation_date, creation_id,
-				creation_search', 'safe', 'on'=>'search'),
+			array('year_id, publish, years, creation_date, creation_id, modified_date, modified_id,
+				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -90,10 +90,8 @@ class PsbYears extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'registers' => array(self::HAS_MANY, 'PsbRegisters', 'year_id'),
-			'batches' => array(self::HAS_MANY, 'PsbYearBatch', 'year_id'),
-			'courses' => array(self::HAS_MANY, 'PsbYearCourse', 'year_id'),
-			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -103,15 +101,16 @@ class PsbYears extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'year_id' => 'Year',
-			'years' => 'Years',
-			'batchs' => 'Batchs',
-			'courses' => 'Courses',
-			'registers' => 'Registers',
-			'creation_date' => 'Creation Date',
-			'creation_id' => 'Creation',
-			'course_input' => 'Courses',
-			'creation_search' => 'Creation',
+			'year_id' => Yii::t('attribute', 'Year'),
+			'publish' => Yii::t('attribute', 'Publish'),
+			'years' => Yii::t('attribute', 'Years'),
+			'creation_date' => Yii::t('attribute', 'Creation Date'),
+			'creation_id' => Yii::t('attribute', 'Creation'),
+			'modified_date' => Yii::t('attribute', 'Modified Date'),
+			'modified_id' => Yii::t('attribute', 'Modified'),
+			'course_input' => Yii::t('attribute', 'Courses'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 	}
 
@@ -134,22 +133,37 @@ class PsbYears extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('t.year_id',$this->year_id,true);
+		if(isset($_GET['type']) && $_GET['type'] == 'publish')
+			$criteria->compare('t.publish',1);
+		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
+			$criteria->compare('t.publish',0);
+		elseif(isset($_GET['type']) && $_GET['type'] == 'trash')
+			$criteria->compare('t.publish',2);
+		else {
+			$criteria->addInCondition('t.publish',array(0,1));
+			$criteria->compare('t.publish',$this->publish);
+		}
 		$criteria->compare('t.years',$this->years,true);
-		$criteria->compare('t.batchs',$this->batchs);
-		$criteria->compare('t.courses',$this->courses);
-		$criteria->compare('t.registers',$this->registers);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
 		$criteria->compare('t.creation_id',$this->creation_id,true);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->creation_id,true);
 		
 		// Custom Search
 		$criteria->with = array(
-			'creation_relation' => array(
-				'alias'=>'creation_relation',
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
 				'select'=>'displayname'
 			),
 		);
-		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['PsbYears_sort']))
 			$criteria->order = 'year_id DESC';
@@ -181,12 +195,12 @@ class PsbYears extends CActiveRecord
 			}
 		} else {
 			//$this->defaultColumns[] = 'year_id';
+			$this->defaultColumns[] = 'publish';
 			$this->defaultColumns[] = 'years';
-			$this->defaultColumns[] = 'batchs';
-			$this->defaultColumns[] = 'courses';
-			$this->defaultColumns[] = 'registers';
 			$this->defaultColumns[] = 'creation_date';
 			$this->defaultColumns[] = 'creation_id';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -202,6 +216,7 @@ class PsbYears extends CActiveRecord
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
 			$this->defaultColumns[] = 'years';
+			/*
 			$this->defaultColumns[] = array(
 				'header' => 'batchs',
 				'value' => 'CHtml::link($data->batchs, Yii::app()->controller->createUrl("batch/manage",array("year"=>$data->year_id)))',
@@ -226,9 +241,10 @@ class PsbYears extends CActiveRecord
 				),
 				'type' => 'raw',
 			);
+			*/
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
-				'value' => '$data->creation_relation->displayname',
+				'value' => '$data->creation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
@@ -256,6 +272,20 @@ class PsbYears extends CActiveRecord
 					),
 				), true),
 			);
+			if(!isset($_GET['type'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'publish',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->year_id)), $data->publish, 1)',
+					'htmlOptions' => array(
+						'class' => 'center',
+					),
+					'filter'=>array(
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
+					),
+					'type' => 'raw',
+				);
+			}
 		}
 		parent::afterConstruct();
 	}
@@ -278,24 +308,27 @@ class PsbYears extends CActiveRecord
 	}
 
 	/**
-	 * Get category
-	 * 0 = unpublish
-	 * 1 = publish
+	 * Get Years
 	 */
-	public static function getYear() {
-		
-		$criteria=new CDbCriteria;		
+	public static function getYear($publish=null, $type=null) 
+	{		
+		$criteria=new CDbCriteria;
+		if($publish != null)
+			$criteria->compare('t.publish',$publish);
 		$model = self::model()->findAll($criteria);
 
-		$items = array();
-		if($model != null) {
-			foreach($model as $key => $val) {
-				$items[$val->year_id] = $val->years;
-			}
-			return $items;
-		} else {
-			return false;
-		}
+		if($type == null) {
+			$items = array();
+			if($model != null) {
+				foreach($model as $key => $val)
+					$items[$val->year_id] = $val->years;
+				return $items;
+				
+			} else
+				return false;
+			
+		} else
+			return $model;
 	}
 
 	/**
@@ -303,9 +336,10 @@ class PsbYears extends CActiveRecord
 	 */
 	protected function beforeValidate() {
 		if(parent::beforeValidate()) {
-			if($this->isNewRecord) {
-				$this->creation_id = Yii::app()->user->id;	
-			}
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;
+			else
+				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}
