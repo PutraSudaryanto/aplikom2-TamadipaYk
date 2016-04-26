@@ -1,8 +1,8 @@
 <?php
 /**
- * AlbumLikes
+ * AlbumTag
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
  * @link https://github.com/oMMu/Ommu-Photo-Albums
  * @contact (+62)856-299-4114
  *
@@ -17,31 +17,33 @@
  *
  * --------------------------------------------------------------------------------------
  *
- * This is the model class for table "ommu_album_likes".
+ * This is the model class for table "ommu_album_tag".
  *
- * The followings are the available columns in table 'ommu_album_likes':
- * @property string $like_id
+ * The followings are the available columns in table 'ommu_album_tag':
+ * @property string $id
  * @property string $album_id
- * @property string $user_id
- * @property string $likes_date
- * @property string $likes_ip
+ * @property string $tag_id
+ * @property string $creation_date
+ * @property string $creation_id
  *
  * The followings are the available model relations:
  * @property OmmuAlbums $album
  */
-class AlbumLikes extends CActiveRecord
+class AlbumTag extends CActiveRecord
 {
 	public $defaultColumns = array();
+	public $body;
 	
 	// Variable Search
 	public $album_search;
-	public $user_search;
+	public $tag_search;
+	public $creation_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return AlbumLikes the static model class
+	 * @return AlbumTag the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -53,7 +55,7 @@ class AlbumLikes extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'ommu_album_likes';
+		return 'ommu_album_tag';
 	}
 
 	/**
@@ -64,13 +66,12 @@ class AlbumLikes extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('album_id, user_id, likes_date, likes_ip', 'required'),
-			array('album_id, user_id', 'length', 'max'=>11),
-			array('likes_ip', 'length', 'max'=>20),
+			array('album_id, tag_id', 'required'),
+			array('album_id, tag_id, creation_id', 'length', 'max'=>11),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('like_id, album_id, user_id, likes_date, likes_ip,
-				album_search, user_search', 'safe', 'on'=>'search'),
+			array('id, album_id, tag_id, creation_date, creation_id,
+				album_search, tag_search, creation_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -82,8 +83,9 @@ class AlbumLikes extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'album' => array(self::BELONGS_TO, 'Albums', 'album_id'),
-			'user' => array(self::BELONGS_TO, 'Users', 'user_id'),
+			'album_relation' => array(self::BELONGS_TO, 'Albums', 'album_id'),
+			'tag_TO' => array(self::BELONGS_TO, 'OmmuTags', 'tag_id'),
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 		);
 	}
 
@@ -93,13 +95,14 @@ class AlbumLikes extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'like_id' => 'Like',
+			'id' => 'ID',
 			'album_id' => 'Album',
-			'user_id' => 'User',
-			'likes_date' => 'Likes Date',
-			'likes_ip' => 'Likes Ip',
-			'album_search' => 'Album Search',
-			'user_search' => 'User Search',
+			'tag_id' => 'Tag',
+			'creation_date' => 'Creation Date',
+			'creation_id' => 'Creation',
+			'album_search' => 'Album',
+			'tag_search' => 'Tag',
+			'creation_search' => 'Creation',
 		);
 	}
 
@@ -121,35 +124,40 @@ class AlbumLikes extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('t.like_id',$this->like_id,true);
+		$criteria->compare('t.id',strtolower($this->id),true);
 		if(isset($_GET['album']))
 			$criteria->compare('t.album_id',$_GET['album']);
 		else
 			$criteria->compare('t.album_id',$this->album_id);
-		if(isset($_GET['user']))
-			$criteria->compare('t.user_id',$_GET['user']);
+		$criteria->compare('t.tag_id',strtolower($this->tag_id),true);
+		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		if(isset($_GET['creation']))
+			$criteria->compare('t.creation_id',$_GET['creation']);
 		else
-			$criteria->compare('t.user_id',$this->user_id);
-		if($this->likes_date != null && !in_array($this->likes_date, array('0000-00-00 00:00:00', '0000-00-00')))
-			$criteria->compare('date(t.likes_date)',date('Y-m-d', strtotime($this->likes_date)));
-		$criteria->compare('t.likes_ip',$this->likes_ip,true);
+			$criteria->compare('t.creation_id',$this->creation_id);
 		
 		// Custom Search
 		$criteria->with = array(
-			'album' => array(
-				'alias'=>'album',
+			'album_relation' => array(
+				'alias'=>'album_relation',
 				'select'=>'title'
 			),
-			'user' => array(
-				'alias'=>'user',
+			'tag_TO' => array(
+				'alias'=>'tag_TO',
+				'select'=>'body'
+			),
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
 				'select'=>'displayname'
 			),
 		);
-		$criteria->compare('album.title',strtolower($this->album_search), true);
-		$criteria->compare('user.displayname',strtolower($this->user_search), true);
+		$criteria->compare('album_relation.title',strtolower($this->album_search), true);
+		$criteria->compare('tag_TO.body',strtolower($this->tag_search), true);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
 
-		if(!isset($_GET['AlbumLikes_sort']))
-			$criteria->order = 't.like_id DESC';
+		if(!isset($_GET['AlbumTag_sort']))
+			$criteria->order = 't.id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -177,11 +185,11 @@ class AlbumLikes extends CActiveRecord
 				$this->defaultColumns[] = $val;
 			}
 		} else {
-			//$this->defaultColumns[] = 'like_id';
+			//$this->defaultColumns[] = 'id';
 			$this->defaultColumns[] = 'album_id';
-			$this->defaultColumns[] = 'user_id';
-			$this->defaultColumns[] = 'likes_date';
-			$this->defaultColumns[] = 'likes_ip';
+			$this->defaultColumns[] = 'tag_id';
+			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
 		}
 
 		return $this->defaultColumns;
@@ -199,7 +207,7 @@ class AlbumLikes extends CActiveRecord
 			if(!isset($_GET['album'])) {
 				$this->defaultColumns[] = array(
 					'name' => 'album_search',
-					'value' => '$data->album->title."<br/><span>".Utility::shortText(Utility::hardDecode($data->album->body),150)."</span>"',
+					'value' => '$data->album_relation->title."<br/><span>".Utility::shortText(Utility::hardDecode($data->album_relation->body),150)."</span>"',
 					'htmlOptions' => array(
 						'class' => 'bold',
 					),
@@ -207,23 +215,27 @@ class AlbumLikes extends CActiveRecord
 				);
 			}
 			$this->defaultColumns[] = array(
-				'name' => 'user_search',
-				'value' => '$data->user->displayname',
+				'name' => 'tag_search',
+				'value' => '$data->tag->body',
 			);
 			$this->defaultColumns[] = array(
-				'name' => 'likes_date',
-				'value' => 'Utility::dateFormat($data->likes_date)',
+				'name' => 'creation_search',
+				'value' => '$data->creation_relation->displayname',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_date',
+				'value' => 'Utility::dateFormat($data->creation_date)',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
 				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
 					'model'=>$this,
-					'attribute'=>'likes_date',
+					'attribute'=>'creation_date',
 					'language' => 'ja',
 					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
 					//'mode'=>'datetime',
 					'htmlOptions' => array(
-						'id' => 'likes_date_filter',
+						'id' => 'creation_date_filter',
 					),
 					'options'=>array(
 						'showOn' => 'focus',
@@ -235,13 +247,6 @@ class AlbumLikes extends CActiveRecord
 						'showButtonPanel' => true,
 					),
 				), true),
-			);
-			$this->defaultColumns[] = array(
-				'name' => 'likes_ip',
-				'value' => '$data->likes_ip',
-				'htmlOptions' => array(
-					'class' => 'center',
-				),
 			);
 		}
 		parent::afterConstruct();
@@ -265,15 +270,56 @@ class AlbumLikes extends CActiveRecord
 	}
 
 	/**
-	 * before validate attributes
+	 * get album tag
 	 */
-	protected function beforeValidate() {
-		if(parent::beforeValidate()) {		
+	public static function getKeyword($keyword, $id) {
+		$model = self::model()->findAll(array(
+			'condition' => 'album_id = :id',
+			'params' => array(
+				':id' => $id,
+			),
+			'order' => 'id ASC',
+			'limit' => 30,
+		));
+		
+		$tag = '';
+		if($model != null) {
+			foreach($model as $val) {
+				$tag .= ','.$val->tag_TO->body;
+			}
+		}
+		
+		return $keyword.$tag;
+	}
+	
+	/**
+	 * before save attributes
+	 */
+	protected function beforeSave() {
+		if(parent::beforeSave()) {
 			if($this->isNewRecord) {
-				$this->user_id = Yii::app()->user->id;
-				$this->likes_ip = $_SERVER['REMOTE_ADDR'];
-			}		
+				if($this->tag_id == 0) {
+					$tag = OmmuTags::model()->find(array(
+						'select' => 'tag_id, body',
+						'condition' => 'publish = 1 AND body = :body',
+						'params' => array(
+							':body' => $this->body,
+						),
+					));
+					if($tag != null) {
+						$this->tag_id = $tag->tag_id;
+					} else {
+						$data = new OmmuTags;
+						$data->body = $this->body;
+						if($data->save()) {
+							$this->tag_id = $data->tag_id;
+						}
+					}					
+				}
+			}
+			$this->creation_id = Yii::app()->user->id;
 		}
 		return true;
 	}
+
 }

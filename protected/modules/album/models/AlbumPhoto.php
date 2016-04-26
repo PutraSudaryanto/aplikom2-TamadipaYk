@@ -1,8 +1,9 @@
 <?php
 /**
- * AlbumPhoto * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * AlbumPhoto
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
- * @link http://company.ommu.co
+ * @link https://github.com/oMMu/Ommu-Photo-Albums
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -27,6 +28,7 @@
  * @property string $media
  * @property string $desc
  * @property string $creation_date
+ * @property string $creation_id
  *
  * The followings are the available model relations:
  * @property OmmuAlbums $album
@@ -38,6 +40,7 @@ class AlbumPhoto extends CActiveRecord
 	
 	// Variable Search
 	public $album_search;
+	public $creation_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -67,17 +70,15 @@ class AlbumPhoto extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('album_id', 'required'),
-			array('publish, orders, cover', 'numerical', 'integerOnly'=>true),
+			array('publish, orders, cover, creation_id', 'numerical', 'integerOnly'=>true),
 			array('album_id', 'length', 'max'=>11),
-			array('media,
-				old_media', 'length', 'max'=>128),
 			//array('media', 'file', 'types' => 'jpg, jpeg, png, gif', 'allowEmpty' => true),
 			array('cover, media, desc, creation_date,
 				old_media', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('media_id, publish, album_id, orders, cover, media, desc, creation_date,
-				album_search', 'safe', 'on'=>'search'),
+				album_search, creation_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -90,6 +91,7 @@ class AlbumPhoto extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'album' => array(self::BELONGS_TO, 'Albums', 'album_id'),
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 		);
 	}
 
@@ -107,8 +109,10 @@ class AlbumPhoto extends CActiveRecord
 			'media' => 'Photo',
 			'desc' => 'Desc',
 			'creation_date' => 'Creation Date',
-			'album_search' => 'Album Search',
+			'creation_id' => 'Creation',
 			'old_media' => 'Old Photo',
+			'album_search' => 'Album',
+			'creation_search' => 'Creation',
 		);
 	}
 
@@ -141,17 +145,17 @@ class AlbumPhoto extends CActiveRecord
 			$criteria->addInCondition('t.publish',array(0,1));
 			$criteria->compare('t.publish',$this->publish);
 		}
-		if(isset($_GET['album'])) {
+		if(isset($_GET['album']))
 			$criteria->compare('t.album_id',$_GET['album']);
-		} else {
+		else
 			$criteria->compare('t.album_id',$this->album_id);
-		}
 		$criteria->compare('t.orders',$this->orders);
 		$criteria->compare('t.cover',$this->cover);
 		$criteria->compare('t.media',$this->media,true);
 		$criteria->compare('t.desc',$this->desc,true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		$criteria->compare('t.creation_id',$this->creation_id);
 		
 		// Custom Search
 		$criteria->with = array(
@@ -159,11 +163,16 @@ class AlbumPhoto extends CActiveRecord
 				'alias'=>'album',
 				'select'=>'title'
 			),
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname'
+			),
 		);
 		$criteria->compare('album.title',strtolower($this->album_search), true);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
 
 		if(!isset($_GET['AlbumPhoto_sort']))
-			//$criteria->order = 'media_id DESC';
+			$criteria->order = 't.media_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -199,6 +208,7 @@ class AlbumPhoto extends CActiveRecord
 			$this->defaultColumns[] = 'media';
 			$this->defaultColumns[] = 'desc';
 			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
 		}
 
 		return $this->defaultColumns;
@@ -222,18 +232,10 @@ class AlbumPhoto extends CActiveRecord
 					),
 					'type' => 'raw',
 				);
-			}		
+			}
 			$this->defaultColumns[] = array(
-				'name' => 'cover',
-				'value' => '$data->cover == 1 ? Chtml::image(Yii::app()->theme->baseUrl.\'/images/icons/publish.png\') : Chtml::image(Yii::app()->theme->baseUrl.\'/images/icons/unpublish.png\')',
-				'htmlOptions' => array(
-					'class' => 'center',
-				),
-				'filter'=>array(
-					1=>Phrase::trans(588,0),
-					0=>Phrase::trans(589,0),
-				),
-				'type' => 'raw',
+				'name' => 'creation_search',
+				'value' => '$data->creation_relation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
@@ -260,6 +262,18 @@ class AlbumPhoto extends CActiveRecord
 						'showButtonPanel' => true,
 					),
 				), true),
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'cover',
+				'value' => '$data->cover == 1 ? Chtml::image(Yii::app()->theme->baseUrl.\'/images/icons/publish.png\') : Chtml::image(Yii::app()->theme->baseUrl.\'/images/icons/unpublish.png\')',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'filter'=>array(
+					1=>Yii::t('phrase', 'Yes'),
+					0=>Yii::t('phrase', 'No'),
+				),
+				'type' => 'raw',
 			);
 		}
 		parent::afterConstruct();
@@ -320,9 +334,12 @@ class AlbumPhoto extends CActiveRecord
 			$media = CUploadedFile::getInstance($this, 'media');
 			if($currentAction != 'photo/ajaxadd' && $media->name != '') {
 				$extension = pathinfo($media->name, PATHINFO_EXTENSION);
-				if(!in_array($extension, array('bmp','gif','jpg','png')))
+				if(!in_array(strtolower($extension), array('bmp','gif','jpg','png')))
 					$this->addError('media', 'The file "'.$media->name.'" cannot be uploaded. Only files with these extensions are allowed: bmp, gif, jpg, png.');
 			}
+			
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;
 		}
 		return true;
 	}
@@ -340,9 +357,9 @@ class AlbumPhoto extends CActiveRecord
 				
 				$this->media = CUploadedFile::getInstance($this, 'media');
 				if($this->media instanceOf CUploadedFile) {
-					$fileName = time().'_'.$this->album_id.'.'.strtolower($this->media->extensionName);
+					$fileName = time().'_'.$this->album_id.'_'.Utility::getUrlTitle($this->album->title).'.'.strtolower($this->media->extensionName);
 					if($this->media->saveAs($album_path.'/'.$fileName)) {
-						if($this->old_media != '')
+						if($this->old_media != '' && file_exists($album_path.'/'.$this->old_media))
 							rename($album_path.'/'.$this->old_media, 'public/album/verwijderen/'.$this->album_id.'_'.$this->old_media);
 						$this->media = $fileName;
 					}
@@ -405,7 +422,7 @@ class AlbumPhoto extends CActiveRecord
 		parent::afterDelete();
 		//delete album image
 		$album_path = "public/album/".$this->album_id;
-		if($this->media != '')
+		if($this->media != '' && file_exists($album_path.'/'.$this->media))
 			rename($album_path.'/'.$this->media, 'public/album/verwijderen/'.$this->album_id.'_'.$this->media);
 
 		//reset cover in album

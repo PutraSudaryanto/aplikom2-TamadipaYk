@@ -1,4 +1,14 @@
 <?php
+/**
+ * AlbumModule
+ *
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @link https://github.com/oMMu/Ommu-Photo-Albums
+ * @contect (+62)856-299-4114
+ *
+ *----------------------------------------------------------------------------------------------------------
+ */
 
 class AlbumModule extends CWebModule
 {
@@ -21,9 +31,11 @@ class AlbumModule extends CWebModule
 			// you may place customized code here
 			//list public controller in this module
 			$publicControllers = array(
-				'site',
-				'member',
+				'like',
+				'photo',
 				'search',
+				'site',
+				'sync',
 			);
 			
 			// pake ini untuk set theme per action di controller..
