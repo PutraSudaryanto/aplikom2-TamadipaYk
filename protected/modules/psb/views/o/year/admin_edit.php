@@ -77,7 +77,7 @@
 					<div id="course-suggest" class="suggest clearfix">
 						<?php if($course != null) {
 							foreach($course as $key => $val) {?>
-								<div><?php echo ucwords($val->course_relation->course_name);?><a href="<?php echo Yii::app()->controller->createUrl('yearcourse/delete',array('id'=>$val->id,'type'=>'year'));?>" title="<?php echo Phrase::trans(173,0);?>"><?php echo Phrase::trans(173,0);?></a></div>
+								<div><?php echo ucwords($val->course_relation->course_name);?><a href="<?php echo Yii::app()->controller->createUrl('yearcourse/delete',array('id'=>$val->id,'type'=>'year'));?>" title="<?php echo Yii::t('phrase', 'Delete');?>"><?php echo Yii::t('phrase', 'Delete');?></a></div>
 						<?php }
 						} ?>
 					</div>
@@ -88,7 +88,7 @@
 		<div class="submit clearfix">
 			<label>&nbsp;</label>
 			<div class="desc">
-				<?php echo CHtml::submitButton($model->isNewRecord ? Phrase::trans(1,0) : Phrase::trans(2,0), array('onclick' => 'setEnableSave()')); ?>
+				<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('phrase', 'Create') : Yii::t('phrase', 'Save'), array('onclick' => 'setEnableSave()')); ?>
 			</div>
 		</div>
 
@@ -119,7 +119,7 @@
 		<?php 
 			$columnData   = $columns;
 			array_push($columnData, array(
-				'header' => Phrase::trans(151,0),
+				'header' => Yii::t('phrase', 'Options'),
 				'class'=>'CButtonColumn',
 				'buttons' => array(
 					'view' => array(

@@ -290,19 +290,10 @@ class AdminController extends Controller
 		$model=$this->loadModel($id);
 		
 		if($model->publish == 1) {
-		//if($model->actived == 1) {
-		//if($model->enabled == 1) {
-		//if($model->status == 1) {
-			$title = Phrase::trans(276,0);
-			//$title = Phrase::trans(278,0);
-			//$title = Phrase::trans(284,0);
-			//$title = Phrase::trans(292,0);
+			$title = Yii::t('phrase', 'Unpublish');
 			$replace = 0;
 		} else {
-			$title = Phrase::trans(275,0);
-			//$title = Phrase::trans(277,0);
-			//$title = Phrase::trans(283,0);
-			//$title = Phrase::trans(291,0);
+			$title = Yii::t('phrase', 'Publish');
 			$replace = 1;
 		}
 
@@ -311,9 +302,6 @@ class AdminController extends Controller
 			if(isset($id)) {
 				//change value active or publish
 				$model->publish = $replace;
-				//$model->actived = $replace;
-				//$model->enabled = $replace;
-				//$model->status = $replace;
 
 				if($model->update()) {
 					echo CJSON::encode(array(

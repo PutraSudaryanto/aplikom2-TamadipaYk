@@ -33,11 +33,10 @@
 				if($model->isNewRecord && isset($_GET['id']))
 					$model->year_id = $_GET['id'];
 				$year = PsbYears::getYear();
-				if($year != null) {
+				if($year != null)
 					echo $form->dropDownList($model,'year_id', $year);					
-				} else {
-					echo $form->dropDownList($model,'year_id', array('prompt'=>'No Years'));					
-				} ?>
+				else
+					echo $form->dropDownList($model,'year_id', array('prompt'=>'No Years')); ?>
 				<?php echo $form->error($model,'year_id'); ?>
 				<?php /*<div class="small-px silent"></div>*/?>
 			</div>
@@ -99,8 +98,8 @@
 	</fieldset>
 </div>
 <div class="dialog-submit">
-	<?php echo CHtml::submitButton($model->isNewRecord ? Phrase::trans(1,0) : Phrase::trans(2,0) ,array('onclick' => 'setEnableSave()')); ?>
-	<?php echo CHtml::button(Phrase::trans(4,0), array('id'=>'closed')); ?>
+	<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('phrase', 'Create') : Yii::t('phrase', 'Save') ,array('onclick' => 'setEnableSave()')); ?>
+	<?php echo CHtml::button(Yii::t('phrase', 'Close'), array('id'=>'closed')); ?>
 </div>
 <?php $this->endWidget(); ?>
 

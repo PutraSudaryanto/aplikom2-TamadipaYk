@@ -90,9 +90,9 @@ class PsbYearBatch extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'registers' => array(self::HAS_MANY, 'PsbRegisters', 'batch_id'),
-			'year_relation' => array(self::BELONGS_TO, 'PsbYears', 'year_id'),
-			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
-			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
+			'year' => array(self::BELONGS_TO, 'PsbYears', 'year_id'),
+			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -161,22 +161,22 @@ class PsbYearBatch extends CActiveRecord
 		
 		// Custom Search
 		$criteria->with = array(
-			'year_relation' => array(
-				'alias'=>'year_relation',
+			'year' => array(
+				'alias'=>'year',
 				'select'=>'years'
 			),
-			'creation_relation' => array(
-				'alias'=>'creation_relation',
+			'creation' => array(
+				'alias'=>'creation',
 				'select'=>'displayname'
 			),
-			'modified_relation' => array(
-				'alias'=>'modified_relation',
+			'modified' => array(
+				'alias'=>'modified',
 				'select'=>'displayname'
 			),
 		);
-		$criteria->compare('year_relation.years',strtolower($this->year_search), true);
-		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
-		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
+		$criteria->compare('year.years',strtolower($this->year_search), true);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['PsbYearBatch_sort']) && $currentAction != 'year/edit')
 			$criteria->order = 'batch_id DESC';
@@ -241,7 +241,7 @@ class PsbYearBatch extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'year_search',
-				'value' => '$data->year_relation->years',
+				'value' => '$data->year->years',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'batch_name',
@@ -306,7 +306,7 @@ class PsbYearBatch extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
-				'value' => '$data->creation_relation->displayname',
+				'value' => '$data->creation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
