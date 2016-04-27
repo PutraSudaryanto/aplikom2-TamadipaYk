@@ -30,7 +30,7 @@
 		<div class="clearfix">
 			<?php echo $form->labelEx($model,'course_name'); ?>
 			<div class="desc">
-				<?php echo $form->textField($model,'course_name',array('size'=>32,'maxlength'=>32)); ?>
+				<?php echo $form->textField($model,'course_name',array('maxlength'=>32)); ?>
 				<?php echo $form->error($model,'course_name'); ?>
 				<?php /*<div class="small-px silent"></div>*/?>
 			</div>
@@ -41,6 +41,16 @@
 			<div class="desc">
 				<?php echo $form->textArea($model,'course_desc',array('rows'=>6, 'cols'=>50)); ?>
 				<?php echo $form->error($model,'course_desc'); ?>
+				<?php /*<div class="small-px silent"></div>*/?>
+			</div>
+		</div>
+
+		<div class="clearfix publish">
+			<?php echo $form->labelEx($model,'publish'); ?>
+			<div class="desc">
+				<?php echo $form->checkBox($model,'publish'); ?>
+				<?php echo $form->labelEx($model,'publish'); ?>
+				<?php echo $form->error($model,'publish'); ?>
 				<?php /*<div class="small-px silent"></div>*/?>
 			</div>
 		</div>

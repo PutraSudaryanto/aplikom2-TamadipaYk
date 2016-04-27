@@ -1,7 +1,9 @@
 <?php
 /**
  * Psb Schools (psb-schools)
- * @var $this SchoolController * @var $model PsbSchools * @var $form CActiveForm
+ * @var $this SchoolController
+ * @var $model PsbSchools
+ * @var $form CActiveForm
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
@@ -62,6 +64,16 @@
 			<div class="desc">
 				<?php echo $form->textField($model,'school_phone',array('maxlength'=>15)); ?>
 				<?php echo $form->error($model,'school_phone'); ?>
+			</div>
+		</div>
+
+		<div class="clearfix publish">
+			<?php echo $form->labelEx($model,'publish'); ?>
+			<div class="desc">
+				<?php echo $form->checkBox($model,'publish'); ?>
+				<?php echo $form->labelEx($model,'publish'); ?>
+				<?php echo $form->error($model,'publish'); ?>
+				<?php /*<div class="small-px silent"></div>*/?>
 			</div>
 		</div>
 

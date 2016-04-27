@@ -1,7 +1,9 @@
 <?php
 /**
  * Psb Schools (psb-schools)
- * @var $this SchoolController * @var $model PsbSchools * @var $form CActiveForm
+ * @var $this SchoolController
+ * @var $model PsbSchools
+ * @var $form CActiveForm
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
@@ -39,11 +41,6 @@
 		<li>
 			<?php echo $model->getAttributeLabel('school_status'); ?><br/>
 			<?php echo $form->textField($model,'school_status',array('size'=>32,'maxlength'=>32)); ?>
-		</li>
-
-		<li>
-			<?php echo $model->getAttributeLabel('registers'); ?><br/>
-			<?php echo $form->textField($model,'registers'); ?>
 		</li>
 
 		<li class="submit">

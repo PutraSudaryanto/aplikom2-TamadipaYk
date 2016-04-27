@@ -1,7 +1,9 @@
 <?php
 /**
  * Psb Schools (psb-schools)
- * @var $this SchoolController * @var $model PsbSchools *
+ * @var $this SchoolController
+ * @var $model PsbSchools
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link http://company.ommu.co

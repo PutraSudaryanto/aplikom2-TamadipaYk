@@ -20,11 +20,15 @@
  *
  * The followings are the available columns in table 'ommu_psb_schools':
  * @property string $school_id
+ * @property integer $publish
  * @property string $school_name
  * @property string $school_address
  * @property string $school_phone
  * @property string $school_status
- * @property integer $registers
+ * @property string $creation_date
+ * @property string $creation_id
+ * @property string $modified_date
+ * @property string $modified_id
  *
  * The followings are the available model relations:
  * @property OmmuPsbRegisters[] $ommuPsbRegisters
@@ -32,6 +36,10 @@
 class PsbSchools extends CActiveRecord
 {
 	public $defaultColumns = array();
+	
+	// Variable Search
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -61,15 +69,15 @@ class PsbSchools extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('school_name', 'required', 'on'=>'schoolmaster, schoolmasterEdit'),
-			array('school_address, school_phone, school_status', 'required', 'on'=>'schoolmasterEdit'),
-			array('school_address, school_phone, school_status', 'required', 'on'=>'edit'),
-			array('school_status, registers', 'numerical', 'integerOnly'=>true),
+			array('school_address, school_phone, school_status', 'required', 'on'=>'edit, schoolmasterEdit'),
+			array('publish, school_status', 'numerical', 'integerOnly'=>true),
 			array('school_name', 'length', 'max'=>64),
 			array('school_phone', 'length', 'max'=>15),
-			array('school_name, school_address, school_phone, school_status, registers', 'safe'),
+			array('school_name, school_address, school_phone, school_status', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('school_id, school_name, school_address, school_phone, school_status, registers', 'safe', 'on'=>'search'),
+			array('school_id, publish, school_name, school_address, school_phone, school_status, creation_date, creation_id, modified_date, modified_id,
+				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -82,6 +90,8 @@ class PsbSchools extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'registers' => array(self::HAS_MANY, 'PsbRegisters', 'school_id'),
+			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -92,11 +102,17 @@ class PsbSchools extends CActiveRecord
 	{
 		return array(
 			'school_id' => 'School',
+			'publish' => Yii::t('attribute', 'Publish'),
 			'school_name' => 'School Name',
 			'school_address' => 'School Address',
 			'school_phone' => 'School Phone',
 			'school_status' => 'School Status',
-			'registers' => 'Registers',
+			'creation_date' => 'Creation Date',
+			'creation_id' => 'Creation',
+			'modified_date' => 'Modified Date',
+			'modified_id' => 'Modified',
+			'creation_search' => 'Creation',
+			'modified_search' => 'Modified',
 		);
 	}
 
@@ -119,11 +135,40 @@ class PsbSchools extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('t.school_id',$this->school_id,true);
+		if(isset($_GET['type']) && $_GET['type'] == 'publish')
+			$criteria->compare('t.publish',1);
+		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
+			$criteria->compare('t.publish',0);
+		elseif(isset($_GET['type']) && $_GET['type'] == 'trash')
+			$criteria->compare('t.publish',2);
+		else {
+			$criteria->addInCondition('t.publish',array(0,1));
+			$criteria->compare('t.publish',$this->publish);
+		}
 		$criteria->compare('t.school_name',$this->school_name,true);
 		$criteria->compare('t.school_address',$this->school_address,true);
 		$criteria->compare('t.school_phone',$this->school_phone,true);
 		$criteria->compare('t.school_status',$this->school_status);
-		$criteria->compare('t.registers',$this->registers);
+		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		$criteria->compare('t.creation_id',$this->creation_id,true);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->modified_id,true);
+		
+		// Custom Search
+		$criteria->with = array(
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
+				'select'=>'displayname'
+			),
+		);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['PsbSchools_sort']))
 			$criteria->order = 'school_id DESC';
@@ -155,11 +200,15 @@ class PsbSchools extends CActiveRecord
 			}
 		} else {
 			//$this->defaultColumns[] = 'school_id';
+			$this->defaultColumns[] = 'publish';
 			$this->defaultColumns[] = 'school_name';
 			$this->defaultColumns[] = 'school_address';
 			$this->defaultColumns[] = 'school_phone';
 			$this->defaultColumns[] = 'school_status';
-			$this->defaultColumns[] = 'registers';
+			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -176,7 +225,7 @@ class PsbSchools extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'school_name',
-				'value' => 'ucwords($data->school_name)',
+				'value' => '$data->school_name',
 			);
 			$this->defaultColumns[] = 'school_address';
 			$this->defaultColumns[] = 'school_phone';
@@ -192,11 +241,57 @@ class PsbSchools extends CActiveRecord
 				),
 				'type' => 'raw',
 			);
+			/*
 			$this->defaultColumns[] = array(
 				'header' => 'registers',
 				'value' => 'CHtml::link($data->registers, Yii::app()->controller->createUrl("o/admin/manage",array("school"=>$data->school_id)))',
 				'type' => 'raw',
 			);
+			*/
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation->displayname',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_date',
+				'value' => 'Utility::dateFormat($data->creation_date)',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
+					'model'=>$this,
+					'attribute'=>'creation_date',
+					'language' => 'ja',
+					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
+					//'mode'=>'datetime',
+					'htmlOptions' => array(
+						'id' => 'creation_date_filter',
+					),
+					'options'=>array(
+						'showOn' => 'focus',
+						'dateFormat' => 'dd-mm-yy',
+						'showOtherMonths' => true,
+						'selectOtherMonths' => true,
+						'changeMonth' => true,
+						'changeYear' => true,
+						'showButtonPanel' => true,
+					),
+				), true),
+			);
+			if(!isset($_GET['type'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'publish',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->school_id)), $data->publish, 1)',
+					'htmlOptions' => array(
+						'class' => 'center',
+					),
+					'filter'=>array(
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
+					),
+					'type' => 'raw',
+				);
+			}
 		}
 		parent::afterConstruct();
 	}
@@ -238,13 +333,16 @@ class PsbSchools extends CActiveRecord
 			return false;
 		}
 	}
-	
+
 	/**
-	 * before save attributes
+	 * before validate attributes
 	 */
-	protected function beforeSave() {
-		if(parent::beforeSave()) {
-			$this->school_name = strtolower($this->school_name);
+	protected function beforeValidate() {
+		if(parent::beforeValidate()) {
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;
+			else
+				$this->modified_id = Yii::app()->user->id;				
 		}
 		return true;
 	}
