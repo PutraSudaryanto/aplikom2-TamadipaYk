@@ -101,19 +101,31 @@ class PsbSchools extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'school_id' => 'School',
-			'publish' => Yii::t('attribute', 'Publish'),
-			'school_name' => 'School Name',
-			'school_address' => 'School Address',
-			'school_phone' => 'School Phone',
-			'school_status' => 'School Status',
-			'creation_date' => 'Creation Date',
-			'creation_id' => 'Creation',
-			'modified_date' => 'Modified Date',
-			'modified_id' => 'Modified',
-			'creation_search' => 'Creation',
-			'modified_search' => 'Modified',
+            'school_id' => Yii::t('attribute', 'School'),
+            'publish' => Yii::t('attribute', 'Publish'),
+            'school_name' => Yii::t('attribute', 'School Name'),
+            'school_address' => Yii::t('attribute', 'School Address'),
+            'school_phone' => Yii::t('attribute', 'School Phone'),
+            'school_status' => Yii::t('attribute', 'School Status'),
+            'creation_date' => Yii::t('attribute', 'Creation Date'),
+            'creation_id' => Yii::t('attribute', 'Creation'),
+            'modified_date' => Yii::t('attribute', 'Modified Date'),
+            'modified_id' => Yii::t('attribute', 'Modified'),
+            'creation_search' => Yii::t('attribute', 'Creation'),
+            'modified_search' => Yii::t('attribute', 'Modified'),
 		);
+        /* 
+            'School' => 'School',
+            'Publish' => 'Publish',
+            'School Name' => 'School Name',
+            'School Address' => 'School Address',
+            'School Phone' => 'School Phone',
+            'School Status' => 'School Status',
+            'Creation Date' => 'Creation Date',
+            'Creation' => 'Creation',
+            'Modified Date' => 'Modified Date',
+            'Modified' => 'Modified',         
+        */ 		
 	}
 
 	/**

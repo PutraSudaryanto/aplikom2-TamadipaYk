@@ -99,17 +99,28 @@ class PsbCourses extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'course_id' => 'Course',
-			'publish' => Yii::t('attribute', 'Publish'),
-			'course_name' => 'Course Name',
-			'course_desc' => 'Course Desc',
-			'creation_date' => 'Creation Date',
-			'creation_id' => 'Creation',
-			'modified_date' => 'Modified Date',
-			'modified_id' => 'Modified',
-			'creation_search' => 'Creation',
-			'modified_search' => 'Modified',
+            'course_id' => Yii::t('attribute', 'Course'),
+            'publish' => Yii::t('attribute', 'Publish'),
+            'course_name' => Yii::t('attribute', 'Course Name'),
+            'course_desc' => Yii::t('attribute', 'Course Desc'),
+            'creation_date' => Yii::t('attribute', 'Creation Date'),
+            'creation_id' => Yii::t('attribute', 'Creation'),
+            'modified_date' => Yii::t('attribute', 'Modified Date'),
+            'modified_id' => Yii::t('attribute', 'Modified'),
+            'creation_search' => Yii::t('attribute', 'Creation'),
+            'modified_search' => Yii::t('attribute', 'Modified'),
 		);
+        /* 
+            'Course' => 'Course',
+            'Publish' => 'Publish',
+            'Course Name' => 'Course Name',
+            'Course Desc' => 'Course Desc',
+            'Creation Date' => 'Creation Date',
+            'Creation' => 'Creation',
+            'Modified Date' => 'Modified Date',
+            'Modified' => 'Modified',
+         
+        */ 		
 	}
 
 	/**

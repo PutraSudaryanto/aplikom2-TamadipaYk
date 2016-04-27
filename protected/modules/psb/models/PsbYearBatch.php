@@ -103,20 +103,32 @@ class PsbYearBatch extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'batch_id' => 'Batch',
-			'publish' => Yii::t('attribute', 'Publish'),
-			'year_id' => 'Year',
-			'batch_name' => 'Batch Name',
-			'batch_start' => 'Batch Start',
-			'batch_finish' => 'Batch Finish',
-			'creation_date' => 'Creation Date',
-			'creation_id' => 'Creation',
-			'modified_date' => 'Modified Date',
-			'modified_id' => 'Modified',
-			'year_search' => 'Year',
-			'creation_search' => 'Creation',
-			'modified_search' => 'Modified',
+            'batch_id' => Yii::t('attribute', 'Batch'),
+            'publish' => Yii::t('attribute', 'Publish'),
+            'year_id' => Yii::t('attribute', 'Year'),
+            'batch_name' => Yii::t('attribute', 'Batch Name'),
+            'batch_start' => Yii::t('attribute', 'Batch Start'),
+            'batch_finish' => Yii::t('attribute', 'Batch Finish'),
+            'creation_date' => Yii::t('attribute', 'Creation Date'),
+            'creation_id' => Yii::t('attribute', 'Creation'),
+            'modified_date' => Yii::t('attribute', 'Modified Date'),
+            'modified_id' => Yii::t('attribute', 'Modified'),
+            'creation_search' => Yii::t('attribute', 'Creation'),
+            'modified_search' => Yii::t('attribute', 'Modified'),
+            'year_search' => Yii::t('attribute', 'Year'),
 		);
+        /* 
+            'Batch' => 'Batch',
+            'Publish' => 'Publish',
+            'Year' => 'Year',
+            'Batch Name' => 'Batch Name',
+            'Batch Start' => 'Batch Start',
+            'Batch Finish' => 'Batch Finish',
+            'Creation Date' => 'Creation Date',
+            'Creation' => 'Creation',
+            'Modified Date' => 'Modified Date',
+            'Modified' => 'Modified',         
+        */ 		
 	}
 
 	/**
