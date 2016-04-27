@@ -214,7 +214,7 @@ class PsbYearCourse extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'course_search',
-				'value' => 'ucwords($data->course_relation->course_name)',
+				'value' => '$data->course_relation->course_name',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',

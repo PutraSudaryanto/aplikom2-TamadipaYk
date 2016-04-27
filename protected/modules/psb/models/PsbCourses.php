@@ -89,6 +89,7 @@ class PsbCourses extends CActiveRecord
 			'courses' => array(self::HAS_MANY, 'PsbYearCourse', 'course_id'),
 			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
+			'view' => array(self::BELONGS_TO, 'ViewPsbCourses', 'course_id'),
 		);
 	}
 
@@ -219,6 +220,14 @@ class PsbCourses extends CActiveRecord
 				'value' => '$data->course_name',
 			);
 			$this->defaultColumns[] = 'course_desc';
+			$this->defaultColumns[] = array(
+				'header' => 'years',
+				'value' => 'CHtml::link($data->view->years, Yii::app()->controller->createUrl("o/yearcourse/manage",array("course"=>$data->course_id)))',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'type' => 'raw',
+			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
 				'value' => '$data->creation->displayname',
