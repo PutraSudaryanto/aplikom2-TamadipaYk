@@ -1,7 +1,9 @@
 <?php
 /**
  * Psb Year Batches (psb-year-batch)
- * @var $this BatchController * @var $model PsbYearBatch *
+ * @var $this BatchController
+ * @var $model PsbYearBatch
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link http://company.ommu.co

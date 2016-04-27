@@ -1,7 +1,9 @@
 <?php
 /**
  * Psb Courses (psb-courses)
- * @var $this CourseController * @var $model PsbCourses * @var $form CActiveForm
+ * @var $this CourseController
+ * @var $model PsbCourses
+ * @var $form CActiveForm
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)

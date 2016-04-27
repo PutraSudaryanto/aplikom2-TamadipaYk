@@ -73,7 +73,7 @@ class PsbYearBatch extends CActiveRecord
 			array('year_id, batch_name, batch_start, batch_finish', 'required'),
 			array('publish', 'numerical', 'integerOnly'=>true),
 			array('year_id, creation_id, modified_id', 'length', 'max'=>11),
-			array('batch_name, batch_start, batch_finish, creation_date, creation_id, modified_date, modified_id', 'safe'),
+			array('batch_name, batch_start, batch_finish', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('batch_id, publish, year_id, batch_name, batch_start, batch_finish, creation_date, creation_id, modified_date, modified_id,

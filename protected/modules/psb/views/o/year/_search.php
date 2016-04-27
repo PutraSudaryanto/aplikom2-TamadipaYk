@@ -1,7 +1,9 @@
 <?php
 /**
  * Psb Years (psb-years)
- * @var $this YearController * @var $model PsbYears * @var $form CActiveForm
+ * @var $this YearController
+ * @var $model PsbYears
+ * @var $form CActiveForm
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)

@@ -20,10 +20,13 @@
  *
  * The followings are the available columns in table 'ommu_psb_courses':
  * @property string $course_id
+ * @property integer $publish
  * @property string $course_name
  * @property string $course_desc
  * @property string $creation_date
  * @property string $creation_id
+ * @property string $modified_date
+ * @property string $modified_id
  *
  * The followings are the available model relations:
  * @property OmmuPsbYearCourse[] $ommuPsbYearCourses
@@ -34,6 +37,7 @@ class PsbCourses extends CActiveRecord
 	
 	// Variable Search
 	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -63,13 +67,14 @@ class PsbCourses extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('course_name', 'required'),
+			array('publish', 'numerical', 'integerOnly'=>true),
 			array('course_name', 'length', 'max'=>32),
 			array('creation_id', 'length', 'max'=>11),
 			array('course_desc', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('course_id, course_name, course_desc, creation_date, creation_id,
-				creation_search', 'safe', 'on'=>'search'),
+			array('course_id, publish, course_name, course_desc, creation_date, creation_id, modified_date, modified_id,
+				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -82,7 +87,8 @@ class PsbCourses extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'courses' => array(self::HAS_MANY, 'PsbYearCourse', 'course_id'),
-			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
 	}
 
@@ -93,11 +99,15 @@ class PsbCourses extends CActiveRecord
 	{
 		return array(
 			'course_id' => 'Course',
+			'publish' => Yii::t('attribute', 'Publish'),
 			'course_name' => 'Course Name',
 			'course_desc' => 'Course Desc',
 			'creation_date' => 'Creation Date',
 			'creation_id' => 'Creation',
+			'modified_date' => 'Modified Date',
+			'modified_id' => 'Modified',
 			'creation_search' => 'Creation',
+			'modified_search' => 'Modified',
 		);
 	}
 
@@ -120,20 +130,38 @@ class PsbCourses extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('t.course_id',$this->course_id,true);
+		if(isset($_GET['type']) && $_GET['type'] == 'publish')
+			$criteria->compare('t.publish',1);
+		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
+			$criteria->compare('t.publish',0);
+		elseif(isset($_GET['type']) && $_GET['type'] == 'trash')
+			$criteria->compare('t.publish',2);
+		else {
+			$criteria->addInCondition('t.publish',array(0,1));
+			$criteria->compare('t.publish',$this->publish);
+		}
 		$criteria->compare('t.course_name',$this->course_name,true);
 		$criteria->compare('t.course_desc',$this->course_desc,true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
 		$criteria->compare('t.creation_id',$this->creation_id,true);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->modified_id,true);
 		
 		// Custom Search
 		$criteria->with = array(
-			'creation_relation' => array(
-				'alias'=>'creation_relation',
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
 				'select'=>'displayname'
 			),
 		);
-		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['PsbCourses_sort']))
 			$criteria->order = 'course_id DESC';
@@ -165,10 +193,13 @@ class PsbCourses extends CActiveRecord
 			}
 		} else {
 			//$this->defaultColumns[] = 'course_id';
+			$this->defaultColumns[] = 'publish';
 			$this->defaultColumns[] = 'course_name';
 			$this->defaultColumns[] = 'course_desc';
 			$this->defaultColumns[] = 'creation_date';
 			$this->defaultColumns[] = 'creation_id';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -185,12 +216,12 @@ class PsbCourses extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'course_name',
-				'value' => 'ucwords($data->course_name)',
+				'value' => '$data->course_name',
 			);
 			$this->defaultColumns[] = 'course_desc';
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
-				'value' => '$data->creation_relation->displayname',
+				'value' => '$data->creation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
@@ -218,6 +249,20 @@ class PsbCourses extends CActiveRecord
 					),
 				), true),
 			);
+			if(!isset($_GET['type'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'publish',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->course_id)), $data->publish, 1)',
+					'htmlOptions' => array(
+						'class' => 'center',
+					),
+					'filter'=>array(
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
+					),
+					'type' => 'raw',
+				);
+			}
 		}
 		parent::afterConstruct();
 	}
@@ -244,19 +289,10 @@ class PsbCourses extends CActiveRecord
 	 */
 	protected function beforeValidate() {
 		if(parent::beforeValidate()) {
-			if($this->isNewRecord) {
-				$this->creation_id = Yii::app()->user->id;	
-			}
-		}
-		return true;
-	}
-	
-	/**
-	 * before save attributes
-	 */
-	protected function beforeSave() {
-		if(parent::beforeSave()) {
-			$this->course_name = strtolower($this->course_name);
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;
+			else
+				$this->modified_id = Yii::app()->user->id;				
 		}
 		return true;
 	}
