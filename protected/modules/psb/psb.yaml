@@ -18,7 +18,7 @@ plugin_menu		:
 		
 	- urlTitle: Settings
 		urlRules: {siteType: 0, userLevel: 1,2}
-		urlPath: {url: -, attr: -, icon: -}
+		urlPath: {url: o/setting/edit, attr: -, icon: -}
 		submenu :
 			- urlTitle: Years
 				urlRules: {siteType: 0, userLevel: 1,2}
@@ -32,15 +32,27 @@ plugin_menu		:
 			- urlTitle: Courses
 				urlRules: {siteType: 0, userLevel: 1,2}
 				urlPath: {url: o/course/manage, attr: -, icon: -}
+			- urlTitle: Religions
+				urlRules: {siteType: 0, userLevel: 1,2}
+				urlPath: {url: o/religion/manage, attr: -, icon: -}
 
 content_menu	:
+# controller o/admin
+	- urlTitle: Add Register
+		urlRules: {psb, o/admin, manage, siteType: 0, userLevel: 1,2}
+		urlPath: {url: add, attr: -, icon: -}
+		
+	- urlTitle: Back to Manage
+		urlRules: {psb, o/admin, add,edit,view, siteType: 0, userLevel: 1,2}
+		urlPath: {url: manage, attr: -, icon: -}
+		
 # controller o/year
 	- urlTitle: Add Year
 		urlRules: {psb, o/year, manage, siteType: 0, userLevel: 1,2}
 		urlPath: {url: add, attr: -, icon: -}
 		
 	- urlTitle: Back to Manage
-		urlRules: {article, o/year, edit, siteType: 0, userLevel: 1,2}
+		urlRules: {psb, o/year, edit, siteType: 0, userLevel: 1,2}
 		urlPath: {url: manage, attr: -, icon: -}
 		
 # controller o/batch
@@ -56,4 +68,9 @@ content_menu	:
 # controller o/course
 	- urlTitle: Add Course
 		urlRules: {psb, o/course, manage, siteType: 0, userLevel: 1,2}
+		urlPath: {url: add, attr: -, icon: -}
+		
+# controller o/religion
+	- urlTitle: Add Religion
+		urlRules: {psb, o/religion, manage, siteType: 0, userLevel: 1,2}
 		urlPath: {url: add, attr: -, icon: -}

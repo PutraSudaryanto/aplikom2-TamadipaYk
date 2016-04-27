@@ -1,8 +1,8 @@
 <?php
 /**
- * AdminController
- * @var $this AdminController
- * @var $model PsbRegisters
+ * ReligionController
+ * @var $this ReligionController
+ * @var $model PsbReligions
  * @var $form CActiveForm
  * version: 0.0.1
  * Reference start
@@ -12,7 +12,6 @@
  *	Manage
  *	Add
  *	Edit
- *	View
  *	RunAction
  *	Delete
  *	Publish
@@ -22,14 +21,14 @@
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
- * @created date 27 April 2016, 12:23 WIB
+ * @created date 27 April 2016, 15:50 WIB
  * @link http://company.ommu.co
  * @contect (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
  */
 
-class AdminController extends Controller
+class ReligionController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -86,7 +85,7 @@ class AdminController extends Controller
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('manage','add','edit','view','runaction','delete','publish'),
+				'actions'=>array('manage','add','edit','runaction','delete','publish'),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level) && in_array(Yii::app()->user->level, array(1,2))',
 			),
@@ -113,10 +112,10 @@ class AdminController extends Controller
 	 */
 	public function actionManage() 
 	{
-		$model=new PsbRegisters('search');
+		$model=new PsbReligions('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['PsbRegisters'])) {
-			$model->attributes=$_GET['PsbRegisters'];
+		if(isset($_GET['PsbReligions'])) {
+			$model->attributes=$_GET['PsbReligions'];
 		}
 
 		$columnTemp = array();
@@ -129,7 +128,7 @@ class AdminController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Yii::t('phrase', 'Psb Registers Manage');
+		$this->pageTitle = Yii::t('phrase', 'Psb Religions Manage');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -144,22 +143,40 @@ class AdminController extends Controller
 	 */
 	public function actionAdd() 
 	{
-		$model=new PsbRegisters;
+		$model=new PsbReligions;
 
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['PsbRegisters'])) {
-			$model->attributes=$_POST['PsbRegisters'];
+		if(isset($_POST['PsbReligions'])) {
+			$model->attributes=$_POST['PsbReligions'];
 			
-			if($model->save()) {
-				Yii::app()->user->setFlash('success', Yii::t('phrase', 'PsbRegisters success created.'));
-				//$this->redirect(array('view','id'=>$model->register_id));
-				$this->redirect(array('manage'));
-			}
-		}
+			$jsonError = CActiveForm::validate($model);
+			if(strlen($jsonError) > 2) {
+				echo $jsonError;
 
-		$this->pageTitle = Yii::t('phrase', 'Create Psb Registers');
+			} else {
+				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
+					if($model->save()) {
+						echo CJSON::encode(array(
+							'type' => 5,
+							'get' => Yii::app()->controller->createUrl('manage'),
+							'id' => 'partial-psb-religions',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'PsbReligions success created.').'</strong></div>',
+						));
+					} else {
+						print_r($model->getErrors());
+					}
+				}
+			}
+			Yii::app()->end();
+		}
+		
+		$this->dialogDetail = true;
+		$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+		$this->dialogWidth = 600;
+
+		$this->pageTitle = Yii::t('phrase', 'Create Psb Religions');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_add',array(
@@ -179,39 +196,41 @@ class AdminController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['PsbRegisters'])) {
-			$model->attributes=$_POST['PsbRegisters'];
+		if(isset($_POST['PsbReligions'])) {
+			$model->attributes=$_POST['PsbReligions'];
 			
-			if($model->save()) {
-				Yii::app()->user->setFlash('success', Yii::t('phrase', 'PsbRegisters success updated.'));
-				//$this->redirect(array('view','id'=>$model->register_id));
-				$this->redirect(array('manage'));
-			}
-		}
+			$jsonError = CActiveForm::validate($model);
+			if(strlen($jsonError) > 2) {
+				echo $jsonError;
 
-		$this->pageTitle = Yii::t('phrase', 'Update Psb Registers');
+			} else {
+				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
+					if($model->save()) {
+						echo CJSON::encode(array(
+							'type' => 5,
+							'get' => Yii::app()->controller->createUrl('manage'),
+							'id' => 'partial-psb-religions',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'PsbReligions success updated.').'</strong></div>',
+						));
+					} else {
+						print_r($model->getErrors());
+					}
+				}
+			}
+			Yii::app()->end();
+		}
+		
+		$this->dialogDetail = true;
+		$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+		$this->dialogWidth = 600;
+
+		$this->pageTitle = Yii::t('phrase', 'Update Psb Religions');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_edit',array(
 			'model'=>$model,
 		));
 	}
-	
-	/**
-	 * Displays a particular model.
-	 * @param integer $id the ID of the model to be displayed
-	 */
-	public function actionView($id) 
-	{
-		$model=$this->loadModel($id);
-
-		$this->pageTitle = Yii::t('phrase', 'View Psb Registers');
-		$this->pageDescription = '';
-		$this->pageMeta = '';
-		$this->render('admin_view',array(
-			'model'=>$model,
-		));
-	}	
 
 	/**
 	 * Displays a particular model.
@@ -227,19 +246,19 @@ class AdminController extends Controller
 			$criteria->addInCondition('id', $id);
 
 			if($actions == 'publish') {
-				PsbRegisters::model()->updateAll(array(
+				PsbReligions::model()->updateAll(array(
 					'publish' => 1,
 				),$criteria);
 			} elseif($actions == 'unpublish') {
-				PsbRegisters::model()->updateAll(array(
+				PsbReligions::model()->updateAll(array(
 					'publish' => 0,
 				),$criteria);
 			} elseif($actions == 'trash') {
-				PsbRegisters::model()->updateAll(array(
+				PsbReligions::model()->updateAll(array(
 					'publish' => 2,
 				),$criteria);
 			} elseif($actions == 'delete') {
-				PsbRegisters::model()->deleteAll($criteria);
+				PsbReligions::model()->deleteAll($criteria);
 			}
 		}
 
@@ -265,8 +284,8 @@ class AdminController extends Controller
 					echo CJSON::encode(array(
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-psb-registers',
-						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'PsbRegisters success deleted.').'</strong></div>',
+						'id' => 'partial-psb-religions',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'PsbReligions success deleted.').'</strong></div>',
 					));
 				}
 			}
@@ -276,7 +295,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Yii::t('phrase', 'PsbRegisters Delete.');
+			$this->pageTitle = Yii::t('phrase', 'PsbReligions Delete.');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -293,19 +312,10 @@ class AdminController extends Controller
 		$model=$this->loadModel($id);
 		
 		if($model->publish == 1) {
-		//if($model->actived == 1) {
-		//if($model->enabled == 1) {
-		//if($model->status == 1) {
 			$title = Yii::t('phrase', 'Unpublish');
-			//$title = Yii::t('phrase', 'Deactived');
-			//$title = Yii::t('phrase', 'Disabled');
-			//$title = Yii::t('phrase', 'Unresolved');
 			$replace = 0;
 		} else {
 			$title = Yii::t('phrase', 'Publish');
-			//$title = Yii::t('phrase', 'Actived');
-			//$title = Yii::t('phrase', 'Enabled');
-			//$title = Yii::t('phrase', 'Resolved');
 			$replace = 1;
 		}
 
@@ -314,16 +324,13 @@ class AdminController extends Controller
 			if(isset($id)) {
 				//change value active or publish
 				$model->publish = $replace;
-				//$model->actived = $replace;
-				//$model->enabled = $replace;
-				//$model->status = $replace;
 
 				if($model->update()) {
 					echo CJSON::encode(array(
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-psb-registers',
-						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'PsbRegisters success updated.').'</strong></div>',
+						'id' => 'partial-psb-religions',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'PsbReligions success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -350,7 +357,7 @@ class AdminController extends Controller
 	 */
 	public function loadModel($id) 
 	{
-		$model = PsbRegisters::model()->findByPk($id);
+		$model = PsbReligions::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
@@ -362,7 +369,7 @@ class AdminController extends Controller
 	 */
 	protected function performAjaxValidation($model) 
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='psb-registers-form') {
+		if(isset($_POST['ajax']) && $_POST['ajax']==='psb-religions-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
