@@ -3,7 +3,7 @@
  * PsbYearBatch
  * version: 0.0.1
  *
- * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link https://github.com/Ommu/Ommu-PSB
  * @contact (+62)856-299-4114
@@ -376,6 +376,14 @@ class PsbYearBatch extends CActiveRecord
 				'filter'=>array(
 					1=>Yii::t('phrase', 'Ujian Nasional'),
 					0=>Yii::t('phrase', 'Raport'),
+				),
+				'type' => 'raw',
+			);
+			$this->defaultColumns[] = array(
+				'header' => Yii::t('phrase', 'Recap'),
+				'value' => 'CHtml::link(Yii::t("phrase", "Recap"), Yii::app()->controller->createUrl("recap",array("year"=>$data->batch_id)))',
+				'htmlOptions' => array(
+					'class' => 'center',
 				),
 				'type' => 'raw',
 			);

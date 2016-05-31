@@ -6,7 +6,7 @@
  * @var $form CActiveForm
  * version: 0.0.1
  *
- * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
  * @created date 27 April 2016, 12:23 WIB
  * @link https://github.com/Ommu/Ommu-PSB
@@ -419,7 +419,8 @@ EOP;
 			<?php 
 			$valuation = $batch->batch_valuation == 1 ? 1 : 3;
 			$courses = $batch->year->courses;
-			$model->school_un_detail = unserialize($model->school_un_detail);
+			if(!$model->isNewRecord)
+				$model->school_un_detail = unserialize($model->school_un_detail);
 			if($courses != '') {?>
 				<tr>
 					<?php foreach($courses as $key => $val) {?>
