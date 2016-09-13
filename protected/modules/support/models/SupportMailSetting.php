@@ -252,7 +252,11 @@ class SupportMailSetting extends CActiveRecord
     /**
 	 * Sent Email
 	 */
-	public static function sendEmail($to_email, $to_name, $subject, $message, $type, $cc=null, $attachment=null) {
+	public static function sendEmail($to_email, $to_name, $subject, $message, $type, $cc=null, $attachment=null) 
+	{
+		ini_set('max_execution_time', 0);
+		ob_start();
+		
 		Yii::import('application.extensions.phpmailer.JPhpMailer');
 		$model = self::model()->findByPk(1,array(
 			'select' => 'mail_contact, mail_name, mail_from, mail_smtp, smtp_address, smtp_port, smtp_username, smtp_password, smtp_ssl',
@@ -309,6 +313,8 @@ class SupportMailSetting extends CActiveRecord
 			return false;
 			//echo 'no send';
 		}
+
+		ob_end_flush();
     }
 
 	/**

@@ -76,7 +76,7 @@ class SiteController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','error','login','logout','sendemail','analytics'),
+				'actions'=>array('index','error','login','logout','sendemail','analytics','about'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -144,7 +144,7 @@ class SiteController extends Controller
 			
 		}
 	}
-
+	
 	/**
 	 * Displays the login page
 	 */
@@ -198,5 +198,15 @@ class SiteController extends Controller
 		$this->render('application.webs.site.front_analytics', array(
 			'model'=>$model,
 		));
-	}	
+	}
+	
+	/* About */
+	public function actionAbout()
+	{		
+		$this->adsSidebar = false;
+		$this->pageTitle = 'About COE';
+		$this->pageDescription = '';
+		$this->pageMeta = '';
+		$this->render('application.webs.site.front_about');
+	}
 }

@@ -16,11 +16,11 @@ plugin_menu		:
 		urlPath: {url: o/admin/manage, attr: -, icon: -}
 		
 	- urlTitle: Video Settings
-		urlRules: {siteType: 0,1, userLevel: 1}
+		urlRules: {siteType: 0,1, userLevel: 1,2}
 		urlPath: {url: o/setting/index, attr: -, icon: -}
 		submenu :
 			- urlTitle: Likes
-				urlRules: {siteType: 0,1, userLevel: 1,2}
+				urlRules: {siteType: 1, userLevel: 1,2}
 				urlPath: {url: o/likes/manage, attr: -, icon: -}
 
 content_menu	:
@@ -40,3 +40,9 @@ content_menu	:
 	- urlTitle: Add Category
 		urlRules: {video, o/setting, index, siteType: 0,1, userLevel: 1,2}
 		urlPath: {url: o/category/add, attr: -, icon: -}
+		
+# controller o/like
+
+	- urlTitle: Back to video manage
+		urlRules: {video, o/like, manage, siteType: 1, userLevel: 1,2}
+		urlPath: {url: o/admin/manage, attr: -, icon: -}
