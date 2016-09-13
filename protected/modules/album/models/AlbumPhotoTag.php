@@ -1,10 +1,11 @@
 <?php
 /**
- * AlbumTag
+ * AlbumPhotoTag
  * version: 0.1.4
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
+ * @created date 1 September 2016, 11:56 WIB
  * @link https://github.com/oMMu/Ommu-Photo-Albums
  * @contact (+62)856-299-4114
  *
@@ -19,25 +20,25 @@
  *
  * --------------------------------------------------------------------------------------
  *
- * This is the model class for table "ommu_album_tag".
+ * This is the model class for table "ommu_album_photo_tag".
  *
- * The followings are the available columns in table 'ommu_album_tag':
+ * The followings are the available columns in table 'ommu_album_photo_tag':
  * @property string $id
- * @property string $album_id
+ * @property string $media_id
  * @property string $tag_id
  * @property string $creation_date
  * @property string $creation_id
  *
  * The followings are the available model relations:
- * @property OmmuAlbums $album
+ * @property OmmuAlbumPhoto $media
  */
-class AlbumTag extends CActiveRecord
+class AlbumPhotoTag extends CActiveRecord
 {
 	public $defaultColumns = array();
 	public $body;
 	
 	// Variable Search
-	public $album_search;
+	public $photo_search;
 	public $tag_search;
 	public $creation_search;
 
@@ -45,7 +46,7 @@ class AlbumTag extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return AlbumTag the static model class
+	 * @return AlbumPhotoTag the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -57,7 +58,7 @@ class AlbumTag extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'ommu_album_tag';
+		return 'ommu_album_photo_tag';
 	}
 
 	/**
@@ -68,12 +69,12 @@ class AlbumTag extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('album_id, tag_id', 'required'),
-			array('album_id, tag_id, creation_id', 'length', 'max'=>11),
+			array('media_id, tag_id', 'required'),
+			array('media_id, tag_id, creation_id', 'length', 'max'=>11),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, album_id, tag_id, creation_date, creation_id,
-				album_search, tag_search, creation_search', 'safe', 'on'=>'search'),
+			array('id, media_id, tag_id, creation_date, creation_id,
+				photo_search, tag_search, creation_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -85,9 +86,9 @@ class AlbumTag extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'album_relation' => array(self::BELONGS_TO, 'Albums', 'album_id'),
-			'tag_TO' => array(self::BELONGS_TO, 'OmmuTags', 'tag_id'),
-			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'photo' => array(self::BELONGS_TO, 'AlbumPhoto', 'media_id'),
+			'tag' => array(self::BELONGS_TO, 'OmmuTags', 'tag_id'),
+			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 		);
 	}
 
@@ -98,14 +99,22 @@ class AlbumTag extends CActiveRecord
 	{
 		return array(
 			'id' => Yii::t('attribute', 'ID'),
-			'album_id' => Yii::t('attribute', 'Album'),
+			'media_id' => Yii::t('attribute', 'Photo'),
 			'tag_id' => Yii::t('attribute', 'Tag'),
 			'creation_date' => Yii::t('attribute', 'Creation Date'),
 			'creation_id' => Yii::t('attribute', 'Creation'),
-			'album_search' => Yii::t('attribute', 'Album'),
+			'photo_search' => Yii::t('attribute', 'Photo'),
 			'tag_search' => Yii::t('attribute', 'Tag'),
 			'creation_search' => Yii::t('attribute', 'Creation'),
 		);
+		/*
+			'ID' => 'ID',
+			'Media' => 'Media',
+			'Tag' => 'Tag',
+			'Creation Date' => 'Creation Date',
+			'Creation' => 'Creation',
+		
+		*/
 	}
 
 	/**
@@ -127,10 +136,10 @@ class AlbumTag extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('t.id',strtolower($this->id),true);
-		if(isset($_GET['album']))
-			$criteria->compare('t.album_id',$_GET['album']);
+		if(isset($_GET['media']))
+			$criteria->compare('t.media_id',$_GET['media']);
 		else
-			$criteria->compare('t.album_id',$this->album_id);
+			$criteria->compare('t.media_id',$this->media_id);
 		$criteria->compare('t.tag_id',strtolower($this->tag_id),true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
@@ -141,24 +150,24 @@ class AlbumTag extends CActiveRecord
 		
 		// Custom Search
 		$criteria->with = array(
-			'album_relation' => array(
-				'alias'=>'album_relation',
-				'select'=>'title'
+			'photo' => array(
+				'alias'=>'photo',
+				'select'=>'media'
 			),
-			'tag_TO' => array(
-				'alias'=>'tag_TO',
+			'tag' => array(
+				'alias'=>'tag',
 				'select'=>'body'
 			),
-			'creation_relation' => array(
-				'alias'=>'creation_relation',
+			'creation' => array(
+				'alias'=>'creation',
 				'select'=>'displayname'
 			),
 		);
-		$criteria->compare('album_relation.title',strtolower($this->album_search), true);
-		$criteria->compare('tag_TO.body',strtolower($this->tag_search), true);
-		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('photo.media',strtolower($this->photo_search), true);
+		$criteria->compare('tag.body',strtolower($this->tag_search), true);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
 
-		if(!isset($_GET['AlbumTag_sort']))
+		if(!isset($_GET['AlbumPhotoTag_sort']))
 			$criteria->order = 't.id DESC';
 
 		return new CActiveDataProvider($this, array(
@@ -188,7 +197,7 @@ class AlbumTag extends CActiveRecord
 			}
 		} else {
 			//$this->defaultColumns[] = 'id';
-			$this->defaultColumns[] = 'album_id';
+			$this->defaultColumns[] = 'media_id';
 			$this->defaultColumns[] = 'tag_id';
 			$this->defaultColumns[] = 'creation_date';
 			$this->defaultColumns[] = 'creation_id';
@@ -202,18 +211,22 @@ class AlbumTag extends CActiveRecord
 	 */
 	protected function afterConstruct() {
 		if(count($this->defaultColumns) == 0) {
+			/*
+			$this->defaultColumns[] = array(
+				'class' => 'CCheckBoxColumn',
+				'name' => 'id',
+				'selectableRows' => 2,
+				'checkBoxHtmlOptions' => array('name' => 'trash_id[]')
+			);
+			*/
 			$this->defaultColumns[] = array(
 				'header' => 'No',
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
-			if(!isset($_GET['album'])) {
+			if(!isset($_GET['photo'])) {
 				$this->defaultColumns[] = array(
-					'name' => 'album_search',
-					'value' => '$data->album_relation->title."<br/><span>".Utility::shortText(Utility::hardDecode($data->album_relation->body),150)."</span>"',
-					'htmlOptions' => array(
-						'class' => 'bold',
-					),
-					'type' => 'raw',
+					'name' => 'photo_search',
+					'value' => '$data->photo->media',
 				);
 			}
 			$this->defaultColumns[] = array(
@@ -222,7 +235,7 @@ class AlbumTag extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
-				'value' => '$data->creation_relation->displayname',
+				'value' => '$data->creation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
@@ -270,29 +283,6 @@ class AlbumTag extends CActiveRecord
 			return $model;			
 		}
 	}
-
-	/**
-	 * get album tag
-	 */
-	public static function getKeyword($keyword, $id) {
-		$model = self::model()->findAll(array(
-			'condition' => 'album_id = :id',
-			'params' => array(
-				':id' => $id,
-			),
-			'order' => 'id ASC',
-			'limit' => 30,
-		));
-		
-		$tag = '';
-		if($model != null) {
-			foreach($model as $val) {
-				$tag .= ','.$val->tag_TO->body;
-			}
-		}
-		
-		return $keyword.$tag;
-	}
 	
 	/**
 	 * before save attributes
@@ -308,14 +298,13 @@ class AlbumTag extends CActiveRecord
 							':body' => $this->body,
 						),
 					));
-					if($tag != null) {
+					if($tag != null)
 						$this->tag_id = $tag->tag_id;
-					} else {
+					else {
 						$data = new OmmuTags;
 						$data->body = $this->body;
-						if($data->save()) {
+						if($data->save())
 							$this->tag_id = $data->tag_id;
-						}
 					}					
 				}
 			}
@@ -323,5 +312,4 @@ class AlbumTag extends CActiveRecord
 		}
 		return true;
 	}
-
 }

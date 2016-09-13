@@ -1,21 +1,22 @@
 <?php
 /**
- * Album Settings (album-setting)
- * @var $this SettingController
- * @var $model AlbumSetting
+ * Album Categories (album-category)
+ * @var $this CategoryController
+ * @var $model AlbumCategory
  * @var $form CActiveForm
  * version: 0.1.4
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
+ * @created date 26 August 2016, 23:10 WIB
  * @link https://github.com/oMMu/Ommu-Photo-Albums
  * @contect (+62)856-299-4114
  *
  */
 
 	$this->breadcrumbs=array(
-		'Album Settings'=>array('manage'),
-		$model->id=>array('view','id'=>$model->id),
+		'Album Categories'=>array('manage'),
+		$model->name=>array('view','id'=>$model->cat_id),
 		'Update',
 	);
 ?>

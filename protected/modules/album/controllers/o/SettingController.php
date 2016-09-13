@@ -4,7 +4,7 @@
  * @var $this SettingController
  * @var $model AlbumSetting
  * @var $form CActiveForm
- * version: 0.0.1
+ * version: 0.1.4
  * Reference start
  *
  * TOC :
@@ -36,7 +36,7 @@ class SettingController extends Controller
 	public function init() 
 	{
 		if(!Yii::app()->user->isGuest) {
-			if(Yii::app()->user->level == 1) {
+			if(in_array(Yii::app()->user->level, array(1,2))) {
 				$arrThemes = Utility::getCurrentTemplate('admin');
 				Yii::app()->theme = $arrThemes['folder'];
 				$this->layout = $arrThemes['layout'];
@@ -80,7 +80,7 @@ class SettingController extends Controller
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
 				'actions'=>array('index'),
 				'users'=>array('@'),
-				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 1)',
+				'expression'=>'isset(Yii::app()->user->level) && in_array(Yii::app()->user->level, array(1,2))',
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
 				'actions'=>array(),
@@ -125,7 +125,7 @@ class SettingController extends Controller
 					if($model->save()) {
 						echo CJSON::encode(array(
 							'type' => 0,
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(24025,1).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Album setting success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -136,7 +136,7 @@ class SettingController extends Controller
 
 		}
 
-		$this->pageTitle = Phrase::trans(24014,1);
+		$this->pageTitle = Yii::t('phrase', 'Album Settings');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_index',array(

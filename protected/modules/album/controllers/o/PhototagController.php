@@ -1,31 +1,31 @@
 <?php
 /**
- * LikesController
- * @var $this LikesController
- * @var $model AlbumLikes
+ * PhototagController
+ * @var $this PhototagController
+ * @var $model AlbumPhotoTag
  * @var $form CActiveForm
  * version: 0.1.4
  * Reference start
  *
  * TOC :
  *	Index
-*	Up
-*	Down
  *	Manage
+ *	Add
  *	Delete
  *
  *	LoadModel
  *	performAjaxValidation
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
+ * @created date 1 September 2016, 11:58 WIB
  * @link https://github.com/oMMu/Ommu-Photo-Albums
  * @contect (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
  */
 
-class LikesController extends Controller
+class PhototagController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -76,13 +76,13 @@ class LikesController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('up','down'),
+				'actions'=>array(),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level)',
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('manage','delete'),
+				'actions'=>array('manage','add','delete'),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level) && in_array(Yii::app()->user->level, array(1,2))',
 			),
@@ -109,10 +109,10 @@ class LikesController extends Controller
 	 */
 	public function actionManage() 
 	{
-		$model=new AlbumLikes('search');
+		$model=new AlbumPhotoTag('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['AlbumLikes'])) {
-			$model->attributes=$_GET['AlbumLikes'];
+		if(isset($_GET['AlbumPhotoTag'])) {
+			$model->attributes=$_GET['AlbumPhotoTag'];
 		}
 
 		$columnTemp = array();
@@ -125,13 +125,41 @@ class LikesController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = 'Album Likes Manage';
+		$this->pageTitle = Yii::t('phrase', 'Album Photo Tags Manage');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
-		$this->render('admin_manage',array(
+		$this->render('/o/photo_tag/admin_manage',array(
 			'model'=>$model,
 			'columns' => $columns,
 		));
+	}	
+	
+	/**
+	 * Creates a new model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 */
+	public function actionAdd() 
+	{
+		$model=new AlbumPhotoTag;
+
+		// Uncomment the following line if AJAX validation is needed
+		$this->performAjaxValidation($model);
+		
+		if(isset($_POST['media_id'], $_POST['tag_id'], $_POST['tag'])) {
+			$model->media_id = $_POST['media_id'];
+			$model->tag_id = $_POST['tag_id'];
+			$model->body = $_POST['tag'];
+
+			if($model->save()) {
+				if(isset($_GET['type']) && $_GET['type'] == 'photo')
+					$url = Yii::app()->controller->createUrl('delete',array('id'=>$model->id,'type'=>'photo'));
+				else 
+					$url = Yii::app()->controller->createUrl('delete',array('id'=>$model->id));
+				echo CJSON::encode(array(
+					'data' => '<div>'.$model->tag->body.'<a href="'.$url.'" title="'.Yii::t('phrase', 'Delete').'">'.Yii::t('phrase', 'Delete').'</a></div>',
+				));
+			}
+		}
 	}
 
 	/**
@@ -146,25 +174,36 @@ class LikesController extends Controller
 		if(Yii::app()->request->isPostRequest) {
 			// we only allow deletion via POST request
 			if(isset($id)) {
-				if($model->delete()) {
+				$model->delete();
+				if(isset($_GET['type']) && $_GET['type'] == 'photo') {
+					echo CJSON::encode(array(
+						'type' => 4,
+					));					
+				} else {
 					echo CJSON::encode(array(
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-album-likes',
-						'msg' => '<div class="errorSummary success"><strong>AlbumLikes success deleted.</strong></div>',
-					));
+						'id' => 'partial-album-photo-tag',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'AlbumPhotoTag success deleted.').'</strong></div>',
+					));					
+				}
+				if($model->delete()) {
 				}
 			}
 
 		} else {
 			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+			if(isset($_GET['type']) && $_GET['type'] == 'photo')
+				$url = Yii::app()->controller->createUrl('o/photo/edit', array('id'=>$model->media_id));
+			else
+				$url = Yii::app()->controller->createUrl('manage');
+			$this->dialogGroundUrl = $url;
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = 'AlbumLikes Delete.';
+			$this->pageTitle = Yii::t('phrase', 'AlbumPhotoTag Delete.');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
-			$this->render('admin_delete');
+			$this->render('/o/photo_tag/admin_delete');
 		}
 	}
 
@@ -175,7 +214,7 @@ class LikesController extends Controller
 	 */
 	public function loadModel($id) 
 	{
-		$model = AlbumLikes::model()->findByPk($id);
+		$model = AlbumPhotoTag::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
@@ -187,7 +226,7 @@ class LikesController extends Controller
 	 */
 	protected function performAjaxValidation($model) 
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='album-likes-form') {
+		if(isset($_POST['ajax']) && $_POST['ajax']==='album-photo-tag-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}

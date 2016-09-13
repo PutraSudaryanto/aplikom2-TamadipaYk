@@ -1,19 +1,20 @@
 <?php
 /**
- * Album Photos (album-photo)
- * @var $this PhotoController
- * @var $model AlbumPhoto
+ * Album Categories (album-category)
+ * @var $this CategoryController
+ * @var $model AlbumCategory
  * version: 0.1.4
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
+ * @created date 26 August 2016, 23:10 WIB
  * @link https://github.com/oMMu/Ommu-Photo-Albums
  * @contect (+62)856-299-4114
  *
  */
 
 	$this->breadcrumbs=array(
-		'Album Photos'=>array('manage'),
+		'Album Categories'=>array('manage'),
 		'Manage',
 	);
 	$this->menu=array(
@@ -49,7 +50,7 @@
 </div>
 <?php //end.Grid Option ?>
 
-<div id="partial-album-photo">
+<div id="partial-album-category">
 	<?php //begin.Messages ?>
 	<div id="ajax-message">
 	<?php
@@ -74,17 +75,17 @@
 						'options' => array(							
 							'class' => 'view',
 						),
-						'url' => 'Yii::app()->controller->createUrl("view",array("id"=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl("site/view",array("id"=>$data->primaryKey))'),
 					'update' => array(
 						'label' => 'update',
 						'options' => array(
-							'class' => 'update',
+							'class' => 'update'
 						),
 						'url' => 'Yii::app()->controller->createUrl("edit",array("id"=>$data->primaryKey))'),
 					'delete' => array(
 						'label' => 'delete',
 						'options' => array(
-							'class' => 'delete',
+							'class' => 'delete'
 						),
 						'url' => 'Yii::app()->controller->createUrl("delete",array("id"=>$data->primaryKey))')
 				),
@@ -92,7 +93,7 @@
 			));
 
 			$this->widget('application.components.system.OGridView', array(
-				'id'=>'album-photo-grid',
+				'id'=>'album-category-grid',
 				'dataProvider'=>$model->search(),
 				'filter'=>$model,
 				'columns' => $columnData,

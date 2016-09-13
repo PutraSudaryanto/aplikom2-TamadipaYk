@@ -1,8 +1,8 @@
 <?php
 /**
- * AdminController
- * @var $this AdminController
- * @var $model Albums
+ * CategoryController
+ * @var $this CategoryController
+ * @var $model AlbumCategory
  * @var $form CActiveForm
  * version: 0.1.4
  * Reference start
@@ -12,23 +12,24 @@
  *	Manage
  *	Add
  *	Edit
+ *	View
  *	RunAction
  *	Delete
  *	Publish
- *	Headline
  *
  *	LoadModel
  *	performAjaxValidation
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
+ * @created date 26 August 2016, 23:10 WIB
  * @link https://github.com/oMMu/Ommu-Photo-Albums
  * @contect (+62)856-299-4114
  *
  *----------------------------------------------------------------------------------------------------------
  */
 
-class AdminController extends Controller
+class CategoryController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -85,7 +86,7 @@ class AdminController extends Controller
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('manage','add','edit','runaction','delete','publish','headline'),
+				'actions'=>array('manage','add','edit','view','runaction','delete','publish'),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level) && in_array(Yii::app()->user->level, array(1,2))',
 			),
@@ -112,10 +113,10 @@ class AdminController extends Controller
 	 */
 	public function actionManage() 
 	{
-		$model=new Albums('search');
+		$model=new AlbumCategory('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Albums'])) {
-			$model->attributes=$_GET['Albums'];
+		if(isset($_GET['AlbumCategory'])) {
+			$model->attributes=$_GET['AlbumCategory'];
 		}
 
 		$columnTemp = array();
@@ -128,7 +129,7 @@ class AdminController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Yii::t('phrase', 'Manage Album');
+		$this->pageTitle = Yii::t('phrase', 'Album Categories Manage');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -143,29 +144,51 @@ class AdminController extends Controller
 	 */
 	public function actionAdd() 
 	{
-		$model=new Albums;
-		$setting = AlbumSetting::model()->findByPk(1,array(
-			'select' => 'meta_keyword',
-		));
+		$model=new AlbumCategory;
 
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['Albums'])) {
-			$model->attributes=$_POST['Albums'];
+		if(isset($_POST['AlbumCategory'])) {
+			$model->attributes=$_POST['AlbumCategory'];
 			
-			if($model->save()) {
-				Yii::app()->user->setFlash('success', Yii::t('phrase', 'Album success created.'));
-				$this->redirect(array('edit','id'=>$model->album_id));
+			$jsonError = CActiveForm::validate($model);
+			if(strlen($jsonError) > 2) {
+				$errors = $model->getErrors();
+				$summary['msg'] = "<div class='errorSummary'><strong>Please fix the following input errors:</strong>";
+				$summary['msg'] .= "<ul>";
+				foreach($errors as $key => $value) {
+					$summary['msg'] .= "<li>{$value[0]}</li>";
+				}
+				$summary['msg'] .= "</ul></div>";
+
+				$message = json_decode($jsonError, true);
+				$merge = array_merge_recursive($summary, $message);
+				$encode = json_encode($merge);
+				echo $encode;
+
+			} else {
+				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
+					if($model->save()) {
+						echo CJSON::encode(array(
+							'type' => 5,
+							'get' => Yii::app()->controller->createUrl('manage'),
+							'id' => 'partial-album-category',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'AlbumCategory success created.').'</strong></div>',
+						));
+					} else {
+						print_r($model->getErrors());
+					}
+				}
 			}
+			Yii::app()->end();
 		}
 
-		$this->pageTitle = Yii::t('phrase', 'Create Album');
+		$this->pageTitle = Yii::t('phrase', 'Create Album Categories');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_add',array(
 			'model'=>$model,
-			'setting'=>$setting,
 		));
 	}
 
@@ -178,26 +201,16 @@ class AdminController extends Controller
 	{
 		$model=$this->loadModel($id);
 
-		$setting = AlbumSetting::model()->findByPk(1,array(
-			'select' => 'photo_limit, meta_keyword',
-		));
-		$tag = AlbumTag::model()->findAll(array(
-			'condition' => 'album_id = :id',
-			'params' => array(
-				':id' => $model->album_id,
-			),
-		));
-
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['Albums'])) {
-			$model->attributes=$_POST['Albums'];
+		if(isset($_POST['AlbumCategory'])) {
+			$model->attributes=$_POST['AlbumCategory'];
 			
 			$jsonError = CActiveForm::validate($model);
 			if(strlen($jsonError) > 2) {
 				$errors = $model->getErrors();
-				$summary['msg'] = "<div class='errorSummary'><strong>".Yii::t('phrase', 'Please fix the following input errors:')."</strong>";
+				$summary['msg'] = "<div class='errorSummary'><strong>Please fix the following input errors:</strong>";
 				$summary['msg'] .= "<ul>";
 				foreach($errors as $key => $value) {
 					$summary['msg'] .= "<li>{$value[0]}</li>";
@@ -214,7 +227,7 @@ class AdminController extends Controller
 					if($model->save()) {
 						echo CJSON::encode(array(
 							'type' => 0,
-							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Album success updated.').'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'AlbumCategory success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -222,18 +235,31 @@ class AdminController extends Controller
 				}
 			}
 			Yii::app()->end();
-			
-		} else {
-			$this->pageTitle = Yii::t('phrase', 'Update Album').': '.$model->title;
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_edit',array(
-				'model'=>$model,
-				'setting'=>$setting,
-				'tag'=>$tag,
-			));
 		}
+
+		$this->pageTitle = Yii::t('phrase', 'Update Album Categories');
+		$this->pageDescription = '';
+		$this->pageMeta = '';
+		$this->render('admin_edit',array(
+			'model'=>$model,
+		));
 	}
+	
+	/**
+	 * Displays a particular model.
+	 * @param integer $id the ID of the model to be displayed
+	 */
+	public function actionView($id) 
+	{
+		$model=$this->loadModel($id);
+
+		$this->pageTitle = Yii::t('phrase', 'View Album Categories');
+		$this->pageDescription = '';
+		$this->pageMeta = '';
+		$this->render('admin_view',array(
+			'model'=>$model,
+		));
+	}	
 
 	/**
 	 * Displays a particular model.
@@ -249,19 +275,19 @@ class AdminController extends Controller
 			$criteria->addInCondition('id', $id);
 
 			if($actions == 'publish') {
-				Albums::model()->updateAll(array(
+				AlbumCategory::model()->updateAll(array(
 					'publish' => 1,
 				),$criteria);
 			} elseif($actions == 'unpublish') {
-				Albums::model()->updateAll(array(
+				AlbumCategory::model()->updateAll(array(
 					'publish' => 0,
 				),$criteria);
 			} elseif($actions == 'trash') {
-				Albums::model()->updateAll(array(
+				AlbumCategory::model()->updateAll(array(
 					'publish' => 2,
 				),$criteria);
 			} elseif($actions == 'delete') {
-				Albums::model()->deleteAll($criteria);
+				AlbumCategory::model()->deleteAll($criteria);
 			}
 		}
 
@@ -287,8 +313,8 @@ class AdminController extends Controller
 					echo CJSON::encode(array(
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-albums',
-						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Album success deleted.').'</strong></div>',
+						'id' => 'partial-album-category',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'AlbumCategory success deleted.').'</strong></div>',
 					));
 				}
 			}
@@ -298,7 +324,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Yii::t('phrase', 'Delete Album');
+			$this->pageTitle = Yii::t('phrase', 'AlbumCategory Delete.');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -332,8 +358,8 @@ class AdminController extends Controller
 					echo CJSON::encode(array(
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-albums',
-						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Album success updated.').'</strong></div>',
+						'id' => 'partial-album-category',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'AlbumCategory success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -354,51 +380,13 @@ class AdminController extends Controller
 	}
 
 	/**
-	 * Deletes a particular model.
-	 * If deletion is successful, the browser will be redirected to the 'admin' page.
-	 * @param integer $id the ID of the model to be deleted
-	 */
-	public function actionHeadline($id) 
-	{
-		$model=$this->loadModel($id);
-
-		if(Yii::app()->request->isPostRequest) {
-			// we only allow deletion via POST request
-			if(isset($id)) {
-				//change value active or publish
-				$model->headline = 1;
-				$model->publish = 1;
-
-				if($model->update()) {
-					echo CJSON::encode(array(
-						'type' => 5,
-						'get' => Yii::app()->controller->createUrl('manage'),
-						'id' => 'partial-albums',
-						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Album success updated.').'</strong></div>',
-					));
-				}
-			}
-
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-			$this->dialogWidth = 350;
-
-			$this->pageTitle = Yii::t('phrase', 'Headline');
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_headline');
-		}
-	}
-
-	/**
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer the ID of the model to be loaded
 	 */
 	public function loadModel($id) 
 	{
-		$model = Albums::model()->findByPk($id);
+		$model = AlbumCategory::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		return $model;
@@ -410,7 +398,7 @@ class AdminController extends Controller
 	 */
 	protected function performAjaxValidation($model) 
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='albums-form') {
+		if(isset($_POST['ajax']) && $_POST['ajax']==='album-category-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}

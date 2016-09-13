@@ -1,19 +1,20 @@
 <?php
 /**
- * Album Photos (album-photo)
- * @var $this PhotoController
- * @var $model AlbumPhoto
+ * Album Photo Tags (album-photo-tag)
+ * @var $this PhototagController
+ * @var $model AlbumPhotoTag
  * version: 0.1.4
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
+ * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
+ * @created date 1 September 2016, 11:58 WIB
  * @link https://github.com/oMMu/Ommu-Photo-Albums
  * @contect (+62)856-299-4114
  *
  */
 
 	$this->breadcrumbs=array(
-		'Album Photos'=>array('manage'),
+		'Album Photo Tags'=>array('manage'),
 		'Manage',
 	);
 	$this->menu=array(
@@ -35,7 +36,7 @@
 
 <?php //begin.Search ?>
 <div class="search-form">
-<?php $this->renderPartial('_search',array(
+<?php $this->renderPartial('/o/photo_tag/_search',array(
 	'model'=>$model,
 )); ?>
 </div>
@@ -43,13 +44,13 @@
 
 <?php //begin.Grid Option ?>
 <div class="grid-form">
-<?php $this->renderPartial('_option_form',array(
+<?php $this->renderPartial('/o/photo_tag/_option_form',array(
 	'model'=>$model,
 )); ?>
 </div>
 <?php //end.Grid Option ?>
 
-<div id="partial-album-photo">
+<div id="partial-album-photo-tag">
 	<?php //begin.Messages ?>
 	<div id="ajax-message">
 	<?php
@@ -74,25 +75,25 @@
 						'options' => array(							
 							'class' => 'view',
 						),
-						'url' => 'Yii::app()->controller->createUrl("view",array("id"=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl("site/view",array("id"=>$data->primaryKey))'),
 					'update' => array(
 						'label' => 'update',
 						'options' => array(
-							'class' => 'update',
+							'class' => 'update'
 						),
 						'url' => 'Yii::app()->controller->createUrl("edit",array("id"=>$data->primaryKey))'),
 					'delete' => array(
 						'label' => 'delete',
 						'options' => array(
-							'class' => 'delete',
+							'class' => 'delete'
 						),
 						'url' => 'Yii::app()->controller->createUrl("delete",array("id"=>$data->primaryKey))')
 				),
-				'template' => '{update}|{delete}',
+				'template' => '{delete}',
 			));
 
 			$this->widget('application.components.system.OGridView', array(
-				'id'=>'album-photo-grid',
+				'id'=>'album-photo-tag-grid',
 				'dataProvider'=>$model->search(),
 				'filter'=>$model,
 				'columns' => $columnData,

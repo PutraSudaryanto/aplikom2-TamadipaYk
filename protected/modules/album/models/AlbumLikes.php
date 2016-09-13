@@ -1,6 +1,8 @@
 <?php
 /**
  * AlbumLikes
+ * version: 0.1.4
+ *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link https://github.com/oMMu/Ommu-Photo-Albums
@@ -93,13 +95,13 @@ class AlbumLikes extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'like_id' => 'Like',
-			'album_id' => 'Album',
-			'user_id' => 'User',
-			'likes_date' => 'Likes Date',
-			'likes_ip' => 'Likes Ip',
-			'album_search' => 'Album Search',
-			'user_search' => 'User Search',
+			'like_id' => Yii::t('attribute', 'Like'),
+			'album_id' => Yii::t('attribute', 'Album'),
+			'user_id' => Yii::t('attribute', 'User'),
+			'likes_date' => Yii::t('attribute', 'Likes Date'),
+			'likes_ip' => Yii::t('attribute', 'Likes Ip'),
+			'album_search' => Yii::t('attribute', 'Album Search'),
+			'user_search' => Yii::t('attribute', 'User Search'),
 		);
 	}
 

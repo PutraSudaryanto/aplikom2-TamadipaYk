@@ -4,6 +4,7 @@
  * @var $this PhotoController
  * @var $model AlbumPhoto
  * @var $form CActiveForm
+ * version: 0.1.4
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
@@ -51,27 +52,84 @@
 	</div>
 
 	<div class="clearfix">
-		<?php echo $form->labelEx($model,'desc'); ?>
+		<?php echo $form->labelEx($model,'title'); ?>
 		<div class="desc">
-			<?php echo $form->textArea($model,'desc',array('rows'=>6, 'cols'=>50)); ?>
-			<?php echo $form->error($model,'desc'); ?>
+			<?php echo $form->textField($model,'title',array('class'=>'span-6')); ?>
+			<?php echo $form->error($model,'title'); ?>
+		</div>
+	</div>
+
+	<div class="clearfix">
+		<?php echo $form->labelEx($model,'description'); ?>
+		<div class="desc">
+			<?php echo $form->textArea($model,'description',array('rows'=>6, 'cols'=>50, 'class'=>'span-7 smaller')); ?>
+			<?php echo $form->error($model,'description'); ?>
 		</div>
 	</div>
 	
-	<div class="clearfix publish">
+	<?php if(!$model->isNewRecord) {?>
+	<div class="clearfix">
+		<?php echo $form->labelEx($model,'tag'); ?>
+		<div class="desc">
+			<?php 
+			if(!$model->isNewRecord) {
+				//echo $form->textField($model,'keyword',array('maxlength'=>32,'class'=>'span-6'));
+				$url = Yii::app()->controller->createUrl('o/phototag/add', array('type'=>'photo'));
+				$photo = $model->media_id;
+				$tagId = 'AlbumPhoto_tag';
+				$this->widget('zii.widgets.jui.CJuiAutoComplete', array(
+					'model' => $model,
+					'attribute' => 'tag',
+					'source' => Yii::app()->createUrl('globaltag/suggest'),
+					'options' => array(
+						//'delay '=> 50,
+						'minLength' => 1,
+						'showAnim' => 'fold',
+						'select' => "js:function(event, ui) {
+							$.ajax({
+								type: 'post',
+								url: '$url',
+								data: { media_id: '$photo', tag_id: ui.item.id, tag: ui.item.value },
+								dataType: 'json',
+								success: function(response) {
+									$('form #$tagId').val('');
+									$('form #tag-suggest').append(response.data);
+								}
+							});
+
+						}"
+					),
+					'htmlOptions' => array(
+						'class'	=> 'span-4',
+					),
+				));
+				echo $form->error($model,'keyword');
+			}?>
+			<div id="tag-suggest" class="suggest clearfix">
+				<?php if(!$model->isNewRecord) {
+					if($tag != null) {
+						foreach($tag as $key => $val) {?>
+						<div><?php echo $val->tag->body;?><a href="<?php echo Yii::app()->controller->createUrl('o/phototag/delete',array('id'=>$val->id,'type'=>'photo'));?>" title="<?php echo Yii::t('phrase', 'Delete');?>"><?php echo Yii::t('phrase', 'Delete');?></a></div>
+					<?php }
+					}
+				}?>
+			</div>
+		</div>
+	</div>
+	<?php }?>
+	
+	<div class="clearfix">
 		<?php echo $form->labelEx($model,'cover'); ?>
 		<div class="desc">
 			<?php echo $form->checkBox($model,'cover'); ?>
-			<?php echo $form->labelEx($model,'cover'); ?>
 			<?php echo $form->error($model,'cover'); ?>
 		</div>
 	</div>
 
-	<div class="clearfix publish">
+	<div class="clearfix">
 		<?php echo $form->labelEx($model,'publish'); ?>
 		<div class="desc">
 			<?php echo $form->checkBox($model,'publish'); ?>
-			<?php echo $form->labelEx($model,'publish'); ?>
 			<?php echo $form->error($model,'publish'); ?>
 		</div>
 	</div>

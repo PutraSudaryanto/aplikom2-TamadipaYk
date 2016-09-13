@@ -37,11 +37,25 @@
 	</div>
 	<?php //begin.Messages ?>
 
-	<h3><?php echo Phrase::trans(24008,1); ?></h3>
+	<h3><?php echo Yii::t('phrase', 'Album Information'); ?></h3>
 	<fieldset class="clearfix">
 		<div class="clear">
 			<div class="left">
 				<div class="shadow"></div>
+
+				<div class="clearfix">
+					<?php echo $form->labelEx($model,'cat_id'); ?>
+					<div class="desc">
+						<?php
+						$category = AlbumCategory::getCategory();
+
+						if($category != null)
+							echo $form->dropDownList($model,'cat_id', $category, array('prompt'=>Yii::t('phrase', 'Select Category')));
+						else
+							echo $form->dropDownList($model,'cat_id', array('prompt'=>Yii::t('phrase', 'No Parent')));?>
+						<?php echo $form->error($model,'cat_id'); ?>
+					</div>
+				</div>
 
 				<div class="clearfix">
 					<?php echo $form->labelEx($model,'title'); ?>
@@ -147,7 +161,7 @@
 							<?php 
 							$arrKeyword = explode(',', $setting->meta_keyword);
 							foreach($arrKeyword as $row) {?>
-								<div class="d"><?php echo $row;?></div>
+								<div class="d"><?php echo trim($row);?></div>
 							<?php }
 							if(!$model->isNewRecord) {
 								if($tag != null) {
