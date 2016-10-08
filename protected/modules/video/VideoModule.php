@@ -22,6 +22,8 @@ class VideoModule extends CWebModule
 			//list public controller in this module
 			$publicControllers = array(
 				'site',
+				'member',
+				'search',
 			);
 			
 			// pake ini untuk set theme per action di controller..
