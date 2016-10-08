@@ -7,14 +7,14 @@ var gmarkers = [];
 
 function initialize() {
 	var infoWindow = new google.maps.InfoWindow();
-	var haightAshbury = new google.maps.LatLng(-7.786318, 110.360848);
+	var haightAshbury = new google.maps.LatLng(-8.009394, 110.304709);
 	var mapOptions = {
 		zoom: 16,
 		center: haightAshbury,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	
-	map = new google.maps.Map(document.getElementById("maps"), mapOptions);
+	map = new google.maps.Map(document.getElementById("mapView"), mapOptions);
 
 	google.maps.event.addListener(map, 'click', function(){
 		infoWindow.close();
