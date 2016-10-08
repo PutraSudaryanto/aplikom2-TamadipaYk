@@ -1,8 +1,9 @@
 <?php
 /**
  * AlbumModule
+ * version: 0.1.4
  *
- * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link https://github.com/oMMu/Ommu-Photo-Albums
  * @contect (+62)856-299-4114
@@ -31,7 +32,11 @@ class AlbumModule extends CWebModule
 			// you may place customized code here
 			//list public controller in this module
 			$publicControllers = array(
+				'like',
+				'photo',
+				'search',
 				'site',
+				'api/gallery',
 			);
 			
 			// pake ini untuk set theme per action di controller..
