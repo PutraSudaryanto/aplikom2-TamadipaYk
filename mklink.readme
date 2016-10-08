@@ -55,8 +55,8 @@ mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\views" "D:\htdocs\_pr
 -------
 themes
 =======
-mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\themes\ommu" "D:\htdocs\_project_ommu_bootstrap\themes\backend-end\ommu"
-mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\themes\tamadipayk\css\content.css" "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\content.css"
+mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\themes\ommu" "D:\htdocs\_project_ommu_bootstrap\themes\ommu"
+mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\content.css" "D:\htdocs\_kampus_aplikom2_tamadipayk\themes\tamadipayk\css\content.css"
 
 -------
 protected\modules
@@ -79,8 +79,8 @@ mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\users\views\a
 ///report\\\
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\report" "D:\htdocs\_project_ommu_module_reports\externals\report"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\report\report.yaml" "D:\htdocs\_project_ommu_module_reports\modules\report\report.yaml"
-mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\report\LICENSE" "D:\htdocs\_project_ommu_module_reports\modules\report\LICENSE"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\report\ReportModule.php" "D:\htdocs\_project_ommu_module_reports\modules\report\ReportModule.php"
+mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\report\LICENSE" "D:\htdocs\_project_ommu_module_reports\modules\report\LICENSE"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\report\assets" "D:\htdocs\_project_ommu_module_reports\modules\report\assets"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\report\components" "D:\htdocs\_project_ommu_module_reports\modules\report\components"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\report\models" "D:\htdocs\_project_ommu_module_reports\modules\report\models"
@@ -92,8 +92,8 @@ mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\report\views\
 ///support\\\
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\support" "D:\htdocs\_project_ommu_module_support\externals\support"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\support\support.yaml" "D:\htdocs\_project_ommu_module_support\modules\support\support.yaml"
-mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\support\LICENSE" "D:\htdocs\_project_ommu_module_support\modules\support\LICENSE"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\support\SupportModule.php" "D:\htdocs\_project_ommu_module_support\modules\support\SupportModule.php"
+mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\support\LICENSE" "D:\htdocs\_project_ommu_module_support\modules\support\LICENSE"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\support\assets" "D:\htdocs\_project_ommu_module_support\modules\support\assets"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\support\components" "D:\htdocs\_project_ommu_module_support\modules\support\components"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\support\models" "D:\htdocs\_project_ommu_module_support\modules\support\models"
@@ -112,14 +112,13 @@ mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\compon
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\models" "D:\htdocs\_project_ommu_module_banner\modules\banner\models"
 --
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\controllers\o" "D:\htdocs\_project_ommu_module_banner\modules\banner\controllers\o"
-mklink /h "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\controllers\SiteController.php" "D:\htdocs\_project_ommu_module_banner\modules\banner\controllers\SiteController.php"
 --
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\views\o" "D:\htdocs\_project_ommu_module_banner\modules\banner\views\o"
-mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\banner\views\site" "D:\htdocs\_project_ommu_module_banner\modules\banner\views\site"
 
 ///article\\\
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\article" "D:\htdocs\_project_ommu_module_articles\externals\article"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\article\article.yaml" "D:\htdocs\_project_ommu_module_articles\modules\article\article.yaml"
+mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\article\ArticleModule.php" "D:\htdocs\_project_ommu_module_articles\modules\article\ArticleModule.php"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\article\LICENSE" "D:\htdocs\_project_ommu_module_articles\modules\article\LICENSE"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\article\assets" "D:\htdocs\_project_ommu_module_articles\modules\article\assets"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\article\components" "D:\htdocs\_project_ommu_module_articles\modules\article\components"
@@ -132,6 +131,7 @@ mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\article\views
 ///album\\\
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\album" "D:\htdocs\_project_ommu_module_albums\externals\album"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\album\album.yaml" "D:\htdocs\_project_ommu_module_albums\modules\album\album.yaml"
+mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\album\AlbumModule.php" "D:\htdocs\_project_ommu_module_albums\modules\album\AlbumModule.php"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\album\LICENSE" "D:\htdocs\_project_ommu_module_albums\modules\album\LICENSE"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\album\assets" "D:\htdocs\_project_ommu_module_albums\modules\album\assets"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\album\components" "D:\htdocs\_project_ommu_module_albums\modules\album\components"
@@ -144,6 +144,7 @@ mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\album\views\o
 ///video\\\
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\externals\video" "D:\htdocs\_project_ommu_module_video\externals\video"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\video\video.yaml" "D:\htdocs\_project_ommu_module_video\modules\video\video.yaml"
+mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\video\VideoModule.php" "D:\htdocs\_project_ommu_module_video\modules\video\VideoModule.php"
 mklink /H "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\video\LICENSE" "D:\htdocs\_project_ommu_module_video\modules\video\LICENSE"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\video\assets" "D:\htdocs\_project_ommu_module_video\modules\video\assets"
 mklink /J "D:\htdocs\_kampus_aplikom2_tamadipayk\protected\modules\video\components" "D:\htdocs\_project_ommu_module_video\modules\video\components"
