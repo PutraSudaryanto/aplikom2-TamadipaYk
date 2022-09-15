@@ -88,9 +88,9 @@ class ViewVideoCategory extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'cat_id' => 'Cat',
-			'category_name' => 'Category Name',
-			'category_desc' => 'Category Desc',
+			'cat_id' => PYii::t('attribute', 'Cat'),
+			'category_name' => PYii::t('attribute', 'Category Name'),
+			'category_desc' => PYii::t('attribute', 'Category Desc'),
 		);
 	}
 

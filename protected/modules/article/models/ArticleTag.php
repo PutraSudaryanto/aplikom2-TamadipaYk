@@ -67,7 +67,7 @@ class ArticleTag extends CActiveRecord
 		return array(
 			array('article_id, tag_id', 'required'),
 			array('article_id, tag_id, creation_id', 'length', 'max'=>11),
-			array('creation_date, 
+			array(' 
 				body', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -96,13 +96,13 @@ class ArticleTag extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => Phrase::trans(26080,1),
-			'article_id' => Phrase::trans(26000,1),
-			'tag_id' => Phrase::trans(26080,1),
-			'article_search' => Phrase::trans(26000,1),
-			'tag_search' => Phrase::trans(26080,1),
-			'creation_date' => Phrase::trans(26069,1),
-			'creation_search' => 'Creation',
+			'id' => Yii::t('attribute', 'Tags'),
+			'article_id' => Yii::t('attribute', 'Article'),
+			'tag_id' => Yii::t('attribute', 'Tags'),
+			'article_search' => Yii::t('attribute', 'Article'),
+			'tag_search' => Yii::t('attribute', 'Tags'),
+			'creation_date' => Yii::t('attribute', 'Creation Date'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
 		);
 	}
 	
@@ -116,17 +116,6 @@ class ArticleTag extends CActiveRecord
 		// should not be searched.
 
 		$criteria=new CDbCriteria;
-
-		$criteria->compare('t.id',$this->id);
-		if(isset($_GET['article'])) {
-			$criteria->compare('t.article_id',$_GET['article']);
-		} else {
-			$criteria->compare('t.article_id',$this->article_id);
-		}
-		$criteria->compare('t.tag_id',$this->tag_id);
-		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
-			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
-		$criteria->compare('t.creation_id',$this->creation_id);
 		
 		// Custom Search
 		$criteria->with = array(
@@ -143,6 +132,17 @@ class ArticleTag extends CActiveRecord
 				'select'=>'displayname'
 			),
 		);
+
+		$criteria->compare('t.id',$this->id);
+		if(isset($_GET['article']))
+			$criteria->compare('t.article_id',$_GET['article']);
+		else
+			$criteria->compare('t.article_id',$this->article_id);
+		$criteria->compare('t.tag_id',$this->tag_id);
+		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		$criteria->compare('t.creation_id',$this->creation_id);
+		
 		$criteria->compare('article.title',strtolower($this->article_search), true);
 		$criteria->compare('tag_TO.body',strtolower($this->tag_search), true);
 		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);

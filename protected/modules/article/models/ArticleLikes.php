@@ -94,13 +94,13 @@ class ArticleLikes extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'like_id' => Phrase::trans(26068,1),
-			'article_id' => Phrase::trans(26000,1),
-			'user_id' => Phrase::trans(26041,1),
-			'likes_date' => Phrase::trans(26060,1),
-			'likes_ip' => Phrase::trans(26061,1),
-			'article_search' => Phrase::trans(26000,1),
-			'user_search' => Phrase::trans(26041,1),
+			'like_id' => Yii::t('attribute', 'Likes'),
+			'article_id' => Yii::t('attribute', 'Article'),
+			'user_id' => Yii::t('attribute', 'User'),
+			'likes_date' => Yii::t('attribute', 'Likes Date'),
+			'likes_ip' => Yii::t('attribute', 'Likes Ip'),
+			'article_search' => Yii::t('attribute', 'Article'),
+			'user_search' => Yii::t('attribute', 'User'),
 		);
 	}
 	
@@ -114,6 +114,18 @@ class ArticleLikes extends CActiveRecord
 		// should not be searched.
 
 		$criteria=new CDbCriteria;
+		
+		// Custom Search
+		$criteria->with = array(
+			'article' => array(
+				'alias'=>'article',
+				'select'=>'title'
+			),
+			'user' => array(
+				'alias'=>'user',
+				'select'=>'displayname'
+			),
+		);
 
 		$criteria->compare('t.like_id',$this->like_id);
 		if(isset($_GET['article'])) {
@@ -130,17 +142,6 @@ class ArticleLikes extends CActiveRecord
 			$criteria->compare('date(t.likes_date)',date('Y-m-d', strtotime($this->likes_date)));
 		$criteria->compare('t.likes_ip',strtolower($this->likes_ip),true);
 		
-		// Custom Search
-		$criteria->with = array(
-			'article' => array(
-				'alias'=>'article',
-				'select'=>'title'
-			),
-			'user' => array(
-				'alias'=>'user',
-				'select'=>'displayname'
-			),
-		);
 		$criteria->compare('article.title',strtolower($this->article_search), true);
 		$criteria->compare('user.displayname',strtolower($this->user_search), true);
 

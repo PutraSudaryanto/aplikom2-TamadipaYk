@@ -109,21 +109,21 @@ class VideoCategory extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'cat_id' => Phrase::trans(25023,1),
-			'publish' => Phrase::trans(25012,1),
-			'dependency' => Phrase::trans(25021,1),
-			'orders' => 'Orders',
-			'name' => Phrase::trans(25009,1),
-			'desc' => Phrase::trans(25010,1),
-			'creation_date' => 'Creation Date',
-			'creation_id' => 'Creation',
-			'modified_date' => 'Modified Date',
-			'modified_id' => 'Modified',
-			'title' => Phrase::trans(25009,1),
-			'description' => Phrase::trans(25010,1),
-			'count_video' => 'Video',
-			'creation_search' => 'Creation',
-			'modified_search' => 'Modified',
+			'cat_id' => Yii::t('attribute', 'Category'),
+			'publish' => Yii::t('attribute', 'Publish'),
+			'dependency' => Yii::t('attribute', 'Parent'),
+			'orders' => Yii::t('attribute', 'Orders'),
+			'name' => Yii::t('attribute', 'Title'),
+			'desc' => Yii::t('attribute', 'Description'),
+			'creation_date' => Yii::t('attribute', 'Creation Date'),
+			'creation_id' => Yii::t('attribute', 'Creation'),
+			'modified_date' => Yii::t('attribute', 'Modified Date'),
+			'modified_id' => Yii::t('attribute', 'Modified'),
+			'title' => Yii::t('attribute', 'Title'),
+			'description' => Yii::t('attribute', 'Description'),
+			'count_video' => Yii::t('attribute', 'Video'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 	}
 
@@ -264,7 +264,7 @@ class VideoCategory extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'header' => 'count_video',
-				'value' => 'CHtml::link($data->count_video." ".Phrase::trans(25000,1), Yii::app()->controller->createUrl("o/admin/manage",array("category"=>$data->cat_id)))',
+				'value' => 'CHtml::link($data->count_video." ".Yii::t(\'attribute\', \'Video\'), Yii::app()->controller->createUrl("o/admin/manage",array("category"=>$data->cat_id)))',
 				'type' => 'raw',
 			);
 			$this->defaultColumns[] = array(

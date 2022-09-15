@@ -401,6 +401,15 @@ class AlbumPhoto extends CActiveRecord
 			$controller = strtolower(Yii::app()->controller->id);
 			if(!Yii::app()->request->isAjaxRequest && !$this->isNewRecord && $controller == 'o/photo') {
 				$album_path = "public/album/".$this->album_id;
+				// Add directory
+				if(!file_exists($album_path)) {
+					@mkdir($album_path, 0755, true);
+
+					// Add file in directory (index.php)
+					$newFile = $album_path.'/index.php';
+					$FileHandle = fopen($newFile, 'w');
+				} else
+					@chmod($album_path, 0755, true);
 				
 				$this->media = CUploadedFile::getInstance($this, 'media');
 				if($this->media instanceOf CUploadedFile) {
@@ -449,6 +458,16 @@ class AlbumPhoto extends CActiveRecord
 		if($photo_resize == 1) {
 			Yii::import('ext.phpthumb.PhpThumbFactory');
 			$album_path = 'public/album/'.$this->album_id;
+			// Add directory
+			if(!file_exists($album_path)) {
+				@mkdir($album_path, 0755, true);
+
+				// Add file in directory (index.php)
+				$newFile = $album_path.'/index.php';
+				$FileHandle = fopen($newFile, 'w');
+			} else
+				@chmod($album_path, 0755, true);
+				
 			$albumImg = PhpThumbFactory::create($album_path.'/'.$this->media, array('jpegQuality' => 90, 'correctPermissions' => true));
 			$resizeSize = unserialize($photo_resize_size);
 			if($resizeSize['height'] == 0)

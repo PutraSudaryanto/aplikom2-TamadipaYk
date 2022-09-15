@@ -94,13 +94,13 @@ class VideoLikes extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'like_id' => 'Like',
-			'video_id' => 'Video',
-			'user_id' => 'User',
-			'likes_date' => 'Likes Date',
-			'likes_ip' => 'Likes Ip',
-			'video_search' => 'Video',
-			'user_search' => 'User',
+			'like_id' => Yii::t('attribute','Like'),
+			'video_id' => Yii::t('attribute','Video'),
+			'user_id' => Yii::t('attribute','User'),
+			'likes_date' => Yii::t('attribute','Likes Date'),
+			'likes_ip' => Yii::t('attribute','Likes Ip'),
+			'video_search' => Yii::t('attribute','Video'),
+			'user_search' => Yii::t('attribute','User'),
 		);
 	}
 

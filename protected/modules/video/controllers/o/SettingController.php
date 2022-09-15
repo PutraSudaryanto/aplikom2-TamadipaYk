@@ -141,7 +141,7 @@ class SettingController extends Controller
 					if($model->save()) {
 						echo CJSON::encode(array(
 							'type' => 0,
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25037,1).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video setting success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -151,8 +151,8 @@ class SettingController extends Controller
 			Yii::app()->end();
 			
 		} else {
-			$this->pageTitle = Phrase::trans(25029,1);
-			$this->pageDescription = Phrase::trans(25028,1);
+			$this->pageTitle = Yii::t('phrase', 'Video Feeder Settings');
+			$this->pageDescription = Yii::t('phrase', 'This page contains general video feeder settings that affect your entire social network.');
 			$this->pageMeta = '';
 			$this->render('admin_index',array(
 				'model'=>$model,

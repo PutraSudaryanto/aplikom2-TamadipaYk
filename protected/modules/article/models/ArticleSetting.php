@@ -30,20 +30,15 @@
  * @property integer $media_limit
  * @property integer $media_resize
  * @property string $media_resize_size
- * @property string $media_large_width
- * @property string $media_large_height
- * @property string $media_medium_width
- * @property string $media_medium_height
- * @property string $media_small_width
- * @property string $media_small_height
+ * @property string $media_view_size
+ * @property string $media_file_type
+ * @property string $download_file_type
  * @property string $modified_date
  * @property string $modified_id
  */
 class ArticleSetting extends CActiveRecord
 {
 	public $defaultColumns = array();
-	public $media_resize_width;
-	public $media_resize_height;
 	
 	// Variable Search
 	public $modified_search;
@@ -74,18 +69,13 @@ class ArticleSetting extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('license, permission, meta_keyword, meta_description, type_active, headline, media_limit, media_resize, media_large_width, media_large_height, media_medium_width, media_medium_height, media_small_width, media_small_height', 'required'),
+			array('license, permission, meta_keyword, meta_description, type_active, headline, media_limit, media_resize', 'required'),
 			array('permission, headline, media_limit, media_resize, modified_id', 'numerical', 'integerOnly'=>true),
-			//array('type_active', 'length', 'max'=>64),
 			array('license', 'length', 'max'=>32),
-			array('media_large_width, media_large_height,
-				media_resize_width, media_resize_height', 'length', 'max'=>4),
-			array('media_medium_width, media_medium_height, media_small_width, media_small_height', 'length', 'max'=>3),
-			array('media_resize_size,
-				media_resize_width, media_resize_height', 'safe'),
+			array('media_resize_size, media_view_size, media_file_type, upload_file_type', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, license, permission, meta_keyword, meta_description, type_active, headline, media_limit, media_resize, media_large_width, media_large_height, media_medium_width, media_medium_height, media_small_width, media_small_height, modified_date, modified_id,
+			array('id, license, permission, meta_keyword, meta_description, type_active, headline, media_limit, media_resize, media_resize_size, media_view_size, media_file_type, upload_file_type, modified_date, modified_id,
 				modified_search', 'safe', 'on'=>'search'),
 		);
 	}
@@ -108,27 +98,22 @@ class ArticleSetting extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'license' => Phrase::trans(26003,1),
-			'permission' => Phrase::trans(26006,1),
-			'meta_keyword' => Phrase::trans(26010,1),
-			'meta_description' => Phrase::trans(26011,1),
-			'type_active' => Phrase::trans(26104,1),
-			'headline' => Phrase::trans(26058,1),
-			'media_limit' => Phrase::trans(26012,1),
-			'media_resize' => Phrase::trans(26087,1),
-			'media_resize_size' => Phrase::trans(26109,1),
-			'media_large_width' => Phrase::trans(26098,1),
-			'media_large_height' => Phrase::trans(26099,1),
-			'media_medium_width' => Phrase::trans(26100,1),
-			'media_medium_height' => Phrase::trans(26101,1),
-			'media_small_width' => Phrase::trans(26102,1),
-			'media_small_height' => Phrase::trans(26103,1),
-			'media_resize_width' => Phrase::trans(261010,1),
-			'media_resize_height' => Phrase::trans(26111,1),
-			'modified_date' => 'Modified Date',
-			'modified_id' => 'Modified',
-			'modified_search' => 'Modified',
+			'id' => Yii::t('attribute', 'ID'),
+			'license' => Yii::t('attribute', 'License Key'),
+			'permission' => Yii::t('attribute', 'Public Permission Defaults'),
+			'meta_keyword' => Yii::t('attribute', 'Meta Keyword'),
+			'meta_description' => Yii::t('attribute', 'Meta Description'),
+			'type_active' => Yii::t('attribute', 'Type Active'),
+			'headline' => Yii::t('attribute', 'Headline Limit'),
+			'media_limit' => Yii::t('attribute', 'Media Limit'),
+			'media_resize' => Yii::t('attribute', 'Media Resize'),
+			'media_resize_size' => Yii::t('attribute', 'Media Resize Size'),
+			'media_view_size' => Yii::t('attribute', 'Media View Size'),
+			'media_file_type' => Yii::t('attribute', 'Media File Type'),
+			'upload_file_type' => Yii::t('attribute', 'Upload File Type'),
+			'modified_date' => Yii::t('attribute', 'Modified Date'),
+			'modified_id' => Yii::t('attribute', 'Modified'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 	}
 	
@@ -142,6 +127,14 @@ class ArticleSetting extends CActiveRecord
 		// should not be searched.
 
 		$criteria=new CDbCriteria;
+		
+		// Custom Search
+		$criteria->with = array(
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
+			),
+		);
 
 		$criteria->compare('t.id',$this->id);
 		$criteria->compare('t.license',$this->license,true);
@@ -153,23 +146,13 @@ class ArticleSetting extends CActiveRecord
 		$criteria->compare('t.media_limit',$this->media_limit);
 		$criteria->compare('t.media_resize',$this->media_resize);
 		$criteria->compare('t.media_resize_size',$this->media_resize_size);
-		$criteria->compare('t.media_large_width',$this->media_large_width);
-		$criteria->compare('t.media_large_height',$this->media_large_height);
-		$criteria->compare('t.media_medium_width',$this->media_medium_width);
-		$criteria->compare('t.media_medium_height',$this->media_medium_height);
-		$criteria->compare('t.media_small_width',$this->media_small_width);
-		$criteria->compare('t.media_small_height',$this->media_small_height);
+		$criteria->compare('t.media_view_size',$this->media_view_size);
+		$criteria->compare('t.media_file_type',$this->media_file_type);
+		$criteria->compare('t.upload_file_type',$this->upload_file_type);
 		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
 		$criteria->compare('t.modified_id',$this->modified_id);
 		
-		// Custom Search
-		$criteria->with = array(
-			'modified_relation' => array(
-				'alias'=>'modified_relation',
-				'select'=>'displayname'
-			),
-		);
 		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['ArticleSetting_sort']))
@@ -208,12 +191,9 @@ class ArticleSetting extends CActiveRecord
 			$this->defaultColumns[] = 'media_limit';
 			$this->defaultColumns[] = 'media_resize';
 			$this->defaultColumns[] = 'media_resize_size';
-			$this->defaultColumns[] = 'media_large_width';
-			$this->defaultColumns[] = 'media_large_height';
-			$this->defaultColumns[] = 'media_medium_width';
-			$this->defaultColumns[] = 'media_medium_height';
-			$this->defaultColumns[] = 'media_small_width';
-			$this->defaultColumns[] = 'media_small_height';
+			$this->defaultColumns[] = 'media_view_size';
+			$this->defaultColumns[] = 'media_file_type';
+			$this->defaultColumns[] = 'upload_file_type';
 			$this->defaultColumns[] = 'modified_date';
 			$this->defaultColumns[] = 'modified_id';
 		}
@@ -235,14 +215,10 @@ class ArticleSetting extends CActiveRecord
 			$this->defaultColumns[] = 'media_limit';
 			$this->defaultColumns[] = 'media_resize';
 			$this->defaultColumns[] = 'media_resize_size';
-			$this->defaultColumns[] = 'media_large_width';
-			$this->defaultColumns[] = 'media_large_height';
-			$this->defaultColumns[] = 'media_medium_width';
-			$this->defaultColumns[] = 'media_medium_height';
-			$this->defaultColumns[] = 'media_small_width';
-			$this->defaultColumns[] = 'media_small_height';
+			$this->defaultColumns[] = 'media_view_size';
+			$this->defaultColumns[] = 'media_file_type';
+			$this->defaultColumns[] = 'upload_file_type';
 			$this->defaultColumns[] = 'modified_date';
-			$this->defaultColumns[] = 'modified_id';
 			$this->defaultColumns[] = array(
 				'name' => 'modified_search',
 				'value' => '$data->modified_relation->displayname',
@@ -271,25 +247,53 @@ class ArticleSetting extends CActiveRecord
 	}
 
 	/**
+	 * get Module License
+	 */
+	public static function getLicense($source='1234567890', $length=16, $char=4)
+	{
+		$mod = $length%$char;
+		if($mod == 0)
+			$sep = ($length/$char);
+		else
+			$sep = (int)($length/$char)+1;
+		
+		$sourceLength = strlen($source);
+		$random = '';
+		for ($i = 0; $i < $length; $i++)
+			$random .= $source[rand(0, $sourceLength - 1)];
+		
+		$license = '';
+		for ($i = 0; $i < $sep; $i++) {
+			if($i != $sep-1)
+				$license .= substr($random,($i*$char),$char).'-';
+			else
+				$license .= substr($random,($i*$char),$char);
+		}
+
+		return $license;
+	}
+
+	/**
 	 * before validate attributes
 	 */
 	protected function beforeValidate() {
 		if(parent::beforeValidate()) {
-			if($this->media_resize == 1 && ($this->media_resize_width == '' || $this->media_resize_height == '')) {
-				$this->addError('media_resize_size', Phrase::trans(26112,1));
-			}
-			if($this->media_large_width == '' || $this->media_large_height == '') {
-				$this->addError('media_large_width', Phrase::trans(26093,1));
-			}
-			if($this->media_medium_width == '' || $this->media_medium_height == '') {
-				$this->addError('media_medium_width', Phrase::trans(26094,1));
-			}
-			if($this->media_small_width == '' || $this->media_small_height == '') {
-				$this->addError('media_small_width', Phrase::trans(26095,1));
-			}
+			if($this->media_limit != '' && $this->media_limit <= 0)
+				$this->addError('media_limit', Yii::t('phrase', 'Photo Limit lebih besar dari 0'));
+			
+			if($this->media_resize == 1 && ($this->media_resize_size['width'] == '' || $this->media_resize_size['height'] == ''))
+				$this->addError('media_resize_size', Yii::t('attribute', 'Media Resize cannot be blank.'));
+			
+			if($this->media_view_size['large']['width'] == '' || $this->media_view_size['large']['height'] == '')
+				$this->addError('media_view_size[large]', Yii::t('phrase', 'Large Size cannot be blank.'));
+			
+			if($this->media_view_size['medium']['width'] == '' || $this->media_view_size['medium']['height'] == '')
+				$this->addError('media_view_size[medium]', Yii::t('phrase', 'Medium Size cannot be blank.'));
+			
+			if($this->media_view_size['small']['width'] == '' || $this->media_view_size['small']['height'] == '')
+				$this->addError('media_view_size[small]', Yii::t('phrase', 'Small Size cannot be blank.'));
 			
 			// Article type is active
-			$this->type_active = implode(',', $this->type_active);
 			
 			$this->modified_id = Yii::app()->user->id;
 		}
@@ -301,9 +305,11 @@ class ArticleSetting extends CActiveRecord
 	 */
 	protected function beforeSave() {
 		if(parent::beforeSave()) {
-			if($this->media_resize == 1) {
-				$this->media_resize_size = $this->media_resize_width.','.$this->media_resize_height;
-			}
+			$this->type_active = serialize($this->type_active);
+			$this->media_resize_size = serialize($this->media_resize_size);
+			$this->media_view_size = serialize($this->media_view_size);
+			$this->media_file_type = serialize(Utility::formatFileType($this->media_file_type));
+			$this->upload_file_type = serialize(Utility::formatFileType($this->upload_file_type));
 		}
 		return true;
 	}

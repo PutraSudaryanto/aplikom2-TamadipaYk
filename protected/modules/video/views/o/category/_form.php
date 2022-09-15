@@ -33,9 +33,9 @@
 			<?php echo $form->labelEx($model,'dependency'); ?>
 			<div class="desc">
 				<?php if(VideoCategory::getCategory() != null) {
-					echo $form->dropDownList($model,'dependency', VideoCategory::getCategory(), array('prompt'=>Phrase::trans(25022,1)));
+					echo $form->dropDownList($model,'dependency', VideoCategory::getCategory(), array('prompt'=>Yii::t('phrase', 'No Parent')));
 				} else {
-					echo $form->dropDownList($model,'dependency', array(0=>Phrase::trans(25022,1)));
+					echo $form->dropDownList($model,'dependency', array(0=>Yii::t('phrase', 'No Parent')));
 				}?>
 				<?php echo $form->error($model,'dependency'); ?>
 			</div>
@@ -45,7 +45,7 @@
 			<?php echo $form->labelEx($model,'title'); ?>
 			<div class="desc">
 				<?php 
-				$model->title = Phrase::trans($model->name, 2);
+				$model->title = Yii::t('phrase', '$model->name, 2);
 				echo $form->textField($model,'title',array('maxlength'=>32,'class'=>'span-8')); ?>
 				<?php echo $form->error($model,'title'); ?>
 			</div>

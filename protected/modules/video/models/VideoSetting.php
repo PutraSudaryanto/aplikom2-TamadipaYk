@@ -91,15 +91,15 @@ class VideoSetting extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'license' => Phrase::trans(25034,1),
-			'permission' => Phrase::trans(25030,1),
-			'meta_keyword' => Phrase::trans(25038,1),
-			'meta_description' => Phrase::trans(25039,1),
-			'headline' => 'Headline',
-			'modified_date' => 'Modified Date',
-			'modified_id' => 'Modified',
-			'modified_search' => 'Modified',
+			'id' => PYii::t('attribute', 'ID'),
+			'license' => PYii::t('attribute', '25034'),
+			'permission' => PYii::t('attribute', '25030'),
+			'meta_keyword' => PYii::t('attribute', '25038'),
+			'meta_description' => PYii::t('attribute', '25039'),
+			'headline' => PYii::t('attribute', 'Headline'),
+			'modified_date' => PYii::t('attribute', 'Modified Date'),
+			'modified_id' => PYii::t('attribute', 'Modified'),
+			'modified_search' => PYii::t('attribute', 'Modified'),
 		);
 	}
 

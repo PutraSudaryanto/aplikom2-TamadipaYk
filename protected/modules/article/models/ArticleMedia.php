@@ -101,18 +101,18 @@ class ArticleMedia extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'media_id' => Phrase::trans(26039,1),
-			'article_id' => Phrase::trans(26000,1),
-			'orders' => Phrase::trans(26072,1),
-			'cover' => Phrase::trans(26073,1),
-			'media' => Phrase::trans(26039,1),
-			'creation_date' => Phrase::trans(26069,1),
-			'creation_id' => 'Creation',
-			'old_media' => Phrase::trans(26071,1),
-			'video' => Phrase::trans(26044,1),
-			'type_search' => Phrase::trans(26067,1),
-			'article_search' => Phrase::trans(26000,1),
-			'creation_search' => 'Creation',
+			'media_id' => Yii::t('attribute', 'Media'),
+			'article_id' => Yii::t('attribute', 'Article'),
+			'orders' => Yii::t('attribute', 'Orders'),
+			'cover' => Yii::t('attribute', 'Cover'),
+			'media' => Yii::t('attribute', 'Media'),
+			'creation_date' => Yii::t('attribute', 'Creation Date'),
+			'creation_id' => Yii::t('attribute', 'Creation'),
+			'old_media' => Yii::t('attribute', 'Old Media'),
+			'video' => Yii::t('attribute', 'Video'),
+			'type_search' => Yii::t('attribute', 'Article Type'),
+			'article_search' => Yii::t('attribute', 'Article'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
 		);
 	}
 	
@@ -126,6 +126,18 @@ class ArticleMedia extends CActiveRecord
 		// should not be searched.
 
 		$criteria=new CDbCriteria;
+		
+		// Custom Search
+		$criteria->with = array(
+			'article' => array(
+				'alias'=>'article',
+				'select'=>'article_type, title',
+			),
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname',
+			),
+		);
 
 		$criteria->compare('t.media_id',$this->media_id);
 		if(isset($_GET['article'])) {
@@ -140,17 +152,6 @@ class ArticleMedia extends CActiveRecord
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
 		$criteria->compare('t.creation_id',$this->creation_id);
 		
-		// Custom Search
-		$criteria->with = array(
-			'article' => array(
-				'alias'=>'article',
-				'select'=>'article_type, title'
-			),
-			'creation_relation' => array(
-				'alias'=>'creation_relation',
-				'select'=>'displayname'
-			),
-		);
 		$criteria->compare('article.article_type',strtolower($this->type_search), true);
 		$criteria->compare('article.title',strtolower($this->article_search), true);
 		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
@@ -216,14 +217,14 @@ class ArticleMedia extends CActiveRecord
 				);
 				$this->defaultColumns[] = array(
 					'name' => 'type_search',
-					'value' => '$data->article->article_type == 1 ? Phrase::trans(26043,1) : ($data->article->article_type == 2 ? Phrase::trans(26044,1) : Phrase::trans(26045,1))',
+					'value' => '$data->article->article_type == 1 ? Yii::t(\'attribute\', \'Standard\') : ($data->article->article_type == 2 ? Yii::t(\'attribute\', \'Video\') : Yii::t(\'attribute\', \'Audio\'))',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
 					'filter'=>array(
-						1=>Phrase::trans(26043,1),
-						2=>Phrase::trans(26044,1),
-						3=>Phrase::trans(26045,1),
+						1=>Yii::t('attribute', 'Standard'),
+						2=>Yii::t('attribute', 'Video'),
+						3=>Yii::t('attribute', 'Audio'),
 					),
 				);
 			}
@@ -332,7 +333,7 @@ class ArticleMedia extends CActiveRecord
 			$currentAction = strtolower(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
 			if(!$this->isNewRecord) {
 				if($this->article->article_type == 2 && $this->media == '') {
-					$this->addError('video', Phrase::trans(26048,1));
+					$this->addError('video', Yii::t('attribute', 'Video cannot be blank.'));
 				}
 			} else
 				$this->creation_id = Yii::app()->user->id;
@@ -358,6 +359,14 @@ class ArticleMedia extends CActiveRecord
 			if(!$this->isNewRecord && $controller == 'media' && !Yii::app()->request->isAjaxRequest) {
 				if(in_array($this->article->article_type, array(1,3))) {
 					$article_path = "public/article/".$this->article_id;
+					if(!file_exists($article_path)) {
+						@mkdir($article_path, 0755, true);
+
+						// Add file in directory (index.php)
+						$newFile = $article_path.'/index.php';
+						$FileHandle = fopen($newFile, 'w');
+					} else
+						@chmod($article_path, 0755, true);
 					
 					if($this->article->article_type == 1) {
 						$this->media = CUploadedFile::getInstance($this, 'media');
@@ -402,12 +411,21 @@ class ArticleMedia extends CActiveRecord
 			if($setting->media_resize == 1) {
 				Yii::import('ext.phpthumb.PhpThumbFactory');
 				$article_path = "public/article/".$this->article_id;
+				if(!file_exists($article_path)) {
+					@mkdir($article_path, 0755, true);
+
+					// Add file in directory (index.php)
+					$newFile = $article_path.'/index.php';
+					$FileHandle = fopen($newFile, 'w');
+				} else
+					@chmod($article_path, 0755, true);
+				
 				$articleImg = PhpThumbFactory::create($article_path.'/'.$this->media, array('jpegQuality' => 90, 'correctPermissions' => true));
-				$resizeSize = explode(',', $setting->media_resize_size);
-				if($resizeSize[1] == 0)
-					$articleImg->resize($resizeSize[0]);
+				$resizeSize = unserialize($setting->media_resize_size);
+				if($resizeSize['height'] == 0)
+					$articleImg->resize($resizeSize['width']);
 				else
-					$articleImg->adaptiveResize($resizeSize[0], $resizeSize[1]);					
+					$articleImg->adaptiveResize($resizeSize['width'], $resizeSize['height']);		
 				$articleImg->save($article_path.'/'.$this->media);
 			}
 			

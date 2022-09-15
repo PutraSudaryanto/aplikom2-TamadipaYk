@@ -25,6 +25,7 @@ $js=<<<EOP
 		var id = $(this).val();
 		$('fieldset div.filter').slideUp();
 		$('div#title').slideDown();
+		$('div#quote').slideDown();
 		if(id == '1') {
 			$('div.filter#media').slideDown();
 		} else if(id == '2') {
@@ -33,6 +34,7 @@ $js=<<<EOP
 			$('div.filter#audio').slideDown();
 		} else if(id == '4') {
 			$('div#title').slideUp();
+			$('div#quote').slideUp();
 		}
 	});
 EOP;
@@ -65,14 +67,12 @@ EOP;
 					<div class="desc">
 						<?php
 						if($model->isNewRecord) {
+							$type_active = unserialize($setting->type_active);
 							$arrAttrParams = array();
-							if($setting->type_active != '') {
-								$arrAttr = explode(',', $setting->type_active);
-								if(count($arrAttr) > 0) {
-									foreach($arrAttr as $row) {
-										$part = explode('=', $row);
-										$arrAttrParams[$part[0]] = Phrase::trans($part[1],1);
-									}
+							if($setting->type_active != '' && !empty($type_active)) {
+								foreach($type_active as $key => $row) {
+									$part = explode('=', $row);
+									$arrAttrParams[$part[0]] = Yii::t('phrase', $part[1]);
 								}
 							}
 							echo $form->dropDownList($model,'article_type', $arrAttrParams);
@@ -114,43 +114,40 @@ EOP;
 					</div>
 				</div>
 	
-				<?php if(!$model->isNewRecord && ($model->article_type == 3 || ($model->article_type == 1 && $setting->media_limit == 1))) {
-					$model->old_media = $model->cover->media;
-					echo $form->hiddenField($model,'old_media');
+				<?php if(!$model->isNewRecord && ($model->article_type == 1 && $setting->media_limit == 1)) {
+					$model->old_media_input = $model->cover->media;
+					echo $form->hiddenField($model,'old_media_input');
 					if($model->media_id != 0) {
-						$file = Yii::app()->request->baseUrl.'/public/article/'.$model->article_id.'/'.$model->cover->media;
-						if($model->article_type == 1) {
-							$media = '<img src="'.Utility::getTimThumb($file, 320, 150, 1).'" alt="">';
-						} elseif($model->article_type == 3) {
-							$media = '<audio src="'.$file.'" controls="true" loop="true" autoplay="false"></audio>';
-						}
+						$image = Yii::app()->request->baseUrl.'/public/article/'.$model->article_id.'/'.$model->old_media_input;
+						$media = '<img src="'.Utility::getTimThumb($image, 320, 150, 1).'" alt="">';
 						echo '<div class="clearfix">';
-						echo $form->labelEx($model,'old_media');
+						echo $form->labelEx($model,'old_media_input');
 						echo '<div class="desc">'.$media.'</div>';
 						echo '</div>';
 					}
 				}?>
 
-				<?php if($model->isNewRecord || (!$model->isNewRecord && ($model->article_type == 1 && $setting->media_limit == 1))) {?>
-				<div id="media" class="clearfix filter">
-					<?php echo $form->labelEx($model,'media'); ?>
-					<div class="desc">
-						<?php echo $form->fileField($model,'media'); ?>
-						<?php echo $form->error($model,'media'); ?>
-					</div>
-				</div>
-				<?php }?>
-
 				<?php if($model->isNewRecord || (!$model->isNewRecord && $model->article_type == 2)) {?>
 					<div id="video" class="clearfix filter <?php echo $model->isNewRecord ? 'hide' : ''?>">
-						<label for="Articles_video"><?php echo $model->getAttributeLabel('video');?> <span class="required">*</span></label>
+						<label for="Articles_video"><?php echo $model->getAttributeLabel('video_input');?> <span class="required">*</span></label>
 						<div class="desc">
-							<?php $model->video = $model->cover->media;
-							echo $form->textField($model,'video',array('maxlength'=>32, 'class'=>'span-8')); ?>
-							<?php echo $form->error($model,'video'); ?>
+							<?php $model->video_input = $model->cover->media;
+							echo $form->textField($model,'video_input',array('maxlength'=>32, 'class'=>'span-8')); ?>
+							<?php echo $form->error($model,'video_input'); ?>
 							<span class="small-px">http://www.youtube.com/watch?v=<strong>HOAqSoDZSho</strong></span>
 						</div>
 					</div>
+				<?php }?>
+
+				<?php if($model->isNewRecord || (!$model->isNewRecord && ($model->article_type == 1 && $setting->media_limit == 1))) {?>
+				<div id="media" class="clearfix filter">
+					<?php echo $form->labelEx($model,'media_input'); ?>
+					<div class="desc">
+						<?php echo $form->fileField($model,'media_input'); ?>
+						<?php echo $form->error($model,'media_input'); ?>
+						<span class="small-px">extensions are allowed: <?php echo Utility::formatFileType(unserialize($setting->media_file_type), false);?></span>
+					</div>
+				</div>
 				<?php }?>
 		
 				<?php if(!$model->isNewRecord || ($model->isNewRecord && $setting->meta_keyword != '')) {?>
@@ -214,21 +211,22 @@ EOP;
 			<div class="right">
 				<?php
 				if(!$model->isNewRecord) {
-					$model->old_file = $model->media_file;
-					echo $form->hiddenField($model,'old_file');
+					$model->old_media_file = $model->media_file;
+					echo $form->hiddenField($model,'old_media_file');
 					if($model->media_file != '') {
 						$file = Yii::app()->request->baseUrl.'/public/article/'.$model->article_id.'/'.$model->media_file;
 						echo '<div class="clearfix">';
-						echo $form->labelEx($model,'old_file');
+						echo $form->labelEx($model,'old_media_file');
 						echo '<div class="desc"><a href="'.$file.'" title="'.$model->media_file.'">'.$model->media_file.'</a></div>';
 						echo '</div>';
 					}
 				}?>
 				<div class="clearfix">
-					<?php echo $form->labelEx($model,'file'); ?>
+					<?php echo $form->labelEx($model,'media_file'); ?>
 					<div class="desc">
-						<?php echo $form->fileField($model,'file'); ?>
-						<?php echo $form->error($model,'file'); ?>
+						<?php echo $form->fileField($model,'media_file'); ?>
+						<?php echo $form->error($model,'media_file'); ?>
+						<span class="small-px">extensions are allowed: <?php echo Utility::formatFileType(unserialize($setting->upload_file_type), false);?></span>
 					</div>
 				</div>
 	
@@ -236,7 +234,7 @@ EOP;
 					<?php echo $form->labelEx($model,'published_date'); ?>
 					<div class="desc">
 						<?php 
-						$model->isNewRecord && $model->published_date == '' ? $model->published_date = date('d-m-Y') : date('d-m-Y', strtotime($model->published_date));
+						$model->published_date = $model->isNewRecord && $model->published_date == '' ? date('d-m-Y') : date('d-m-Y', strtotime($model->published_date));
 						//echo $form->textField($model,'published_date', array('class'=>'span-7'));
 						$this->widget('zii.widgets.jui.CJuiDatePicker',array(
 							'model'=>$model, 
@@ -293,7 +291,7 @@ EOP;
 
 	<fieldset>
 		<?php if($model->isNewRecord || (!$model->isNewRecord && $model->article_type != 4)) {?>
-		<div class="clearfix" id="quote">
+		<div class="clearfix <?php echo $model->article_type == 4 ? 'hide' : '';?>" id="quote">
 			<?php echo $form->labelEx($model,'quote'); ?>
 			<div class="desc">
 				<?php 

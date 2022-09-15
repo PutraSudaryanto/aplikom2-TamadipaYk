@@ -47,7 +47,7 @@
 	<?php //begin.Messages ?>
 
 	<div class="boxed">
-		<h3><?php echo Phrase::trans(25014,1); ?></h3>
+		<h3><?php echo Yii::t('phrase', 'Video Feed Categories'); ?></h3>
 		<?php //begin.Grid Item ?>
 		<?php 
 			$columnData   = $columns;

@@ -127,7 +127,7 @@ class CategoryController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Phrase::trans(25014,1);
+		$this->pageTitle = Yii::t('phrase', 'Video Feed Categories');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -161,7 +161,7 @@ class CategoryController extends Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('o/setting/index'),
 							'id' => 'partial-video-category',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25016,1).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video category success created.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -175,7 +175,7 @@ class CategoryController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 500;
 			
-			$this->pageTitle = Phrase::trans(25015,1);
+			$this->pageTitle = Yii::t('phrase', 'Create Video Category');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_add',array(
@@ -210,7 +210,7 @@ class CategoryController extends Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('o/setting/index'),
 							'id' => 'partial-video-category',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25018,1).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video category success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -224,7 +224,7 @@ class CategoryController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 500;
 			
-			$this->pageTitle = Phrase::trans(25017,1).': '.Phrase::trans($model->name,2);
+			$this->pageTitle = Yii::t('phrase', 'Update Video Category').': '.Phrase::trans($model->name,2);
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_edit',array(
@@ -286,7 +286,7 @@ class CategoryController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('o/setting/index'),
 						'id' => 'partial-video-category',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25020,1).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video category success deleted.').'</strong></div>',
 					));
 				}
 			}
@@ -296,7 +296,7 @@ class CategoryController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(25019,1).': '.Phrase::trans($model->name,2);
+			$this->pageTitle = Yii::t('phrase', 'Delete Video Category').': '.Phrase::trans($model->name,2);
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -331,7 +331,7 @@ class CategoryController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('o/setting/index'),
 						'id' => 'partial-video-category',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25018,1).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video category success updated.').'</strong></div>',
 					));
 				}
 			}

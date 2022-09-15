@@ -93,7 +93,7 @@ class ArticleCategory extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'view_cat' => array(self::BELONGS_TO, 'ViewArticleCategory', 'cat_id'),
+			'view' => array(self::BELONGS_TO, 'ViewArticleCategory', 'cat_id'),
 			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 		);
@@ -105,20 +105,20 @@ class ArticleCategory extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'cat_id' => Phrase::trans(26020,1),
-			'publish' => Phrase::trans(26021,1),
-			'dependency' => Phrase::trans(26018,1),
-			'orders' => Phrase::trans(26059,1),
-			'name' => Phrase::trans(26016,1),
-			'desc' => Phrase::trans(26017,1),
-			'title' => Phrase::trans(26016,1),
-			'description' => Phrase::trans(26017,1),
-			'creation_date' => Phrase::trans(26069,1),
-			'creation_id' => 'Creation',
-			'modified_date' => 'Modified Date',
-			'modified_id' => 'Modified',
-			'creation_search' => 'Creation',
-			'modified_search' => 'Modified',
+			'cat_id' => Yii::t('attribute', 'Category'),
+			'publish' => Yii::t('attribute', 'Publish'),
+			'dependency' => Yii::t('attribute', 'Parent'),
+			'orders' => Yii::t('attribute', 'Orders'),
+			'name' => Yii::t('attribute', 'Category'),
+			'desc' => Yii::t('attribute', 'Description'),
+			'title' => Yii::t('attribute', 'Category'),
+			'description' => Yii::t('attribute', 'Description'),
+			'creation_date' => Yii::t('attribute', 'Creation Date'),
+			'creation_id' => Yii::t('attribute', 'Creation'),
+			'modified_date' => Yii::t('attribute', 'Modified Date'),
+			'modified_id' => Yii::t('attribute', 'Modified'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 	}
 	
@@ -132,6 +132,22 @@ class ArticleCategory extends CActiveRecord
 		// should not be searched.
 
 		$criteria=new CDbCriteria;
+		
+		// Custom Search
+		$criteria->with = array(
+			'view' => array(
+				'alias'=>'view',
+				'select'=>'category_name, category_desc, articles'
+			),
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname'
+			),
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
+			),
+		);
 
 		$criteria->compare('t.cat_id',$this->cat_id);
 		if(isset($_GET['type']) && $_GET['type'] == 'publish') {
@@ -155,23 +171,8 @@ class ArticleCategory extends CActiveRecord
 			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
 		$criteria->compare('t.modified_id',$this->modified_id);
 		
-		// Custom Search
-		$criteria->with = array(
-			'view_cat' => array(
-				'alias'=>'view_cat',
-				'select'=>'category_name, category_desc, articles'
-			),
-			'creation_relation' => array(
-				'alias'=>'creation_relation',
-				'select'=>'displayname'
-			),
-			'modified_relation' => array(
-				'alias'=>'modified_relation',
-				'select'=>'displayname'
-			),
-		);
-		$criteria->compare('view_cat.category_name',strtolower($this->title), true);
-		$criteria->compare('view_cat.category_desc',strtolower($this->description), true);
+		$criteria->compare('view.category_name',strtolower($this->title), true);
+		$criteria->compare('view.category_desc',strtolower($this->description), true);
 		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
 		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
@@ -247,7 +248,7 @@ class ArticleCategory extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'header' => 'Count',
-				'value' => 'CHtml::link($data->view_cat->articles." ".Phrase::trans(26000,1), Yii::app()->controller->createUrl("o/admin/manage",array("category"=>$data->cat_id)))',
+				'value' => 'CHtml::link($data->view->articles.\' \'.Yii::t(\'attribute\', \'Article\'), Yii::app()->controller->createUrl("o/admin/manage",array("category"=>$data->cat_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
@@ -306,8 +307,8 @@ class ArticleCategory extends CActiveRecord
 	 * 0 = unpublish
 	 * 1 = publish
 	 */
-	public static function getCategory($publish=null, $dependency=null) {
-		
+	public static function getCategory($publish=null, $dependency=null) 
+	{		
 		$criteria=new CDbCriteria;
 		if($publish != null)
 			$criteria->compare('t.publish',$publish);
@@ -322,9 +323,9 @@ class ArticleCategory extends CActiveRecord
 				$items[$val->cat_id] = Phrase::trans($val->name, 2);
 			}
 			return $items;
-		} else {
+			
+		} else
 			return false;
-		}
 	}
 
 	/**

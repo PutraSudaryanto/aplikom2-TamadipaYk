@@ -128,7 +128,7 @@ class AdminController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Phrase::trans(25001,1);
+		$this->pageTitle = Yii::t('phrase', 'Manage Video Feeder');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -162,7 +162,7 @@ class AdminController extends Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('manage'),
 							'id' => 'partial-videos',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25003,1).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video feeder success created.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -176,7 +176,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 600;
 			
-			$this->pageTitle = Phrase::trans(25002,1);
+			$this->pageTitle = Yii::t('phrase', 'Create Video Feeder');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_add',array(
@@ -212,7 +212,7 @@ class AdminController extends Controller
 							'type' => 5,
 							'get' => Yii::app()->controller->createUrl('manage'),
 							'id' => 'partial-videos',
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25005,1).'</strong></div>',
+							'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video feeder success updated.').'</strong></div>',
 						));
 					} else {
 						print_r($model->getErrors());
@@ -226,7 +226,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 600;
 			
-			$this->pageTitle = Phrase::trans(25004,1).': '.$model->title;
+			$this->pageTitle = Yii::t('phrase', 'Update Video Feeder ').': '.$model->title;
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_edit',array(
@@ -288,7 +288,7 @@ class AdminController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-videos',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25007,1).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video feeder success deleted.').'</strong></div>',
 					));
 				}
 			}
@@ -298,7 +298,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(25006,1);
+			$this->pageTitle = Yii::t('phrase', 'Delete Video Feeder ');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -333,7 +333,7 @@ class AdminController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-videos',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25005,1).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video feeder success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -374,7 +374,7 @@ class AdminController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-videos',
-						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(24005,1).'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', '24005').'</strong></div>',
 					));
 				}
 			}
